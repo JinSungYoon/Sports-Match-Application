@@ -3,24 +3,25 @@ package core.player.repository;
 import java.util.List;
 import java.util.Optional;
 
-import javax.transaction.Transactional;
-
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import core.player.entity.Player;
-import core.player.entity.Team;
 
-@SpringBootTest
-//@DataJpaTest
-//@EnableAutoConfiguration
-//@ContextConfiguration(classes = {Player.class, PlayerRepository.class, Team.class, TeamRepository.class})
+import core.player.entity.PlayerEntity;
+import core.player.entity.TeamEntity;
+
+//@SpringBootTest
+@ExtendWith(SpringExtension.class)
+@DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class PlayerRepositoryTest {
 	
 	@Autowired
@@ -29,32 +30,33 @@ public class PlayerRepositoryTest {
 	private TeamRepository teamRepository;
 	
 	@Test
-	@Transactional
-	@DisplayName("Player 생성 확인")
+	@Rollback(false)
+	@DisplayName("Player 생성")
 	public void savePlayer() {
 		
-		Team team1 = new Team();
-		team1.setTeamId(1L);
-		team1.setName("team1");
+		TeamEntity team1 = new TeamEntity("team1","Team1팀 입니다.");
 		teamRepository.save(team1);
 
-		Player player1 = new Player();
-		player1.setName("player1");
-		player1.setResRegNo("220428-1111111");
-		player1.setUniformNo(1);		
-		player1.setTeam(team1);
-		team1.getPlayers().add(player1);
+		PlayerEntity player1 = new PlayerEntity("player1","220428-1111111",1,team1);
+		PlayerEntity player2 = new PlayerEntity("player2","220428-2222222",2,team1);
+		PlayerEntity player3 = new PlayerEntity("player2","220428-3333333",3,team1);
 		playerRepository.save(player1);
+		playerRepository.save(player2);
+		playerRepository.save(player3);
 		
-		Team findTeam = teamRepository.findByName("team1");
-		Assertions.assertThat(findTeam).isEqualTo(team1);
+		TeamEntity rtnTeam = teamRepository.findById(1L).orElse(null);
+		Assertions.assertThat(rtnTeam).isEqualTo(team1);
 		
-//		Optional<Player> rtnPlayer = playerRepository.findById(1L);
-//		Assertions.assertThat(rtnPlayer).isEqualTo(player1);
-//		Optional<Team> rtnTeam = teamRepository.findById(1L);
-//		Assertions.assertThat(rtnTeam).isEqualTo(team1);
+		PlayerEntity rtnPlayer = playerRepository.findByName("player1");
+		Assertions.assertThat(rtnPlayer).isEqualTo(player1);
+	
+	}
 
-		
+	@Test
+	@DisplayName("Team 이름으로 Player 목록 조회하기")
+	public void searchPlayerListByTeamName() {
+		List<PlayerEntity> list =  playerRepository.findByTeam_teamId(1L);
+		list.forEach(l->System.out.println(l));
 	}
 	
 }
