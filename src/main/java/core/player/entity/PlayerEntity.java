@@ -11,6 +11,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import core.player.dto.PlayerDto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -56,5 +57,14 @@ public class PlayerEntity {
 		this.team = team;
 	}
 	
+	public PlayerDto toDto() {
+		if(this == null) return null;
+		return PlayerDto.builder()
+				.name(name)
+				.resRegNo(resRegNo)
+				.uniformNo(uniformNo)
+				.team(team.toDto())
+				.build();
+	}
 	
 }

@@ -14,6 +14,7 @@ import javax.persistence.Lob;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import core.player.dto.TeamDto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -43,6 +44,14 @@ public class TeamEntity {
 	public TeamEntity(String name,String introduction) {
 		this.name   = name;
 		this.introduction = introduction;
+	}
+	
+	public TeamDto toDto() {
+		if(this==null) return null;
+		return TeamDto.builder()
+				.name(name)
+				.introduction(introduction)
+				.build();
 	}
 		
 }
