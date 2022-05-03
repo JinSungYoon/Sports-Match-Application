@@ -9,6 +9,6 @@ import core.player.entity.PlayerEntity;
 
 @Repository
 public interface PlayerRepository extends JpaRepository<PlayerEntity,Long> {
-	PlayerEntity findByName(String name);
+	PlayerEntity findByPlayerName(String name);
 	List<PlayerEntity> findByTeam_teamId(Long teamId);
 }

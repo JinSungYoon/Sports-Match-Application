@@ -5,6 +5,8 @@ import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -29,27 +31,36 @@ import lombok.ToString;
 public class TeamEntity {
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Column(name="TEAM_ID")
 	private Long teamId;
 	
 	@NonNull
-	@Column(name="NAME")
-	private String name;
+	@Column(name="TEAM_NAME")
+	private String teamName;
+	
+	private String location;
+	
+	@Enumerated(EnumType.STRING)
+	private BelongType belongType;
 	
 	@Lob
 	private String introduction;
 	
 	@Builder
-	public TeamEntity(String name,String introduction) {
-		this.name   = name;
+	public TeamEntity(String teamName,String location,BelongType belongType,String introduction) {
+		this.teamName   = teamName;
+		this.location = location;
+		this.belongType = belongType;
 		this.introduction = introduction;
 	}
 	
 	public TeamDto toDto() {
 		if(this==null) return null;
 		return TeamDto.builder()
-				.name(name)
+				.teamName(teamName)
+				.location(location)
+				.belongType(belongType)
 				.introduction(introduction)
 				.build();
 	}

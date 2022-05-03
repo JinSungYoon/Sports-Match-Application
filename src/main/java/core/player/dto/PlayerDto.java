@@ -17,21 +17,21 @@ import lombok.ToString;
 public class PlayerDto {
 	
 	@NotNull
-	private String name;
-	
-	@NotNull
-	@Size(min=14,max=14)
-	private String resRegNo;
+	private String playerName;
 	
 	@NotNull
 	@PositiveOrZero
 	private int uniformNo;
 	
+	@NotNull
+	@Size(min=14,max=14)
+	private String resRegNo;
+	
 	private TeamDto team;
 	
 	@Builder
-	public PlayerDto(String name,String resRegNo,int uniformNo,TeamDto team) {
-		this.name = name;
+	public PlayerDto(String playerName,String resRegNo,int uniformNo,TeamDto team) {
+		this.playerName = playerName;
 		this.resRegNo = resRegNo;
 		this.uniformNo = uniformNo;
 		this.team = team;
@@ -40,7 +40,7 @@ public class PlayerDto {
 	public PlayerEntity toEntity() {
 		if(this == null) return null;
 		return PlayerEntity.builder()
-				.name(name)
+				.playerName(playerName)
 				.resRegNo(resRegNo)
 				.uniformNo(uniformNo)
 				.team(team.toEntity())

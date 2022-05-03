@@ -26,18 +26,19 @@ import lombok.ToString;
 public class PlayerEntity {
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name="PLAYER_ID")
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long playerId;
 	
 	@NonNull
-	@Column(name="NAME",nullable = false,length=20)
-	private String name;
+	@Column(name="PLAYER_NAME",nullable = false,length=20)
+	private String playerName;
 	
 	@NonNull
 	@Column(name="RES_REG_NO",nullable = false,length=14)
 	private String resRegNo;
 	
+	@NonNull
 	@Column(name="UNIFORM_NO",unique=true)
 	private int uniformNo;
 	
@@ -50,8 +51,8 @@ public class PlayerEntity {
 	}
 	
 	@Builder
-	public PlayerEntity(String name,String resRegNo,int uniformNo,TeamEntity team) {
-		this.name = name;
+	public PlayerEntity(String playerName,String resRegNo,int uniformNo,TeamEntity team) {
+		this.playerName = playerName;
 		this.resRegNo = resRegNo;
 		this.uniformNo = uniformNo;
 		this.team = team;
@@ -60,7 +61,7 @@ public class PlayerEntity {
 	public PlayerDto toDto() {
 		if(this == null) return null;
 		return PlayerDto.builder()
-				.name(name)
+				.playerName(playerName)
 				.resRegNo(resRegNo)
 				.uniformNo(uniformNo)
 				.team(team.toDto())
