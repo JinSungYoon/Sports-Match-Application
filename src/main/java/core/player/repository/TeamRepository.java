@@ -14,6 +14,7 @@ public interface TeamRepository extends JpaRepository<TeamEntity,Long> {
 	TeamEntity findByTeamName(String name);
 	List<TeamEntity> findByLocation(String location);
 	List<TeamEntity> findByBelongType(BelongType belongType);
+	List<TeamEntity> findByIntroductionLike(String keyword);
 	
 	
 }

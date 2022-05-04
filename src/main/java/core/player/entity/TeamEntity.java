@@ -15,12 +15,12 @@ import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 import core.player.dto.TeamDto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import lombok.ToString;
 
 @Getter
@@ -28,19 +28,15 @@ import lombok.ToString;
 @Entity
 @Table(name="TEAM")
 @NoArgsConstructor
-public class TeamEntity {
+public class TeamEntity extends BaseEntity{
 	
-	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	@Column(name="TEAM_ID")
-	private Long teamId;
-	
-	@NonNull
-	@Column(name="TEAM_NAME")
+	@NotNull
+	@Column(name="TEAM_NAME",nullable=false)
 	private String teamName;
 	
 	private String location;
 	
+	@NotNull
 	@Enumerated(EnumType.STRING)
 	private BelongType belongType;
 	
@@ -49,6 +45,13 @@ public class TeamEntity {
 	
 	@Builder
 	public TeamEntity(String teamName,String location,BelongType belongType,String introduction) {
+		this.teamName   = teamName;
+		this.location = location;
+		this.belongType = belongType;
+		this.introduction = introduction;
+	}
+	
+	public void updateInfo(String teamName,String location,BelongType belongType,String instroduction) {
 		this.teamName   = teamName;
 		this.location = location;
 		this.belongType = belongType;

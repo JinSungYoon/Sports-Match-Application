@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 import core.player.dto.PlayerDto;
 import lombok.Builder;
@@ -23,22 +24,17 @@ import lombok.ToString;
 @Entity
 @Table(name="PLAYER")
 @NoArgsConstructor
-public class PlayerEntity {
+public class PlayerEntity extends BaseEntity{
 	
-	@Id
-	@Column(name="PLAYER_ID")
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	private Long playerId;
-	
-	@NonNull
+	@NotNull
 	@Column(name="PLAYER_NAME",nullable = false,length=20)
 	private String playerName;
 	
-	@NonNull
+	@NotNull
 	@Column(name="RES_REG_NO",nullable = false,length=14)
 	private String resRegNo;
 	
-	@NonNull
+	@NotNull
 	@Column(name="UNIFORM_NO",unique=true)
 	private int uniformNo;
 	
@@ -52,6 +48,13 @@ public class PlayerEntity {
 	
 	@Builder
 	public PlayerEntity(String playerName,String resRegNo,int uniformNo,TeamEntity team) {
+		this.playerName = playerName;
+		this.resRegNo = resRegNo;
+		this.uniformNo = uniformNo;
+		this.team = team;
+	}
+	
+	public void updateInfo(String playerName,String resRegno,int uniformNo,TeamEntity team) {
 		this.playerName = playerName;
 		this.resRegNo = resRegNo;
 		this.uniformNo = uniformNo;
