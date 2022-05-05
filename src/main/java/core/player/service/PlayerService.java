@@ -7,8 +7,8 @@ import core.player.entity.PlayerEntity;
 
 public interface PlayerService {
 	PlayerDto findPlayer(Long id);
-	void createPlayer(PlayerDto player);
-	void createPlayers(List<PlayerDto> players);
+	Long registerPlayer(PlayerDto player);
+	void registerPlayers(List<PlayerDto> players);
 	void updatePlayer(PlayerDto player);
 	void deletePlyaer(Long id);
 }
