@@ -54,6 +54,13 @@ public class PlayerEntity extends BaseEntity{
 		this.team = team;
 	}
 	
+	public void setPlayerEntity(PlayerDto dto) {
+		this.playerName = dto.getPlayerName();
+		this.resRegNo = dto.getResRegNo();
+		this.uniformNo = dto.getUniformNo();
+		this.team = dto.getTeam().toEntity();
+	}
+	
 	public void updateInfo(String playerName,String resRegno,int uniformNo,TeamEntity team) {
 		this.playerName = playerName;
 		this.resRegNo = resRegNo;
