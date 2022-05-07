@@ -1,4 +1,4 @@
-package core.player.repository;
+package core.team.repository;
 
 import java.util.List;
 
@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import core.player.entity.BelongType;
-import core.player.entity.TeamEntity;
+import core.team.entity.TeamEntity;
 
 @Repository
 public interface TeamRepository extends JpaRepository<TeamEntity,Long> {
