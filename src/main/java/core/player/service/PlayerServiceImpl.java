@@ -11,9 +11,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import core.player.dto.PlayerDto;
 import core.player.entity.PlayerEntity;
-import core.player.entity.TeamEntity;
 import core.player.repository.PlayerRepository;
-import core.player.repository.TeamRepository;
+import core.team.entity.TeamEntity;
+import core.team.repository.TeamRepository;
 
 @Service
 public class PlayerServiceImpl implements PlayerService {
@@ -21,7 +21,7 @@ public class PlayerServiceImpl implements PlayerService {
 	private final PlayerRepository playerRepository;
 	private final TeamRepository teamRepository;
 	
-	public PlayerServiceImpl(final PlayerRepository playerRepository,final TeamRepository teamRepository) {
+	public PlayerServiceImpl(PlayerRepository playerRepository,TeamRepository teamRepository) {
 		this.playerRepository = playerRepository;
 		this.teamRepository   = teamRepository;
 	}
@@ -29,14 +29,14 @@ public class PlayerServiceImpl implements PlayerService {
 	
 	@Override
 	@Transactional(readOnly=true)	// JPA 변경감지 내부 기능 비활성화, update시 정합성을 유지 
-	public PlayerDto findOnePlayer(Long id) {
+	public PlayerDto searchOnePlayer(Long id) {
 		PlayerEntity playerEntity = playerRepository.findById(id).orElseThrow(()->new IllegalArgumentException("Id가 존재하지 않습니다."));
 		return playerEntity.toDto();
 	}
 	
 	@Override
 	@Transactional(readOnly=true)
-	public List<PlayerDto> findPlayerAll() {
+	public List<PlayerDto> searchPlayerAll() {
 		List<PlayerEntity> entityList = playerRepository.findAll();
 		List<PlayerDto> dtoList = entityList.stream().map(PlayerEntity::toDto).collect(Collectors.toList());
 		return dtoList;

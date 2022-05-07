@@ -8,42 +8,43 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import core.player.dto.PlayerDto;
-import core.player.entity.PlayerEntity;
 import core.player.service.PlayerService;
 
 @RestController
+@RequestMapping(value="/player")
 public class PlayerController {
 	
 	private final PlayerService playerService;
 	
-	public PlayerController(final PlayerService playerService) {
+	public PlayerController(PlayerService playerService) {
 		this.playerService = playerService;
 	};
 	
-	@PostMapping("/player")
+	@PostMapping("/register")
 	public ResponseEntity<?> register(@RequestBody PlayerDto dto){
-		return new ResponseEntity<>(playerService.registerPlayer(dto),HttpStatus.OK);
+		return new ResponseEntity<>(playerService.registerPlayer(dto),HttpStatus.CREATED);
 	}
 
-	@GetMapping("/player/{id}")
-	public ResponseEntity<?> findPlayer(@PathVariable Long id){
-		return new ResponseEntity<>(playerService.findOnePlayer(id),HttpStatus.OK);
+	@GetMapping("/{id}")
+	public ResponseEntity<?> searchOnePlayer(@PathVariable Long id){
+		return new ResponseEntity<>(playerService.searchOnePlayer(id),HttpStatus.OK);
 	}
 	
-	@GetMapping("/players")
-	public ResponseEntity<?> findAll(){
-		return new ResponseEntity<>(playerService.findPlayerAll(),HttpStatus.OK);
+	@GetMapping("/all")
+	public ResponseEntity<?> searchPlayerAll(){
+		return new ResponseEntity<>(playerService.searchPlayerAll(),HttpStatus.OK);
 	}
 	
-	@PutMapping("/player/{id}")
+	@PutMapping("/{id}")
 	public ResponseEntity<?> update(@PathVariable Long id,@RequestBody PlayerDto dto){
 		return new ResponseEntity<>(playerService.updatePlayer(id, dto),HttpStatus.OK);
 	}
 	
-	@DeleteMapping("/player/{id}")
+	@DeleteMapping("/{id}")
 	public ResponseEntity<?> delete(@PathVariable Long id){
 		return new ResponseEntity<>(playerService.deletePlyaer(id),HttpStatus.OK);
 	};
