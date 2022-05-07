@@ -1,4 +1,4 @@
-package core.player.entity;
+package core.team.entity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +17,10 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
-import core.player.dto.TeamDto;
+import core.player.dto.PlayerDto;
+import core.player.entity.BaseEntity;
+import core.player.entity.BelongType;
+import core.team.dto.TeamDto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -49,6 +52,13 @@ public class TeamEntity extends BaseEntity{
 		this.location = location;
 		this.belongType = belongType;
 		this.introduction = introduction;
+	}
+	
+	public void setTeamEntity(TeamDto dto) {
+		this.teamName   = dto.getTeamName();
+		this.location = dto.getLocation();
+		this.belongType = dto.getBelongType();
+		this.introduction = dto.getIntroduction();
 	}
 	
 	public void updateInfo(String teamName,String location,BelongType belongType,String instroduction) {

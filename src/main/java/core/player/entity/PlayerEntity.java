@@ -13,6 +13,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import core.player.dto.PlayerDto;
+import core.team.entity.TeamEntity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
