@@ -1,4 +1,4 @@
-package core.player.repository;
+package core.team.repository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,12 +15,13 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import core.player.entity.BelongType;
-import core.player.entity.TeamEntity;
+import core.team.entity.TeamEntity;
+import core.team.repository.TeamRepository;
 
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class TeamRepositoryTest {
+public class TeamRepositoryUnitTest {
 	
 	@Autowired
 	TeamRepository teamRepository;

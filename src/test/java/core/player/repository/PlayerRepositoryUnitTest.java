@@ -1,27 +1,31 @@
 package core.player.repository;
 
 import java.util.List;
-import java.util.Optional;
+
+import javax.transaction.Transactional;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import core.player.entity.BelongType;
 import core.player.entity.PlayerEntity;
-import core.player.entity.TeamEntity;
+import core.team.entity.TeamEntity;
+import core.team.repository.TeamRepository;
 
-//@SpringBootTest
-@ExtendWith(SpringExtension.class)
+/* 단위 테스트(DB 관련된 Bean이 IoC에 등록)
+ * @DataJpaTest Repository관련 Bean을 Ioc를 등록
+ * */
+
 @DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class PlayerRepositoryTest {
+@Transactional
+//@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)	// 가짜 DB
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)	// 실제 DB
+public class PlayerRepositoryUnitTest {
 	
 	@Autowired
 	private PlayerRepository playerRepository;
