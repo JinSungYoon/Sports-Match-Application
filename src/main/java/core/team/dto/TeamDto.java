@@ -1,9 +1,9 @@
-package core.player.dto;
+package core.team.dto;
 
 import javax.validation.constraints.NotNull;
 
 import core.player.entity.BelongType;
-import core.player.entity.TeamEntity;
+import core.team.entity.TeamEntity;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
