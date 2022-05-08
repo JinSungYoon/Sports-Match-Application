@@ -9,7 +9,7 @@ public interface PlayerService {
 	PlayerDto searchOnePlayer(Long id);
 	List<PlayerDto> searchPlayerAll();
 	PlayerDto registerPlayer(PlayerDto player);
-	List<PlayerDto> registerPlayers(List<PlayerDto> players);
+	List<PlayerDto> registerPlayers(List<PlayerDto> players) throws Exception;
 	PlayerDto updatePlayer(Long id,PlayerDto player);
 	Long deletePlyaer(Long id);
 }

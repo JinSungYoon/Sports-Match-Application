@@ -40,12 +40,22 @@ public class PlayerDto {
 	
 	public PlayerEntity toEntity() {
 		if(this == null) return null;
-		return PlayerEntity.builder()
-				.playerName(playerName)
-				.resRegNo(resRegNo)
-				.uniformNo(uniformNo)
-				.team(team.toEntity())
-				.build();
+		if(team!=null) {
+			return PlayerEntity.builder()
+					.playerName(playerName)
+					.resRegNo(resRegNo)
+					.uniformNo(uniformNo)
+					.team(team.toEntity())
+					.build();
+		}else {
+			return PlayerEntity.builder()
+					.playerName(playerName)
+					.resRegNo(resRegNo)
+					.uniformNo(uniformNo)
+					.team(null)
+					.build();
+		}
+		
 				
 	}
 	

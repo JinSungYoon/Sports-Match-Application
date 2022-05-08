@@ -75,8 +75,21 @@ public class PlayerServiceImpl implements PlayerService {
 
 	@Override
 	@Transactional
-	public List<PlayerDto> registerPlayers(List<PlayerDto> players) {
+	public List<PlayerDto> registerPlayers(List<PlayerDto> players) throws Exception {
+		
 		List<PlayerDto> list= new ArrayList<PlayerDto>();
+		
+		List<Integer> uniformList = players.stream().map(PlayerDto::getUniformNo).distinct().collect(Collectors.toList());
+		// 입력받느 players의 수와 uniform 숫자만 중복없이 정렬했을때의 수가 같다면 그대로 진행. 
+		if(uniformList.size()==players.size()) {
+			// 입력받은 player를 한번씩 저장한다.
+			for(PlayerDto dto : players) {
+				list.add(registerPlayer(dto));
+			}
+		}else{
+			throw new Exception("Uniform 번호는 중복 될 수 없습니다.");
+		}
+		
 		return list;
 		
 	}
