@@ -59,7 +59,12 @@ public class PlayerEntity extends BaseEntity{
 		this.playerName = dto.getPlayerName();
 		this.resRegNo = dto.getResRegNo();
 		this.uniformNo = dto.getUniformNo();
-		this.team = dto.getTeam().toEntity();
+		if(dto.isExistTeam()) {
+			this.team = dto.getTeam().toEntity();
+		}else {
+			this.team = null;
+		}
+		
 	}
 	
 	public void updateInfo(String playerName,String resRegno,int uniformNo,TeamEntity team) {

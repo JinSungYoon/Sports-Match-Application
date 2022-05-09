@@ -55,8 +55,14 @@ public class PlayerDto {
 					.team(null)
 					.build();
 		}
-		
-				
+	}
+	
+	public boolean isExistTeam() {
+		if (this.team == null) {
+			return false;
+		}else {
+			return true;
+		}
 	}
 	
 }

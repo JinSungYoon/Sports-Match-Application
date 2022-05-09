@@ -1,7 +1,10 @@
 package core.player.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -12,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import core.player.dto.PlayerDto;
 import core.player.entity.PlayerEntity;
 import core.player.repository.PlayerRepository;
+import core.team.dto.TeamDto;
 import core.team.entity.TeamEntity;
 import core.team.repository.TeamRepository;
 
@@ -80,12 +84,30 @@ public class PlayerServiceImpl implements PlayerService {
 		List<PlayerDto> list= new ArrayList<PlayerDto>();
 		
 		List<Integer> uniformList = players.stream().map(PlayerDto::getUniformNo).distinct().collect(Collectors.toList());
-		// 입력받느 players의 수와 uniform 숫자만 중복없이 정렬했을때의 수가 같다면 그대로 진행. 
+		// 입력받는 players의 수와 uniform 숫자만 중복없이 정렬했을때의 수가 같다면 그대로 진행. 
 		if(uniformList.size()==players.size()) {
-			// 입력받은 player를 한번씩 저장한다.
-			for(PlayerDto dto : players) {
-				list.add(registerPlayer(dto));
+			// team이 존재하는 선수들 먼저 저장.
+			Map<TeamDto, List<PlayerDto>> havingTeam =  players.stream().filter(dto->dto.getTeam()!=null).collect(Collectors.groupingBy(dto->dto.getTeam()));
+			for(TeamDto team : havingTeam.keySet()) {
+				List<PlayerEntity> existingPlayerList = playerRepository.findByTeam_teamName(team.getTeamName());
+				List<Integer> existingUniformList =  existingPlayerList.stream().map(PlayerEntity::getUniformNo).collect(Collectors.toList());
+				List<Integer> newUniformList = havingTeam.get(team).stream().map(PlayerDto::getUniformNo).collect(Collectors.toList());
+				// DB에서 존재하는 Team의 Uniform 번호들과 신규로 등록하려는 Uniform 번허들이 갖지 않다면 저장 / 같다면 Exception 발생
+				if(!existingUniformList.containsAll(newUniformList)) {
+					List<PlayerEntity> newPlayerEntityList =  havingTeam.get(team).stream().map(PlayerDto::toEntity).collect(Collectors.toList());
+					List<PlayerEntity> savePlayerEntityList = playerRepository.saveAll(newPlayerEntityList);
+					List<PlayerDto> dtoList =  savePlayerEntityList.stream().map(item->item.toDto()).collect(Collectors.toList());
+					list.addAll(dtoList);
+				}else {
+					throw new Exception("기존에 존재하는 Uniform 번호와 중복 될 수 없습니다.");
+				}
 			}
+			// team이 존재하지 않는 선수들 저장.
+			List<PlayerDto> nonHavingTeam =  players.stream().filter(dto->dto.getTeam()==null).collect(Collectors.toList());
+			List<PlayerEntity> newPlayerEntityList =  nonHavingTeam.stream().map(PlayerDto::toEntity).collect(Collectors.toList());
+			List<PlayerEntity> savePlayerEntityList = playerRepository.saveAll(newPlayerEntityList);
+			List<PlayerDto> dtoList =  savePlayerEntityList.stream().map(item->item.toDto()).collect(Collectors.toList());
+			list.addAll(dtoList);
 		}else{
 			throw new Exception("Uniform 번호는 중복 될 수 없습니다.");
 		}

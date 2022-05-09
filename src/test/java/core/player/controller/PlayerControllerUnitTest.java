@@ -2,8 +2,10 @@ package core.player.controller;
 
 
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -11,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -98,6 +101,50 @@ class PlayerControllerUnitTest {
 		resultAction
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.playerName").value("player1"))
+			.andDo(MockMvcResultHandlers.print());
+	}
+	
+	@Test
+	@DisplayName("Player 정보 업데이트")
+	public void updatePlayer() throws Exception{
+		// given
+		List<PlayerDto> players = new ArrayList<>();
+		players.add(new PlayerDto("player1","220509-1111111",1,null));
+		players.add(new PlayerDto("player1","220509-1111111",1,null));
+		
+		playerService.registerPlayers(players);
+		
+		Long id = 1L;
+		PlayerDto player = new PlayerDto("player1","220509-1111111",1,null);
+		String content = new ObjectMapper().writeValueAsString(player);
+		when(playerService.updatePlayer(id,player)).thenReturn(new PlayerDto("player1","220509-1111111",1,null));
+		// when
+		
+		ResultActions resultAction = mockMvc.perform(put("/player/{id}",id)
+				.contentType(MediaType.APPLICATION_JSON_UTF8)
+				.content(content)
+				.accept(MediaType.APPLICATION_JSON_UTF8));
+		// then
+		resultAction
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.uniformNo").value(1))
+			.andDo(MockMvcResultHandlers.print());
+	}
+	
+	@Test
+	@DisplayName("Player 정보 삭제하기")
+	public void deletePlayer() throws Exception{
+		// given
+		Long id = 1L;
+		when(playerService.deletePlyaer(id)).thenReturn(1L);
+		// when
+		ResultActions resultAction = mockMvc.perform(delete("/player/{id}",id)
+				.contentType(MediaType.APPLICATION_JSON_UTF8)
+				.accept(MediaType.APPLICATION_JSON_UTF8));
+		// then
+		resultAction
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$").value(1L))
 			.andDo(MockMvcResultHandlers.print());
 	}
 	
