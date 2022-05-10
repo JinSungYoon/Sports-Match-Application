@@ -9,6 +9,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.MappedSuperclass;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
@@ -24,6 +25,7 @@ import lombok.ToString;
 @ToString
 @Entity
 @Table(name="PLAYER")
+@MappedSuperclass
 @NoArgsConstructor
 public class PlayerEntity extends BaseEntity{
 	
@@ -67,7 +69,7 @@ public class PlayerEntity extends BaseEntity{
 		
 	}
 	
-	public void updateInfo(String playerName,String resRegno,int uniformNo,TeamEntity team) {
+	public void updateInfo(String playerName,String resRegNo,int uniformNo,TeamEntity team) {
 		this.playerName = playerName;
 		this.resRegNo = resRegNo;
 		this.uniformNo = uniformNo;
