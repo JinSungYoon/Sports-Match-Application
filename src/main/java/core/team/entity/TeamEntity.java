@@ -33,6 +33,11 @@ import lombok.ToString;
 @NoArgsConstructor
 public class TeamEntity extends BaseEntity{
 	
+	@Id
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@Column(name="TEAM_ID")
+	public Long id;
+	
 	@NotNull
 	@Column(name="TEAM_NAME",nullable=false)
 	private String teamName;
@@ -61,7 +66,7 @@ public class TeamEntity extends BaseEntity{
 		this.introduction = dto.getIntroduction();
 	}
 	
-	public void updateInfo(String teamName,String location,BelongType belongType,String instroduction) {
+	public void updateInfo(String teamName,String location,BelongType belongType,String introduction) {
 		this.teamName   = teamName;
 		this.location = location;
 		this.belongType = belongType;

@@ -1,16 +1,24 @@
 package core.player.repository;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.util.List;
 
+import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import core.player.entity.BelongType;
 import core.player.entity.PlayerEntity;
@@ -22,15 +30,24 @@ import core.team.repository.TeamRepository;
  * */
 
 @DataJpaTest
-@Transactional
-//@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)	// 가짜 DB
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)	// 실제 DB
+@AutoConfigureTestDatabase(replace = Replace.NONE)
 public class PlayerRepositoryUnitTest {
 	
 	@Autowired
 	private PlayerRepository playerRepository;
 	@Autowired
 	private TeamRepository teamRepository;
+	
+	@Autowired
+	EntityManager entityManager;
+	
+	@AfterEach
+	public void init() {
+		playerRepository.deleteAll();
+		entityManager
+		.createNativeQuery("ALTER TABLE player AUTO_INCREMENT = 1;")
+		.executeUpdate() ;
+	}
 	
 	@Test
 	@DisplayName("Player 생성")
@@ -51,14 +68,26 @@ public class PlayerRepositoryUnitTest {
 		
 		PlayerEntity rtnPlayer = playerRepository.findByPlayerName("player1");
 		Assertions.assertThat(rtnPlayer).isEqualTo(player1);
-	
+		Assertions.assertThat(rtnPlayer.getId()).isEqualTo(1L);
 	}
 
 	@Test
 	@DisplayName("Team Id로 Player 목록 조회하기")
 	public void searchPlayerListByTeamId() {
+		TeamEntity team1 = new TeamEntity("team1","서울",BelongType.CLUB,"Team1팀 입니다.");
+		teamRepository.save(team1);
+
+		PlayerEntity player1 = new PlayerEntity("player1","220428-1111111",1,team1);
+		PlayerEntity player2 = new PlayerEntity("player2","220428-2222222",2,team1);
+		PlayerEntity player3 = new PlayerEntity("player2","220428-3333333",3,team1);
+		playerRepository.save(player1);
+		playerRepository.save(player2);
+		playerRepository.save(player3);
+		
 		List<PlayerEntity> list =  playerRepository.findByTeam_id(1L);
-		list.forEach(l->System.out.println(l));
+		Assertions.assertThat(list.get(0).getPlayerName()).isEqualTo(player1.getPlayerName());
+		Assertions.assertThat(list.get(1).getResRegNo()).isEqualTo(player2.getResRegNo());
+		Assertions.assertThat(list.get(2).getUniformNo()).isEqualTo(player3.getUniformNo());
 	}
 	
 	@Test
@@ -82,8 +111,15 @@ public class PlayerRepositoryUnitTest {
 		playerRepository.save(player5);
 		playerRepository.save(player6);
 		playerRepository.save(player7);
-		List<PlayerEntity> list = playerRepository.findByTeam_teamName("team1");
-		list.forEach(d->System.out.println(d.toString()));
+		List<PlayerEntity> list1 = playerRepository.findByTeam_teamName("team1");
+		Assertions.assertThat(list1.get(0).getPlayerName()).isEqualTo(player1.getPlayerName());
+		Assertions.assertThat(list1.get(1).getResRegNo()).isEqualTo(player3.getResRegNo());
+		Assertions.assertThat(list1.get(2).getUniformNo()).isEqualTo(player6.getUniformNo());
+		List<PlayerEntity> list2 = playerRepository.findByTeam_teamName("team2");
+		Assertions.assertThat(list2.get(0).getPlayerName()).isEqualTo(player2.getPlayerName());
+		Assertions.assertThat(list2.get(1).getResRegNo()).isEqualTo(player4.getResRegNo());
+		Assertions.assertThat(list2.get(2).getUniformNo()).isEqualTo(player5.getUniformNo());
+		Assertions.assertThat(list2.get(3).getTeam()).isEqualTo(player7.getTeam());
 	}
 	
 }

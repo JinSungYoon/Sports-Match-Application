@@ -9,7 +9,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.MappedSuperclass;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
@@ -18,16 +17,19 @@ import core.team.entity.TeamEntity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import lombok.ToString;
 
 @Getter
 @ToString
 @Entity
 @Table(name="PLAYER")
-@MappedSuperclass
 @NoArgsConstructor
 public class PlayerEntity extends BaseEntity{
+	
+	@Id
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@Column(name="PLAYER_ID")
+	public Long id;
 	
 	@NotNull
 	@Column(name="PLAYER_NAME",nullable = false,length=20)
@@ -66,7 +68,6 @@ public class PlayerEntity extends BaseEntity{
 		}else {
 			this.team = null;
 		}
-		
 	}
 	
 	public void updateInfo(String playerName,String resRegNo,int uniformNo,TeamEntity team) {
