@@ -47,7 +47,7 @@ class PlayerControllerUnitTest {
 		
 	@Test
 	public void register() throws Exception {
-		
+		log.info("=============================== Start Register test ===============================");
 		// given
 		PlayerDto dto = new PlayerDto("player1","220507-1111111",1,null);
 		String content = new ObjectMapper().writeValueAsString(dto);
@@ -64,7 +64,7 @@ class PlayerControllerUnitTest {
 			.andExpect(status().isCreated())
 			.andExpect(jsonPath("$.playerName").value("player1"))
 			.andDo(MockMvcResultHandlers.print());
-		log.info("=============================== Register test Start ===============================");
+		log.info("=============================== End Register test ===============================");
 	}
 	
 	@Test

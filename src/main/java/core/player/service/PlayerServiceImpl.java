@@ -56,7 +56,6 @@ public class PlayerServiceImpl implements PlayerService {
 			List<PlayerEntity> playerList =  playerRepository.findByTeam_teamName(player.getTeam().getTeamName());
 			// 만일 팀이 존재하지 않는다면, 팀을 등록하고 선수를 등록해준다.
 			if(playerList.size() == 0) {
-				//teamRepository.save(player.getTeam().toEntity());
 				PlayerEntity playerEntity = playerRepository.save(player.toEntity());
 				return playerEntity.toDto();
 			}else {
