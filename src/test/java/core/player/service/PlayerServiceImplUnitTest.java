@@ -5,6 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.*;
 
+import java.io.UnsupportedEncodingException;
+import java.security.GeneralSecurityException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -18,8 +21,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
 
-
+import core.common.encryption.AES256Util;
 import core.player.MockEntity;
 import core.player.dto.PlayerDto;
 import core.player.entity.BelongType;
@@ -47,54 +51,73 @@ public class PlayerServiceImplUnitTest {
 	
 	@Mock
 	private TeamRepository teamRepository;
+	
+	@Mock
+	private AES256Util aes256Util;
 		
 	@Test
 	@DisplayName("Player 생성 테스트")
-	public void registerPlayerTest() {
+	public void registerPlayerTest() throws NoSuchAlgorithmException, UnsupportedEncodingException, GeneralSecurityException {
 		// given
+		// 주민번호 암호화
+		String key = "verystrongsecretkey";
+		AES256Util aes256 = new AES256Util(key);
+		String encryptResRegNo = aes256.encrypt("111111-1111111");
+		// Player 객체 생성
 		TeamDto team = new TeamDto("fakeTeam","Earth",BelongType.CLUB,"Fake team 입니다");
 		PlayerDto player = new PlayerDto("fakePlayer","111111-1111111",0,team);
 		
 		// mocking
-		when(playerRepository.save(any())).thenReturn(player.toEntity());
+		when(playerRepository.save(any())).thenReturn(new PlayerDto("fakePlayer",encryptResRegNo,0,team).toEntity());
 		
 		// when
 		PlayerDto newPlayer = playerService.registerPlayer(player);
-		
+		log.info(newPlayer.getResRegNo());
+
 		//then
 		Assertions.assertThat(newPlayer.getPlayerName()).isEqualTo(player.getPlayerName());
-		Assertions.assertThat(newPlayer.getResRegNo()).isEqualTo(player.getResRegNo());
+		Assertions.assertThat(newPlayer.getResRegNo()).isEqualTo(encryptResRegNo);
 		Assertions.assertThat(newPlayer.getUniformNo()).isEqualTo(player.getUniformNo());
 		
 	}
 	
 	@Test
 	@DisplayName("한명의 플레이어 찾기")
-	public void searchOnePlayer() {
+	public void searchOnePlayer() throws UnsupportedEncodingException,NoSuchAlgorithmException, GeneralSecurityException {
 		// given
+		// 주민번호 암호화
+		String key = "verystrongsecretkey";
+		AES256Util aes256 = new AES256Util(key);
+		String encryptResRegNo = aes256.encrypt("111111-1111111");
+		// Player 객체생성
 		TeamDto team = new TeamDto("fakeTeam","Earth",BelongType.CLUB,"Fake team 입니다");
 		PlayerDto player = new PlayerDto("fakePlayer","111111-1111111",0,team);
 		
 		// mocking
-		when(playerRepository.findById(any())).thenReturn(Optional.of(player.toEntity()));
+		when(playerRepository.findById(any())).thenReturn(Optional.of(new PlayerDto("fakePlayer",encryptResRegNo,0,team).toEntity()));
 		
 		// when
 		PlayerDto findPlayer = playerService.searchOnePlayer(1L);
 		
 		// then
 		assertThat(findPlayer.getPlayerName()).isEqualTo(player.getPlayerName());
-		assertThat(findPlayer.getResRegNo()).isEqualTo(player.getResRegNo());
+		assertThat(findPlayer.getResRegNo()).isEqualTo(encryptResRegNo);
 		assertThat(findPlayer.getUniformNo()).isEqualTo(player.getUniformNo());
 		assertThat(findPlayer.getTeam()).isEqualTo(player.getTeam());
 	}
 	
 	@Test
 	@DisplayName("존재하지 않는 Player찾기")
-	public void searchNotExistPlayer() {
+	public void searchNotExistPlayer() throws NoSuchAlgorithmException, UnsupportedEncodingException, GeneralSecurityException {
 		// given
+		// 주민번호 암호화
+		String key = "verystrongsecretkey";
+		AES256Util aes256 = new AES256Util(key);
+		String encryptResRegNo = aes256.encrypt("111111-1111111");
+		// Player 객체생성
 		TeamDto team = new TeamDto("fakeTeam","Earth",BelongType.CLUB,"Fake team 입니다");
 		PlayerDto player = new PlayerDto("fakePlayer","111111-1111111",0,team);
-		when(playerRepository.save(any())).thenReturn(player.toEntity());
+		when(playerRepository.save(any())).thenReturn(new PlayerDto("fakePlayer",encryptResRegNo,0,team).toEntity());
 		playerService.registerPlayer(player);
 		when(playerRepository.findById(3L)).thenThrow(new IllegalArgumentException("Id가 존재하지 않습니다."));
 		
@@ -109,6 +132,10 @@ public class PlayerServiceImplUnitTest {
 	@DisplayName("Player 전체 조회")
 	public void searchPlayerAll() throws Exception {
 		// given
+		// 주민번호 암호화
+		String key = "verystrongsecretkey";
+		AES256Util aes256 = new AES256Util(key);
+		// Player List 객체 생성
 		List<PlayerDto> list = new ArrayList<>();
 		TeamDto team = new TeamDto("fakeTeam","Earth",BelongType.CLUB,"Fake team 입니다");
 		PlayerDto player1 = new PlayerDto("fakePlayer","111111-1111111",1,team);
@@ -140,6 +167,10 @@ public class PlayerServiceImplUnitTest {
 	@DisplayName("여러명의 Player 가입하기")
 	public void registersPlayer() throws Exception {
 		// given
+		// 주민번호 암호화
+		String key = "verystrongsecretkey";
+		AES256Util aes256 = new AES256Util(key);
+		// Player 객체 생성
 		List<PlayerDto> list = new ArrayList<>();
 		TeamDto team = new TeamDto("fakeTeam","Earth",BelongType.CLUB,"Fake team 입니다");
 		PlayerDto player1 = new PlayerDto("fakePlayer","111111-1111111",1,team);
@@ -150,25 +181,36 @@ public class PlayerServiceImplUnitTest {
 		list.add(player2);
 		list.add(player3);
 		list.add(player4);
+		
+		for(PlayerDto item : list) {
+			item.setResRegNo(aes256.encrypt(item.getResRegNo()));  
+		}
+		
 		when(playerRepository.saveAll(any())).thenReturn(list.stream().map(PlayerDto::toEntity).collect(Collectors.toList()));
 		
 		// when
 		List<PlayerDto> rtnPlayers = playerService.registerPlayers(list);
 		
+		log.info(rtnPlayers.toString());
+		
 		// then
-		assertThat(rtnPlayers.get(0)).isEqualTo(player1);
-		assertThat(rtnPlayers.get(1)).isEqualTo(player2);
-		assertThat(rtnPlayers.get(2)).isEqualTo(player3);
-		assertThat(rtnPlayers.get(3)).isEqualTo(player4);
+		assertThat(rtnPlayers.get(0)).isEqualTo(new PlayerDto("fakePlayer",aes256.encrypt("111111-1111111"),1,team));
+		assertThat(rtnPlayers.get(1)).isEqualTo(new PlayerDto("fakePlayer",aes256.encrypt("111111-2222222"),2,team));
+		assertThat(rtnPlayers.get(2)).isEqualTo(new PlayerDto("fakePlayer",aes256.encrypt("111111-3333333"),3,team));
+		assertThat(rtnPlayers.get(3)).isEqualTo(new PlayerDto("fakePlayer",aes256.encrypt("111111-4444444"),4,team));
 		
 	}
 	
 	@Test
 	@DisplayName("Player 업데이트 하기")
-	public void updatePlayer() {
+	public void updatePlayer() throws NoSuchAlgorithmException, UnsupportedEncodingException, GeneralSecurityException {
 		// given
+		// 주민번호 암호화
+		String key = "verystrongsecretkey";
+		AES256Util aes256 = new AES256Util(key);
+		// Player 객체 생성
 		TeamDto team = new TeamDto("fakeTeam","Earth",BelongType.CLUB,"Fake team 입니다");
-		PlayerDto originPlayer = new PlayerDto("fakePlayer","111111-1111111",1,team);
+		PlayerDto originPlayer = new PlayerDto("fakePlayer",aes256.encrypt("111111-1111111"),1,team);
 		when(playerRepository.save(any())).thenReturn(originPlayer.toEntity());
 		PlayerDto rtnPlayer = playerService.registerPlayer(originPlayer);
 		when(playerRepository.findById(1L)).thenReturn(Optional.of(originPlayer.toEntity()));
@@ -188,7 +230,7 @@ public class PlayerServiceImplUnitTest {
 	
 	@Test
 	@DisplayName("Player 정보 제거하기")
-	public void deletePlyaer() {
+	public void deletePlyaer() throws NoSuchAlgorithmException, UnsupportedEncodingException, GeneralSecurityException {
 		// given
 		TeamDto team = new TeamDto("fakeTeam","Earth",BelongType.CLUB,"Fake team 입니다");
 		PlayerDto originPlayer = new PlayerDto("fakePlayer","111111-1111111",1,team);

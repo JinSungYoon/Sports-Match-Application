@@ -36,7 +36,7 @@ public class PlayerEntity extends BaseEntity{
 	private String playerName;
 	
 	@NotNull
-	@Column(name="RES_REG_NO",nullable = false,length=14)
+	@Column(name="RES_REG_NO",nullable = false)
 	private String resRegNo;
 	
 	@NotNull

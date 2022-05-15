@@ -2,11 +2,9 @@ package core.player.dto;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
-import javax.validation.constraints.Size;
 
 import core.player.entity.PlayerEntity;
 import core.team.dto.TeamDto;
-import core.team.entity.TeamEntity;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,11 +15,12 @@ import lombok.ToString;
 @NoArgsConstructor
 public class PlayerDto {
 	
+	private Long id;
+	
 	@NotNull
 	private String playerName;
 	
 	@NotNull
-	@Size(min=14,max=14)
 	private String resRegNo;
 	
 	@NotNull

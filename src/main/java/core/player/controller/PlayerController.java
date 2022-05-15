@@ -1,5 +1,10 @@
 package core.player.controller;
 
+import java.io.UnsupportedEncodingException;
+import java.security.GeneralSecurityException;
+import java.security.NoSuchAlgorithmException;
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,8 +30,13 @@ public class PlayerController {
 	};
 	
 	@PostMapping("/register")
-	public ResponseEntity<?> register(@RequestBody PlayerDto dto){
+	public ResponseEntity<?> register(@RequestBody PlayerDto dto) throws NoSuchAlgorithmException, UnsupportedEncodingException, GeneralSecurityException{
 		return new ResponseEntity<>(playerService.registerPlayer(dto),HttpStatus.CREATED);
+	}
+	
+	@PostMapping("/registers")
+	public ResponseEntity<?> registers(@RequestBody List<PlayerDto> dtoList) throws NoSuchAlgorithmException, UnsupportedEncodingException, GeneralSecurityException, Exception{
+		return new ResponseEntity<>(playerService.registerPlayers(dtoList),HttpStatus.CREATED);
 	}
 
 	@GetMapping("/{id}")
@@ -40,7 +50,7 @@ public class PlayerController {
 	}
 	
 	@PutMapping("/{id}")
-	public ResponseEntity<?> update(@PathVariable Long id,@RequestBody PlayerDto dto){
+	public ResponseEntity<?> update(@PathVariable Long id,@RequestBody PlayerDto dto) throws NoSuchAlgorithmException, UnsupportedEncodingException, GeneralSecurityException{
 		return new ResponseEntity<>(playerService.updatePlayer(id, dto),HttpStatus.OK);
 	}
 	

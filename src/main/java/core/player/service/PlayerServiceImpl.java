@@ -1,5 +1,8 @@
 package core.player.service;
 
+import java.io.UnsupportedEncodingException;
+import java.security.GeneralSecurityException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -12,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import core.common.encryption.AES256Util;
 import core.player.dto.PlayerDto;
 import core.player.entity.PlayerEntity;
 import core.player.repository.PlayerRepository;
@@ -24,10 +28,12 @@ public class PlayerServiceImpl implements PlayerService {
 	
 	private final PlayerRepository playerRepository;
 	private final TeamRepository teamRepository;
+	private final AES256Util aes256Util;
 	
-	public PlayerServiceImpl(PlayerRepository playerRepository,TeamRepository teamRepository) {
+	public PlayerServiceImpl(PlayerRepository playerRepository,TeamRepository teamRepository,AES256Util aes256Util) {
 		this.playerRepository = playerRepository;
 		this.teamRepository   = teamRepository;
+		this.aes256Util       = aes256Util;
 	}
 	
 	
@@ -49,7 +55,10 @@ public class PlayerServiceImpl implements PlayerService {
 	
 	@Override
 	@Transactional
-	public PlayerDto registerPlayer(PlayerDto player) {
+	public PlayerDto registerPlayer(PlayerDto player) throws NoSuchAlgorithmException, UnsupportedEncodingException, GeneralSecurityException {
+		// 개인정보를 암호화 한다.
+		player = personalInformationEncryption(player);
+		
 		// 만일 존재하는 Player ID라면 저장하지 않음.
 		if(player.getTeam()!=null) {
 			// player가 속한 team에 팀원을 조회하여, uniform번호가 중복되는지 확인.
@@ -79,6 +88,22 @@ public class PlayerServiceImpl implements PlayerService {
 	@Override
 	@Transactional
 	public List<PlayerDto> registerPlayers(List<PlayerDto> players) throws Exception {
+		// 개인정보를 암호화 한다.
+		players = players.stream().map(item-> {
+			try {
+				return personalInformationEncryption(item);
+			} catch (NoSuchAlgorithmException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (GeneralSecurityException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return item;
+		}).collect(Collectors.toList());
 		
 		List<PlayerDto> list= new ArrayList<PlayerDto>();
 		
@@ -117,7 +142,11 @@ public class PlayerServiceImpl implements PlayerService {
 	
 	@Override
 	@Transactional
-	public PlayerDto updatePlayer(Long id,PlayerDto player) {
+	public PlayerDto updatePlayer(Long id,PlayerDto player) throws NoSuchAlgorithmException, UnsupportedEncodingException, GeneralSecurityException {
+		// 개인정보를 암호화 한다.
+		player = personalInformationEncryption(player);
+
+		// DB에 Id에 해당하는 Player가 존재하는지 찾은 후 Update를 진행한다.
 		PlayerEntity originPlayer = playerRepository.findById(id).orElseThrow(()->new IllegalArgumentException("Id가 존재하지 않습니다."));
 		originPlayer.setPlayerEntity(player);
 		return originPlayer.toDto();
@@ -132,6 +161,14 @@ public class PlayerServiceImpl implements PlayerService {
 	}
 
 
+	@Override
+	public PlayerDto personalInformationEncryption(PlayerDto player) throws NoSuchAlgorithmException, UnsupportedEncodingException, GeneralSecurityException {
+		// 암호화할 개인정보 정보를 암호화 후 다시 셋팅한다.
+		player.setResRegNo(aes256Util.encrypt(player.getResRegNo()));
+		return player;
+	}
+
+	
 	
 
 }
