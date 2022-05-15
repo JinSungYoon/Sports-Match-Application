@@ -75,12 +75,14 @@ public class TeamEntity extends BaseEntity{
 	
 	public TeamDto toDto() {
 		if(this==null) return null;
-		return TeamDto.builder()
+		TeamDto dto = TeamDto.builder()
 				.teamName(teamName)
 				.location(location)
 				.belongType(belongType)
 				.introduction(introduction)
 				.build();
+		dto.setId(id);
+		return dto;
 	}
 		
 }

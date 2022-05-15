@@ -80,19 +80,25 @@ public class PlayerEntity extends BaseEntity{
 	public PlayerDto toDto() {
 		if(this == null) return null;
 		if(team!=null) {
-			return PlayerDto.builder()
-					.playerName(playerName)
-					.resRegNo(resRegNo)
-					.uniformNo(uniformNo)
-					.team(team.toDto())
-					.build();
+			PlayerDto dto = PlayerDto.builder()
+			.playerName(playerName)
+			.resRegNo(resRegNo)
+			.uniformNo(uniformNo)
+			.team(team.toDto())
+			.build();
+			
+			dto.setId(id);
+			
+			return dto;
 		}else {
-			return PlayerDto.builder()
+			 PlayerDto dto = PlayerDto.builder()
 					.playerName(playerName)
 					.resRegNo(resRegNo)
 					.uniformNo(uniformNo)
 					.team(null)
 					.build();
+			 dto.setId(id);
+			 return dto;
 		}
 	}
 	
