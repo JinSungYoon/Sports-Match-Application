@@ -29,6 +29,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import core.player.dto.PlayerDto;
+import core.player.dto.PlayerListDto;
 import core.player.service.PlayerService;
 import lombok.extern.slf4j.Slf4j;
 
@@ -46,6 +47,7 @@ class PlayerControllerUnitTest {
 	private PlayerService playerService; 
 		
 	@Test
+	@DisplayName("Player 등록하기")
 	public void register() throws Exception {
 		log.info("=============================== Start Register test ===============================");
 		// given
@@ -68,6 +70,38 @@ class PlayerControllerUnitTest {
 	}
 	
 	@Test
+	@DisplayName("여러명의 Player 등록하기")
+	public void registersTest() throws Exception {
+		// given
+		List<PlayerDto> playerList = new ArrayList<>();
+		PlayerDto player1 = new PlayerDto("player1","220516-1111111",1,null);
+		PlayerDto player2 = new PlayerDto("player2","220516-2222222",2,null);
+		PlayerDto player3 = new PlayerDto("player3","220516-3333333",3,null);
+		playerList.add(player1);
+		playerList.add(player2);
+		playerList.add(player3);
+		PlayerListDto dtoList = new PlayerListDto();
+		dtoList.setPlayers(playerList);
+		String content = new ObjectMapper().writeValueAsString(dtoList);
+		when(playerService.registerPlayers(dtoList.getPlayers())).thenReturn(playerList);
+		
+		// when
+		ResultActions resultAction = mockMvc.perform(post("/player/registers")
+				.contentType(MediaType.APPLICATION_JSON_UTF8)
+				.content(content)
+				.accept(MediaType.APPLICATION_JSON_UTF8));
+				
+		// then
+		resultAction
+			.andExpect(status().isCreated())
+			.andExpect(jsonPath("$.[0].playerName").value("player1"))
+			.andExpect(jsonPath("$.[1].uniformNo").value(2))
+			.andExpect(jsonPath("$.[2].playerName").value("player3"))
+			.andDo(MockMvcResultHandlers.print());
+	}
+	
+	@Test
+	@DisplayName("모든 Player 조회하기")
 	public void findAllTest() throws Exception{
 		//given
 		List<PlayerDto> playerDtoList = new ArrayList<>();

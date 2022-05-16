@@ -34,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import core.player.dto.PlayerDto;
+import core.player.dto.PlayerListDto;
 import core.player.entity.BelongType;
 import core.player.repository.PlayerRepository;
 import core.player.service.PlayerService;
@@ -97,6 +98,37 @@ public class PlayerControllerIntegreTest {
 	}
 	
 	@Test
+	public void registersTest() throws Exception {
+		// given
+		List<PlayerDto> playerList = new ArrayList<>();
+		TeamDto team = new TeamDto("team1","Seoul",BelongType.ELEMENTARY_SCHOOL,"Team1 입니다.");
+		PlayerDto player1 = new PlayerDto("player1","220516-1111111",1,team);
+		PlayerDto player2 = new PlayerDto("player2","220516-2222222",2,team);
+		PlayerDto player3 = new PlayerDto("player3","220516-3333333",3,team);
+		playerList.add(player1);
+		playerList.add(player2);
+		playerList.add(player3);
+		PlayerListDto dtoList = new PlayerListDto();
+		dtoList.setPlayers(playerList);
+		String content = new ObjectMapper().writeValueAsString(dtoList);
+		
+		// when
+		ResultActions resultAction = mockMvc.perform(post("/player/registers")
+				.contentType(MediaType.APPLICATION_JSON_UTF8)
+				.content(content)
+				.accept(MediaType.APPLICATION_JSON_UTF8));
+				
+		// then
+		resultAction
+			.andExpect(status().isCreated())
+			.andExpect(jsonPath("$.[0].playerName").value("player1"))
+			.andExpect(jsonPath("$.[1].uniformNo").value(2))
+			.andExpect(jsonPath("$.[2].playerName").value("player3"))
+			.andDo(MockMvcResultHandlers.print());
+	}
+	
+	
+	@Test
 	public void findAllTest() throws Exception{
 		log.info("=============================== findAllTest test Start ===============================");
 		//given
@@ -130,6 +162,11 @@ public class PlayerControllerIntegreTest {
 		playerDtoList.add(new PlayerDto("player3","220507-3333333",3,null));
 	
 		List<PlayerDto> playerList =  playerService.registerPlayers(playerDtoList);
+		
+		// Return될 ID값 미리 매핑해 놓기
+		playerDtoList.get(0).setId(1L);
+		playerDtoList.get(1).setId(2L);
+		playerDtoList.get(2).setId(3L);
 		
 		assertThat(playerList).isEqualTo(playerDtoList);
 		
@@ -182,6 +219,10 @@ public class PlayerControllerIntegreTest {
 		
 		List<PlayerDto> playerList =  playerService.registerPlayers(players);
 		
+		
+		// Return될 ID값 미리 매핑해 놓기
+		players.get(0).setId(1L);
+		players.get(1).setId(2L);
 		assertThat(playerList).isEqualTo(players);
 		
 		Long id = 1L;
