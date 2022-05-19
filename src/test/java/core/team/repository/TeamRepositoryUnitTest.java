@@ -53,6 +53,25 @@ public class TeamRepositoryUnitTest {
 	}
 	
 	@Test
+	@DisplayName("팀 정보로 팀 찾기")
+	public void findTeamTest() {
+		TeamEntity team1 = new TeamEntity("team1","서대문구",BelongType.CLUB,"Team1입니다.");
+		TeamEntity team2 = new TeamEntity("team2","서대문구",BelongType.CLUB,"Team2입니다.");
+		TeamEntity team3 = new TeamEntity("team3","은평구",BelongType.CLUB,"Team3입니다.");
+		TeamEntity team4 = new TeamEntity("team4","서대문구",BelongType.CLUB,"Team4입니다.");
+		TeamEntity team5 = new TeamEntity("team5","마포구",BelongType.CLUB,"Team5입니다.");
+		List<TeamEntity> teamList = new ArrayList<TeamEntity>();
+		teamList.add(team1);
+		teamList.add(team2);
+		teamList.add(team3);
+		teamList.add(team4);
+		teamList.add(team5);
+		teamRepository.saveAll(teamList);
+		List<TeamEntity> rtnTeamList = teamRepository.findByTeamNameContainingAndLocationContainingAndBelongTypeAndIntroductionContaining("","",BelongType.CLUB,"");
+		rtnTeamList.forEach(list -> System.out.println(list));
+	}
+	
+	@Test
 	@DisplayName("지명에 해당하는 팀 찾기")
 	public void findByLocation() {
 		TeamEntity team1 = new TeamEntity("team1","Seoul",BelongType.CLUB,"Team1입니다.");
