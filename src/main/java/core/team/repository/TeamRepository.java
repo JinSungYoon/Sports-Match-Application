@@ -14,7 +14,7 @@ import core.team.entity.TeamEntity;
 public interface TeamRepository extends JpaRepository<TeamEntity,Long> {
 	
 	TeamEntity findByTeamName(String name);
-	@Query(value = "SELECT t FROM Team t WHERE t.teamName LIKE %:teamName% AND t.location LIKE %:location% AND t.belongType :belongType AND t.introducetion LIKE %:introducetion%")
+	@Query(value = "SELECT t FROM Team t WHERE t.teamName LIKE %:teamName% AND t.location LIKE %:location% AND t.belongType = :belongType AND t.introducetion LIKE %:introducetion%")
 	List<TeamEntity> findByTeamNameContainingAndLocationContainingAndBelongTypeAndIntroductionContaining(@Param("teamName")String teamName,@Param("location")String location,@Param("belongType")BelongType belongType ,@Param("introduction")String introduction);
 	List<TeamEntity> findByLocation(String location);
 	List<TeamEntity> findByBelongType(BelongType belongType);
