@@ -91,8 +91,8 @@ public class TeamRepositoryUnitTest {
 		teamList.add(team4);
 		teamList.add(team5);
 		teamRepository.saveAll(teamList);
-		List<TeamEntity> rtnTeamList = teamRepositoryCustom.findTeam(null,null,BelongType.HIGH_SCHOOL,null);
-		assertThat(rtnTeamList.get(0)).isEqualTo(team3);
+		List<TeamEntity> rtnTeamList = teamRepositoryCustom.findTeam(null,"경기",null,null);
+		assertThat(rtnTeamList.get(0)).isEqualTo(team2);
 	}
 	
 	@Test

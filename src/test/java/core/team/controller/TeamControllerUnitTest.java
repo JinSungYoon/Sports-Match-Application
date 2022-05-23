@@ -144,6 +144,36 @@ public class TeamControllerUnitTest {
 	}
 	
 	@Test
+	@DisplayName("팀 조회하기")
+	void searchTeams() throws JsonProcessingException,Exception {
+		// given
+		List<TeamDto> list = new ArrayList<>();
+		List<TeamDto> rtnlist = new ArrayList<>();
+		TeamDto teamDto1 = new TeamDto("BlueTeam","서울 서대문구",BelongType.CLUB,"블루팀입니다.");
+		TeamDto teamDto2 = new TeamDto("RedTeam","경기 동안구",BelongType.CLUB,"레드팀입니다.");
+		TeamDto teamDto3 = new TeamDto("YellowTeam","서울 구로구",BelongType.CLUB,"옐로우팀입니다.");
+		TeamDto teamDto4 = new TeamDto("GreenTeam","부산 금정구",BelongType.CLUB,"그린팀입니다.");
+		TeamDto teamDto5 = new TeamDto("PinkTeam","경기 팔달구",BelongType.HIGH_SCHOOL,"핑크팀입니다.");
+		rtnlist.add(teamDto2);
+		rtnlist.add(teamDto5);
+		when(teamService.searchTeams(null, "경기", null, null)).thenReturn(rtnlist);
+		
+		String content = new ObjectMapper().writeValueAsString(rtnlist);
+		
+		// when
+		ResultActions resultAction = mockMvc.perform(get("/team/search?location={location}","경기")
+				.contentType(MediaType.APPLICATION_JSON_UTF8)
+				.content(content));
+		// then
+		resultAction
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.[0].teamName").value("RedTeam"))
+			.andExpect(jsonPath("$.[1].belongType").value("HIGH_SCHOOL"))
+			.andExpect(jsonPath("$.[0].location").value("경기 동안구"))
+			.andDo(MockMvcResultHandlers.print());
+	}
+	
+	@Test
 	@DisplayName("팀 정보 업데이트")
 	void updateTeamTest() throws Exception {
 		// given

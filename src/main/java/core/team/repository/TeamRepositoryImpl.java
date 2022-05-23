@@ -2,14 +2,10 @@ package core.team.repository;
 
 import java.util.List;
 
-import org.springframework.stereotype.Repository;
-
-import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import core.player.entity.BelongType;
-import core.team.dto.TeamDto;
 import core.team.entity.QTeamEntity;
 import core.team.entity.TeamEntity;
 
@@ -28,9 +24,9 @@ public class TeamRepositoryImpl implements TeamRepositoryCustom {
 		List<TeamEntity> teams = queryFactory
 				.select(team.teamEntity)
 				.from(team.teamEntity)
-				.where(eqTeamName(teamName),containLocation(location),eqBelongType(belongType),containIntroduction(location))
+				.where(eqTeamName(teamName),containLocation(location),eqBelongType(belongType),containIntroduction(introduction))
 				.fetch();
-					
+				
 		return teams;
 	}
 	

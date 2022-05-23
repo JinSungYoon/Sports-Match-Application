@@ -10,14 +10,18 @@ import core.player.entity.BelongType;
 import core.team.dto.TeamDto;
 import core.team.entity.TeamEntity;
 import core.team.repository.TeamRepository;
+import core.team.repository.TeamRepositoryImpl;
 
 @Service
 public class TeamServiceImpl implements TeamService{
 
 	private final TeamRepository teamRepository;
 	
-	public TeamServiceImpl(TeamRepository teamRepository) {
+	private final TeamRepositoryImpl teamRepositoryImpl;
+	
+	public TeamServiceImpl(TeamRepository teamRepository,TeamRepositoryImpl teamRepositoryImpl) {
 		this.teamRepository = teamRepository;
+		this.teamRepositoryImpl = teamRepositoryImpl;
 	}
 	
 	@Override
@@ -77,6 +81,12 @@ public class TeamServiceImpl implements TeamService{
 	public Long deleteTeam(Long id) {
 		teamRepository.deleteById(id);
 		return id;
+	}
+
+	@Override
+	public List<TeamDto> searchTeams(String teamName,String location,BelongType belongType,String introduction) {
+		List<TeamEntity> list = teamRepositoryImpl.findTeam(teamName, location, belongType, introduction);
+		return list.stream().map(item->item.toDto()).collect(Collectors.toList());
 	}
 	
 }
