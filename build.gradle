@@ -50,6 +50,10 @@ dependencies {
     // java.lang.NoClassDefFoundError(javax.annotation.Generated) 발생 대응
     annotationProcessor "jakarta.annotation:jakarta.annotation-api"
 	
+	// hasSize
+	testImplementation group: 'org.hamcrest', name: 'hamcrest', version: '2.1'
+	
+	
 	runtimeOnly 'mysql:mysql-connector-java'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'

@@ -15,16 +15,14 @@ import org.springframework.web.bind.annotation.RestController;
 import core.player.entity.BelongType;
 import core.team.dto.TeamDto;
 import core.team.service.TeamService;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping(value="/team")
+@RequiredArgsConstructor
 public class TeamController {
 	
 	private final TeamService teamService;
-	
-	public TeamController(TeamService teamService) {
-		this.teamService = teamService;
-	}
 	
 	@PostMapping("/register")
 	public ResponseEntity<?> registerTeams(@RequestBody TeamDto dto){

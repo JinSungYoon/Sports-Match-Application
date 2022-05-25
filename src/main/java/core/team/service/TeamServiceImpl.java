@@ -11,18 +11,15 @@ import core.team.dto.TeamDto;
 import core.team.entity.TeamEntity;
 import core.team.repository.TeamRepository;
 import core.team.repository.TeamRepositoryImpl;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class TeamServiceImpl implements TeamService{
 
 	private final TeamRepository teamRepository;
 	
 	private final TeamRepositoryImpl teamRepositoryImpl;
-	
-	public TeamServiceImpl(TeamRepository teamRepository,TeamRepositoryImpl teamRepositoryImpl) {
-		this.teamRepository = teamRepository;
-		this.teamRepositoryImpl = teamRepositoryImpl;
-	}
 	
 	@Override
 	public TeamDto registerTeam(TeamDto team) {

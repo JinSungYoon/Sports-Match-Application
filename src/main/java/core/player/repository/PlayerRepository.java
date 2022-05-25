@@ -12,7 +12,10 @@ import core.player.entity.PlayerEntity;
 @Repository
 public interface PlayerRepository extends JpaRepository<PlayerEntity,Long> {
 	PlayerEntity findByPlayerName(String name);
+	@Query(value = "SELECT p FROM Player p where p.playerName LIKE :playerName order by p.uniformNo desc;")  
+	List<PlayerEntity> findByPlayerNameContaining(@Param("playerName")String playerName);
 	List<PlayerEntity> findByTeam_id(Long teamId);
-	@Query("SELECT  from Player p JOIN INNER JOIN Team t ON p.id = t.id WHERE t.teamName = :teamName")
+	@Query(value = "SELECT p FROM Player p JOIN INNER JOIN Team t ON p.id = t.id WHERE t.teamName = :teamName")
 	List<PlayerEntity> findByTeam_teamName(@Param("teamName")String teamName);
+	
 }

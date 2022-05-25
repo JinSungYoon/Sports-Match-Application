@@ -22,20 +22,15 @@ import core.player.repository.PlayerRepository;
 import core.team.dto.TeamDto;
 import core.team.entity.TeamEntity;
 import core.team.repository.TeamRepository;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class PlayerServiceImpl implements PlayerService {
 	
 	private final PlayerRepository playerRepository;
 	private final TeamRepository teamRepository;
 	private final AES256Util aes256Util;
-	
-	public PlayerServiceImpl(PlayerRepository playerRepository,TeamRepository teamRepository,AES256Util aes256Util) {
-		this.playerRepository = playerRepository;
-		this.teamRepository   = teamRepository;
-		this.aes256Util       = aes256Util;
-	}
-	
 	
 	@Override
 	@Transactional(readOnly=true)	// JPA 변경감지 내부 기능 비활성화, update시 정합성을 유지 

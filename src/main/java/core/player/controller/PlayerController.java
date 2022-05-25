@@ -18,16 +18,14 @@ import org.springframework.web.bind.annotation.RestController;
 import core.player.dto.PlayerDto;
 import core.player.dto.PlayerListDto;
 import core.player.service.PlayerService;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping(value="/player")
+@RequiredArgsConstructor
 public class PlayerController {
 	
 	private final PlayerService playerService;
-	
-	public PlayerController(PlayerService playerService) {
-		this.playerService = playerService;
-	};
 	
 	@PostMapping("/register")
 	public ResponseEntity<?> register(@RequestBody PlayerDto dto) throws NoSuchAlgorithmException, UnsupportedEncodingException, GeneralSecurityException{

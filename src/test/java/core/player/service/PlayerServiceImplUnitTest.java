@@ -21,16 +21,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import core.common.encryption.AES256Util;
-import core.player.MockEntity;
 import core.player.dto.PlayerDto;
 import core.player.entity.BelongType;
-import core.player.entity.PlayerEntity;
 import core.player.repository.PlayerRepository;
 import core.team.dto.TeamDto;
-import core.team.entity.TeamEntity;
 import core.team.repository.TeamRepository;
 import lombok.extern.slf4j.Slf4j;
 

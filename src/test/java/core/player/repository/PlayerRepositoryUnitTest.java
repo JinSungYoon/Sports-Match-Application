@@ -1,34 +1,39 @@
 package core.player.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+
+import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import core.player.entity.BelongType;
 import core.player.entity.PlayerEntity;
 import core.team.entity.TeamEntity;
 import core.team.repository.TeamRepository;
+import lombok.extern.slf4j.Slf4j;
 
 /* 단위 테스트(DB 관련된 Bean이 IoC에 등록)
  * @DataJpaTest Repository관련 Bean을 Ioc를 등록
  * */
 
+@Slf4j
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = Replace.NONE)
 public class PlayerRepositoryUnitTest {
@@ -40,6 +45,19 @@ public class PlayerRepositoryUnitTest {
 	
 	@Autowired
 	EntityManager entityManager;
+	
+	@TestConfiguration
+    static class TestConfig {
+
+        @PersistenceContext
+        private EntityManager entityManager;
+
+        @Bean
+        public JPAQueryFactory jpaQueryFactory() {
+            return new JPAQueryFactory(entityManager);
+        }
+    }
+
 	
 	@AfterEach
 	public void init() {
@@ -71,6 +89,39 @@ public class PlayerRepositoryUnitTest {
 		Assertions.assertThat(rtnPlayer.getId()).isEqualTo(1L);
 	}
 
+	@Test
+	@DisplayName("Player 찾기")
+	public void findPlayerTest() {
+		log.debug("============================================ Start findByPlayrNameLike ============================================");
+		TeamEntity team1 = new TeamEntity("team1","Seoul",BelongType.fromValue("C"),"1팀 입니다.");
+		TeamEntity team2 = new TeamEntity("team2","Seoul",BelongType.fromValue("H"),"2팀 입니다.");
+		teamRepository.save(team1);
+		teamRepository.save(team2);
+		PlayerEntity player1 = new PlayerEntity("player1","220504-1111111",1,team1);
+		PlayerEntity player2 = new PlayerEntity("player2","220504-1111111",2,team2);
+		PlayerEntity player3 = new PlayerEntity("player3","220504-1111111",3,team1);
+		PlayerEntity player4 = new PlayerEntity("player4","220504-1111111",4,team2);
+		PlayerEntity player5 = new PlayerEntity("player5","220504-1111111",5,team2);
+		PlayerEntity player6 = new PlayerEntity("player6","220504-1111111",6,team1);
+		PlayerEntity player7 = new PlayerEntity("player7","220504-1111111",7,team2);
+		List<PlayerEntity> repository = new ArrayList<>();
+		repository.add(player1);
+		repository.add(player2);
+		repository.add(player3);
+		repository.add(player4);
+		repository.add(player5);
+		repository.add(player6);
+		repository.add(player7);
+		playerRepository.saveAll(repository);
+		
+		List<PlayerEntity> list =  playerRepository.findByPlayerNameContaining("player");
+		
+		assertThat(list.get(1)).isEqualTo(player2); 
+		
+		list.forEach(item -> System.out.println(item));
+		log.debug("============================================ End findByPlayrNameLike ============================================");
+	}
+	
 	@Test
 	@DisplayName("Team Id로 Player 목록 조회하기")
 	public void searchPlayerListByTeamId() {
