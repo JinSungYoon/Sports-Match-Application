@@ -12,6 +12,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import core.common.entity.BaseEntity;
 import core.player.dto.PlayerDto;
 import core.team.entity.TeamEntity;
 import lombok.Builder;
@@ -40,7 +41,7 @@ public class PlayerEntity extends BaseEntity{
 	private String resRegNo;
 	
 	@NotNull
-	@Column(name="UNIFORM_NO",unique=true)
+	@Column(name="UNIFORM_NO")
 	private int uniformNo;
 	
 	@ManyToOne(cascade = CascadeType.ALL,fetch=FetchType.LAZY)

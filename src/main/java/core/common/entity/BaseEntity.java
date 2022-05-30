@@ -1,4 +1,4 @@
-package core.player.entity;
+package core.common.entity;
 
 import java.time.LocalDateTime;
 

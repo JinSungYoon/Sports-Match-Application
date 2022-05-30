@@ -3,7 +3,7 @@ package core.team.controller;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -73,7 +73,7 @@ public class TeamControllerIntegreTest {
 		String content = new ObjectMapper().writeValueAsString(teamDto);
 		
 		// when
-		ResultActions resultAction = mockMvc.perform(post("/team/register")
+		ResultActions resultAction = mockMvc.perform(post("/team")
 					.contentType(MediaType.APPLICATION_JSON_UTF8)
 					.content(content)
 					.accept(MediaType.APPLICATION_JSON_UTF8));
@@ -109,7 +109,7 @@ public class TeamControllerIntegreTest {
 		String content = new ObjectMapper().writeValueAsString(list);
 		
 		// when
-		ResultActions resultAction = mockMvc.perform(get("/team/search/all")
+		ResultActions resultAction = mockMvc.perform(get("/teams/all")
 				.contentType(MediaType.APPLICATION_JSON_UTF8)
 				.content(content));
 				
@@ -151,7 +151,7 @@ public class TeamControllerIntegreTest {
 		String content = new ObjectMapper().writeValueAsString(rtnlist);
 		
 		// when
-		ResultActions resultAction = mockMvc.perform(get("/team/search?location={location}","경기")
+		ResultActions resultAction = mockMvc.perform(get("/teams?location={location}","경기")
 				.contentType(MediaType.APPLICATION_JSON_UTF8)
 				.content(content)
 				.accept(MediaType.APPLICATION_JSON_UTF8));
@@ -179,7 +179,7 @@ public class TeamControllerIntegreTest {
 		String content = new ObjectMapper().writeValueAsString(teamDto);
 		
 		// when
-		ResultActions resultAction = mockMvc.perform(put("/team/{id}",1L)
+		ResultActions resultAction = mockMvc.perform(patch("/team/{id}",1L)
 				.contentType(MediaType.APPLICATION_JSON_UTF8)
 				.content(content)
 				.accept(MediaType.APPLICATION_JSON_UTF8));

@@ -27,6 +27,7 @@ import core.player.entity.BelongType;
 import core.player.entity.PlayerEntity;
 import core.team.entity.TeamEntity;
 import core.team.repository.TeamRepository;
+import core.team.repository.TeamRepositoryCustom;
 import lombok.extern.slf4j.Slf4j;
 
 /* 단위 테스트(DB 관련된 Bean이 IoC에 등록)
@@ -40,8 +41,16 @@ public class PlayerRepositoryUnitTest {
 	
 	@Autowired
 	private PlayerRepository playerRepository;
+	
+	@Autowired
+	private PlayerRepositoryCustom playerRepositoryCustom;
+	
 	@Autowired
 	private TeamRepository teamRepository;
+	
+	@Autowired
+	TeamRepositoryCustom teamRepositoryCustom;
+	
 	
 	@Autowired
 	EntityManager entityManager;
@@ -81,7 +90,7 @@ public class PlayerRepositoryUnitTest {
 		playerRepository.save(player2);
 		playerRepository.save(player3);
 		
-		TeamEntity rtnTeam = teamRepository.findByTeamName("team1");
+		TeamEntity rtnTeam = teamRepositoryCustom.findTeam("team1",null,null,null).get(0);
 		Assertions.assertThat(rtnTeam).isEqualTo(team1);
 		
 		PlayerEntity rtnPlayer = playerRepository.findByPlayerName("player1");
@@ -173,4 +182,40 @@ public class PlayerRepositoryUnitTest {
 		Assertions.assertThat(list2.get(3).getTeam()).isEqualTo(player7.getTeam());
 	}
 	
+	@Test
+	@DisplayName("조건에 맞는 player 찾기")
+	void findPlayers() {
+		// given
+		TeamEntity team1 = new TeamEntity("team1","Seoul",BelongType.fromValue("C"),"1팀 입니다.");
+		TeamEntity team2 = new TeamEntity("team2","Seoul",BelongType.fromValue("H"),"2팀 입니다.");
+		teamRepository.save(team1);
+		teamRepository.save(team2);
+		PlayerEntity player1 = new PlayerEntity("가선수","220504-1111111",1,team1);
+		PlayerEntity player2 = new PlayerEntity("나선수","220504-1111111",1,team2);
+		PlayerEntity player3 = new PlayerEntity("다선수","220504-1111111",2,team1);
+		PlayerEntity player4 = new PlayerEntity("라선수","220504-1111111",2,team2);
+		PlayerEntity player5 = new PlayerEntity("마선수","220504-1111111",3,team2);
+		PlayerEntity player6 = new PlayerEntity("바선수","220504-1111111",3,team1);
+		PlayerEntity player7 = new PlayerEntity("사선수","220504-1111111",4,team2);
+		playerRepository.save(player1);
+		playerRepository.save(player2);
+		playerRepository.save(player3);
+		playerRepository.save(player4);
+		playerRepository.save(player5);
+		playerRepository.save(player6);
+		playerRepository.save(player7);
+		
+		// when
+		List<PlayerEntity> playerList1 =  playerRepositoryCustom.findPlayer("가선수", null, null);
+		List<PlayerEntity> playerList2 =  playerRepositoryCustom.findPlayer(null, 3, null);
+		List<PlayerEntity> playerList3 =  playerRepositoryCustom.findPlayer(null, null, "team2");
+		
+		// then
+		Assertions.assertThat(playerList1.size()).isEqualTo(1);
+		Assertions.assertThat(playerList2.size()).isEqualTo(2);
+		Assertions.assertThat(playerList3.size()).isEqualTo(4);
+		Assertions.assertThat(playerList1.get(0)).isEqualTo(player1);
+		Assertions.assertThat(playerList2.get(0)).isEqualTo(player5);
+		Assertions.assertThat(playerList3.get(0)).isEqualTo(player2);
+	}
 }

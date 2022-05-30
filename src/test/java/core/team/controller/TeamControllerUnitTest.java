@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.ArrayList;
@@ -53,7 +54,7 @@ public class TeamControllerUnitTest {
 		when(teamService.registerTeam(teamDto)).thenReturn(new TeamDto("team1","Seoul",BelongType.CLUB,"1팀 입니다 잘 부탁드립니다."));
 		
 		// when
-		ResultActions resultAction = mockMvc.perform(post("/team/register")
+		ResultActions resultAction = mockMvc.perform(post("/team")
 					.contentType(MediaType.APPLICATION_JSON_UTF8)
 					.content(content)
 					.accept(MediaType.APPLICATION_JSON_UTF8));
@@ -77,7 +78,7 @@ public class TeamControllerUnitTest {
 		when(teamService.searchTeamById(1L)).thenReturn(new TeamDto("Team1","Busan",BelongType.HIGH_SCHOOL,"Team1 입니다."));
 		
 		// when
-		ResultActions resultAction = mockMvc.perform(get("/team/id/{id}",id)
+		ResultActions resultAction = mockMvc.perform(get("/team/{id}",id)
 				.contentType(MediaType.APPLICATION_JSON_UTF8)
 				.content(content)
 				.accept(MediaType.APPLICATION_JSON_UTF8));
@@ -89,28 +90,6 @@ public class TeamControllerUnitTest {
 			.andDo(MockMvcResultHandlers.print());
 		
 		log.info("========================== End Search Team ==========================");
-	}
-	
-	@Test
-	@DisplayName("Team 이름으로 Team 찾기")
-	void searchTeamsByNameTest() throws Exception {
-		// given
-		TeamDto teamDto = new TeamDto("fakeTeam","Chungju",BelongType.ELEMENTARY_SCHOOL,"청주 팀입니다.");
-		String content = new ObjectMapper().writeValueAsString(teamDto);
-		when(teamService.searchTeamByName("fakeTeam")).thenReturn(new TeamDto("fakeTeam","Chungju",BelongType.ELEMENTARY_SCHOOL,"청주 팀입니다."));
-		
-		// when
-		ResultActions resultAction = mockMvc.perform(get("/team/name/{name}","fakeTeam")
-				.contentType(MediaType.APPLICATION_JSON_UTF8)
-				.content(content)
-				.accept(MediaType.APPLICATION_JSON_UTF8));
-		
-		// then
-		resultAction
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.belongType").value("ELEMENTARY_SCHOOL"))
-			.andDo(MockMvcResultHandlers.print());
-			
 	}
 	
 	@Test
@@ -130,7 +109,7 @@ public class TeamControllerUnitTest {
 		String content = new ObjectMapper().writeValueAsString(list);
 		
 		// when
-		ResultActions resultAction = mockMvc.perform(get("/team/search/all")
+		ResultActions resultAction = mockMvc.perform(get("/teams/all")
 				.contentType(MediaType.APPLICATION_JSON_UTF8)
 				.content(content));
 				
@@ -162,7 +141,7 @@ public class TeamControllerUnitTest {
 		String content = new ObjectMapper().writeValueAsString(rtnlist);
 		
 		// when
-		ResultActions resultAction = mockMvc.perform(get("/team/search?location={location}","경기")
+		ResultActions resultAction = mockMvc.perform(get("/teams?location={location}","경기")
 				.contentType(MediaType.APPLICATION_JSON_UTF8)
 				.content(content));
 		// then
@@ -186,7 +165,7 @@ public class TeamControllerUnitTest {
 		String content = new ObjectMapper().writeValueAsString(teamDto);
 		when(teamService.updateTeam(1L, teamDto)).thenReturn(teamDto);
 		// when
-		ResultActions resultAction = mockMvc.perform(put("/team/{id}",1L)
+		ResultActions resultAction = mockMvc.perform(patch("/team/{id}",1L)
 				.contentType(MediaType.APPLICATION_JSON_UTF8)
 				.content(content)
 				.accept(MediaType.APPLICATION_JSON_UTF8));

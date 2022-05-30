@@ -19,6 +19,7 @@ import core.common.encryption.AES256Util;
 import core.player.dto.PlayerDto;
 import core.player.entity.PlayerEntity;
 import core.player.repository.PlayerRepository;
+import core.player.repository.PlayerRepositoryCustom;
 import core.team.dto.TeamDto;
 import core.team.entity.TeamEntity;
 import core.team.repository.TeamRepository;
@@ -30,6 +31,7 @@ public class PlayerServiceImpl implements PlayerService {
 	
 	private final PlayerRepository playerRepository;
 	private final TeamRepository teamRepository;
+	private final PlayerRepositoryCustom playerReppositoryCustom;
 	private final AES256Util aes256Util;
 	
 	@Override
@@ -161,6 +163,12 @@ public class PlayerServiceImpl implements PlayerService {
 		// 암호화할 개인정보 정보를 암호화 후 다시 셋팅한다.
 		player.setResRegNo(aes256Util.encrypt(player.getResRegNo()));
 		return player;
+	}
+
+	@Override
+	public List<PlayerDto> searchPlayers(String playerName,Integer uniformNo,String teamName) {
+		List<PlayerEntity> list = playerReppositoryCustom.findPlayer(playerName, uniformNo, teamName);
+		return list.stream().map(item->item.toDto()).collect(Collectors.toList());
 	}
 
 	

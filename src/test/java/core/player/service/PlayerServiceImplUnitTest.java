@@ -26,6 +26,7 @@ import core.common.encryption.AES256Util;
 import core.player.dto.PlayerDto;
 import core.player.entity.BelongType;
 import core.player.repository.PlayerRepository;
+import core.player.repository.PlayerRepositoryCustom;
 import core.team.dto.TeamDto;
 import core.team.repository.TeamRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -44,6 +45,9 @@ public class PlayerServiceImplUnitTest {
 	
 	@Mock
 	private PlayerRepository playerRepository;
+	
+	@Mock
+	private PlayerRepositoryCustom playerRepositoryCustom;
 	
 	@Mock
 	private TeamRepository teamRepository;
@@ -142,8 +146,6 @@ public class PlayerServiceImplUnitTest {
 		list.add(player2);
 		list.add(player3);
 		list.add(player4);
-		when(playerRepository.saveAll(any())).thenReturn(list.stream().map(PlayerDto::toEntity).collect(Collectors.toList()));
-		playerService.registerPlayers(list);
 		when(playerRepository.findAll()).thenReturn(list.stream().map(PlayerDto::toEntity).collect(Collectors.toList()));
 		// when
 		List<PlayerDto> playerList = playerService.searchPlayerAll();
@@ -156,6 +158,37 @@ public class PlayerServiceImplUnitTest {
 		assertThat(playerList.get(3)).isEqualTo(player4);
 		
 		assertEquals("Index 4 out of bounds for length 4",outboundException.getMessage());
+		
+	}
+	
+	@Test
+	@DisplayName("Player 조건 검색")
+	void findPlayer() throws UnsupportedEncodingException {
+		// given
+		// 주민번호 암호화
+		String key = "verystrongsecretkey";
+		AES256Util aes256 = new AES256Util(key);
+		// Player List 객체 생성
+		List<PlayerDto> list = new ArrayList<>();
+		TeamDto team1 = new TeamDto("fakeTeam1","Earth",BelongType.CLUB,"Fake team1 입니다");
+		TeamDto team2 = new TeamDto("fakeTeam2","Space",BelongType.PROTEAM,"Fake team2 입니다");
+		PlayerDto player1 = new PlayerDto("bluePlayer","111111-1111111",1,team1);
+		PlayerDto player2 = new PlayerDto("skyBluePlayer","111111-2222222",1,team2);
+		PlayerDto player3 = new PlayerDto("pinkPlayer","111111-3333333",2,team2);
+		PlayerDto player4 = new PlayerDto("orangeYellowPlayer","111111-4444444",2,team1);
+		PlayerDto player5 = new PlayerDto("redPlayer","111111-5555555",3,team1);
+		list.add(player1);
+		list.add(player4);
+		list.add(player5);
+
+		// when
+		when(playerRepositoryCustom.findPlayer(null, null, "fakeTeam1")).thenReturn(list.stream().map(PlayerDto::toEntity).collect(Collectors.toList()));
+		List<PlayerDto> rtnList = playerService.searchPlayers(null, null, "fakeTeam1");
+		
+		assertThat(rtnList.size()).isEqualTo(3);
+		assertThat(rtnList.get(0).getPlayerName()).isEqualTo("bluePlayer");
+		assertThat(rtnList.get(1).getUniformNo()).isEqualTo(2);
+		assertThat(rtnList.get(2).getTeam().getTeamName()).isEqualTo("fakeTeam1");
 		
 	}
 	

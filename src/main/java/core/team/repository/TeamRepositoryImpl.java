@@ -25,6 +25,7 @@ public class TeamRepositoryImpl implements TeamRepositoryCustom {
 				.select(team.teamEntity)
 				.from(team.teamEntity)
 				.where(eqTeamName(teamName),containLocation(location),eqBelongType(belongType),containIntroduction(introduction))
+				.orderBy(team.id.asc(),team.location.asc(),team.belongType.asc())
 				.fetch();
 				
 		return teams;

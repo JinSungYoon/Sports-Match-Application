@@ -36,29 +36,6 @@ public class TeamServiceImpl implements TeamService{
 	
 	@Override
 	@Transactional(readOnly=true)
-	public TeamDto searchTeamByName(String teamName) {
-		TeamEntity teamEntity = teamRepository.findByTeamName(teamName);
-		return teamEntity.toDto();
-	}
-
-	@Override
-	@Transactional(readOnly=true)
-	public List<TeamDto> searchLocationTeams(String location) {
-		List<TeamEntity> entityList =  teamRepository.findByLocation(location);
-		List<TeamDto> dtoList =  entityList.stream().map(TeamEntity::toDto).collect(Collectors.toList());
-		return dtoList;
-	}
-
-	@Override
-	@Transactional(readOnly=true)
-	public List<TeamDto> searchBelongTypeTeams(BelongType belongType) {
-		List<TeamEntity> entityList = teamRepository.findByBelongType(belongType);
-		List<TeamDto> dtoList =  entityList.stream().map(TeamEntity::toDto).collect(Collectors.toList());
-		return dtoList;
-	}
-
-	@Override
-	@Transactional(readOnly=true)
 	public List<TeamDto> searchAllTeams() {
 		List<TeamEntity> entityList = teamRepository.findAll();
 		List<TeamDto> dtoList = entityList.stream().map(TeamEntity::toDto).collect(Collectors.toList());

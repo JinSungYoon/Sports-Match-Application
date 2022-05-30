@@ -13,7 +13,7 @@ import javax.persistence.Lob;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
-import core.player.entity.BaseEntity;
+import core.common.entity.BaseEntity;
 import core.player.entity.BelongType;
 import core.team.dto.TeamDto;
 import lombok.Builder;
