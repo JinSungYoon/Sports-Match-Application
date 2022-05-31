@@ -26,7 +26,6 @@ import core.player.entity.PlayerEntity;
 import core.player.repository.PlayerRepository;
 import core.player.repository.PlayerRepositoryCustom;
 import core.team.dto.TeamDto;
-import core.team.entity.TeamEntity;
 import core.team.repository.TeamRepository;
 import lombok.RequiredArgsConstructor;
 
@@ -74,7 +73,7 @@ public class PlayerServiceImpl implements PlayerService {
 				// 같은 팀에 동일한 유니폼 번호를 가질 수 없으므로 검사 필요.
 				if(uniformNoList.contains(player.getUniformNo())) {
 					//throw new Exception("Uniform 번호는 중복 될 수 없습니다.");
-					throw new IllegalArgumentException("Uniform 번호는 중복 될 수 없습니다.");
+					throw new ResponseStatusException (HttpStatus.BAD_REQUEST,"Uniform 번호는 중복 될 수 없습니다.",new IllegalArgumentException());
 				}else {
 					PlayerEntity playerEntity = playerRepository.save(player.toEntity());
 					return playerEntity.toDto();
