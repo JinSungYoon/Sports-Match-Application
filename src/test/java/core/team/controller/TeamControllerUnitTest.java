@@ -19,6 +19,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -98,27 +100,37 @@ public class TeamControllerUnitTest {
 		// given
 		List<TeamDto> list = new ArrayList<>();
 		TeamDto teamDto1 = new TeamDto("BlueTeam","Seoul",BelongType.CLUB,"블루팀입니다.");
-		TeamDto teamDto2 = new TeamDto("RedTeam","Seoul",BelongType.CLUB,"레드팀입니다.");
-		TeamDto teamDto3 = new TeamDto("YellowTeam","Seoul",BelongType.CLUB,"옐로우팀입니다.");
-		TeamDto teamDto4 = new TeamDto("GreenTeam","Seoul",BelongType.CLUB,"그린팀입니다.");
-		when(teamService.searchAllTeams()).thenReturn(list);
-		list.add(teamDto1);
-		list.add(teamDto2);
-		list.add(teamDto3);
-		list.add(teamDto4);
+		TeamDto teamDto2 = new TeamDto("RedTeam","Busan",BelongType.PROTEAM,"레드팀입니다.");
+		TeamDto teamDto3 = new TeamDto("YellowTeam","Seoul",BelongType.UNIVERSITY,"옐로우팀입니다.");
+		TeamDto teamDto4 = new TeamDto("GreenTeam","Busan",BelongType.CLUB,"그린팀입니다.");
+		TeamDto teamDto5 = new TeamDto("SkyBlueTeam","Seoul",BelongType.PROTEAM,"스카이 블루팀입니다.");
+		TeamDto teamDto6 = new TeamDto("PinkTeam","Busan",BelongType.UNIVERSITY,"핑크팀입니다.");
+		TeamDto teamDto7 = new TeamDto("OrangeTeam","Seoul",BelongType.CLUB,"오렌지팀입니다.");
+		TeamDto teamDto8 = new TeamDto("DarkGreenTeam","Busan",BelongType.PROTEAM,"다크그린팀입니다.");
+		TeamDto teamDto9 = new TeamDto("BlackTeam","Seoul",BelongType.UNIVERSITY,"블랙팀입니다.");
+		TeamDto teamDto10 = new TeamDto("WhiteTeam","Busan",BelongType.CLUB,"화이트입니다.");
+		PageRequest pageRequest = PageRequest.of(1, 5);
+		when(teamService.searchAllTeams(pageRequest)).thenReturn(list);
+		
+		list.add(teamDto6);
+		list.add(teamDto7);
+		list.add(teamDto8);
+		list.add(teamDto9);
+		list.add(teamDto10);
 		String content = new ObjectMapper().writeValueAsString(list);
 		
 		// when
-		ResultActions resultAction = mockMvc.perform(get("/teams/all")
+		ResultActions resultAction = mockMvc.perform(get("/teams/all?page={page}&size={size}",1,5)
 				.contentType(MediaType.APPLICATION_JSON_UTF8)
 				.content(content));
 				
 		// then
 		resultAction
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.[0].introduction").value("블루팀입니다."))
-			.andExpect(jsonPath("$.[1].teamName").value("RedTeam"))
-			.andExpect(jsonPath("$.[2].belongType").value("CLUB"))
+			.andExpect(jsonPath("$",hasSize(5)))
+			.andExpect(jsonPath("$.[0].introduction").value("핑크팀입니다."))
+			.andExpect(jsonPath("$.[1].teamName").value("OrangeTeam"))
+			.andExpect(jsonPath("$.[2].belongType").value("PROTEAM"))
 			.andExpect(jsonPath("$.[3].location").value("Seoul"))
 			.andDo(MockMvcResultHandlers.print());
 	}

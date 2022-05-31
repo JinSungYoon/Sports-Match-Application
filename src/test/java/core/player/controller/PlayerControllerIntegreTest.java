@@ -3,11 +3,12 @@ package core.player.controller;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -84,7 +85,7 @@ public class PlayerControllerIntegreTest {
 		String content = new ObjectMapper().writeValueAsString(pDto);
 		
 		// when
-		ResultActions resultAction = mockMvc.perform(post("/player/register")
+		ResultActions resultAction = mockMvc.perform(post("/player")
 				.contentType(MediaType.APPLICATION_JSON_UTF8)
 				.content(content)
 				.accept(MediaType.APPLICATION_JSON_UTF8));
@@ -113,7 +114,7 @@ public class PlayerControllerIntegreTest {
 		String content = new ObjectMapper().writeValueAsString(dtoList);
 		
 		// when
-		ResultActions resultAction = mockMvc.perform(post("/player/registers")
+		ResultActions resultAction = mockMvc.perform(post("/players")
 				.contentType(MediaType.APPLICATION_JSON_UTF8)
 				.content(content)
 				.accept(MediaType.APPLICATION_JSON_UTF8));
@@ -136,20 +137,66 @@ public class PlayerControllerIntegreTest {
 		playerDtoList.add(new PlayerDto("player1","220507-1111111",1,null));
 		playerDtoList.add(new PlayerDto("player2","220507-2222222",2,null));
 		playerDtoList.add(new PlayerDto("player3","220507-3333333",3,null));
+		playerDtoList.add(new PlayerDto("player4","220507-4444444",4,null));
+		playerDtoList.add(new PlayerDto("player5","220507-5555555",5,null));
+		playerDtoList.add(new PlayerDto("player6","220507-6666666",6,null));
+		playerDtoList.add(new PlayerDto("player7","220507-7777777",7,null));
+		playerDtoList.add(new PlayerDto("player8","220507-8888888",8,null));
+		playerDtoList.add(new PlayerDto("player9","220507-9999999",9,null));
+		playerDtoList.add(new PlayerDto("player10","220507-0101010",10,null));
+		playerDtoList.add(new PlayerDto("player11","220507-0111111",11,null));
+		playerDtoList.add(new PlayerDto("player12","220507-0121212",12,null));
+		playerDtoList.add(new PlayerDto("player13","220507-0131313",13,null));
+		playerDtoList.add(new PlayerDto("player14","220507-0141414",14,null));
+		playerDtoList.add(new PlayerDto("player15","220507-0151515",15,null));
 	
 		List<PlayerDto> playerList =  playerService.registerPlayers(playerDtoList);
 		
 		// when
-		ResultActions resultAction = mockMvc.perform(get("/player/all")
+		ResultActions resultAction = mockMvc.perform(get("/players/all?page={page}&size={size}",0,10)
 				.accept(MediaType.APPLICATION_JSON_UTF8));
 		
 		// then
 		resultAction
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$",Matchers.hasSize(3)))
+			.andExpect(jsonPath("$",Matchers.hasSize(10)))
 			.andExpect(jsonPath("$.[2].playerName").value("player3"))
 			.andDo(MockMvcResultHandlers.print());
 		log.info("=============================== findAllTest test End ===============================");
+	}
+	
+	@Test
+	@DisplayName("조건에 맞는 Player 조회하기")
+	void findTeamTest() throws Exception {
+		// given
+		List<PlayerDto> list= new ArrayList<>();
+		List<PlayerDto> rtnList= new ArrayList<>();
+		TeamDto team1 = new TeamDto("team1","Seoul",BelongType.CLUB,"Our team belong to Seoul");
+		TeamDto team2 = new TeamDto("team2","Busan",BelongType.CLUB,"Our team belong to Busan");
+		list.add(new PlayerDto("player1","220530-1111111",1,team1));
+		list.add(new PlayerDto("player2","220530-1111111",1,team2));
+		list.add(new PlayerDto("player3","220530-1111111",2,team2));
+		list.add(new PlayerDto("player4","220530-1111111",2,team1));
+		list.add(new PlayerDto("player5","220530-1111111",3,team2));
+		rtnList.add(new PlayerDto("player2","220530-1111111",1,team2));
+		rtnList.add(new PlayerDto("player3","220530-1111111",2,team2));
+		rtnList.add(new PlayerDto("player5","220530-1111111",3,team2));
+		
+		playerService.registerPlayers(list);
+		
+		List<PlayerDto> getList = playerService.searchPlayers(null, null, "team2");
+		
+		// when
+		ResultActions resultAction = mockMvc.perform(get("/players?teamName={teamName}","team2")
+				.accept(MediaType.APPLICATION_JSON_UTF8));
+		
+		// then
+		resultAction
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$").isArray())
+			.andExpect(jsonPath("$",hasSize(3)))
+			.andExpect(jsonPath("$.[0].playerName").value("player2"))
+			.andDo(MockMvcResultHandlers.print());
 	}
 	
 	@Test
@@ -198,7 +245,7 @@ public class PlayerControllerIntegreTest {
 		
 		// when
 		
-		ResultActions resultAction = mockMvc.perform(put("/player/{id}",id)
+		ResultActions resultAction = mockMvc.perform(patch("/player/{id}",id)
 				.contentType(MediaType.APPLICATION_JSON_UTF8)
 				.content(content)
 				.accept(MediaType.APPLICATION_JSON_UTF8));

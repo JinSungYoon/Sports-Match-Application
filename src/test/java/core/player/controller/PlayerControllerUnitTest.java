@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -108,7 +109,8 @@ class PlayerControllerUnitTest {
 		playerDtoList.add(new PlayerDto("player1","220507-1111111",1,null));
 		playerDtoList.add(new PlayerDto("player2","220507-2222222",2,null));
 		playerDtoList.add(new PlayerDto("player3","220507-3333333",3,null));
-		when(playerService.searchPlayerAll()).thenReturn(playerDtoList);
+		PageRequest pageRequest = PageRequest.of(0, 10);
+		when(playerService.searchPlayerAll(pageRequest)).thenReturn(playerDtoList);
 		
 		// when
 		ResultActions resultAction = mockMvc.perform(get("/players/all")

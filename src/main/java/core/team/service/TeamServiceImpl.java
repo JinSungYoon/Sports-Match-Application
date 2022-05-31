@@ -3,6 +3,8 @@ package core.team.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,8 +38,8 @@ public class TeamServiceImpl implements TeamService{
 	
 	@Override
 	@Transactional(readOnly=true)
-	public List<TeamDto> searchAllTeams() {
-		List<TeamEntity> entityList = teamRepository.findAll();
+	public List<TeamDto> searchAllTeams(Pageable pageable) {
+		Page<TeamEntity> entityList = teamRepository.findAll(pageable);
 		List<TeamDto> dtoList = entityList.stream().map(TeamEntity::toDto).collect(Collectors.toList());
 		return dtoList;
 	}

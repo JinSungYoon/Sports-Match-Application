@@ -5,11 +5,14 @@ import java.security.GeneralSecurityException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import core.player.dto.PlayerDto;
 
 public interface PlayerService {
 	PlayerDto searchOnePlayer(Long id);
-	List<PlayerDto> searchPlayerAll();
+	List<PlayerDto> searchPlayerAll(Pageable pageable);
 	List<PlayerDto> searchPlayers(String playerName,Integer uniformNo,String teamName);
 	PlayerDto registerPlayer(PlayerDto player) throws NoSuchAlgorithmException, UnsupportedEncodingException, GeneralSecurityException;
 	List<PlayerDto> registerPlayers(List<PlayerDto> players) throws Exception;

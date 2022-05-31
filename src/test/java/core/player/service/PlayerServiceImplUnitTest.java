@@ -21,10 +21,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import core.common.encryption.AES256Util;
 import core.player.dto.PlayerDto;
 import core.player.entity.BelongType;
+import core.player.entity.PlayerEntity;
 import core.player.repository.PlayerRepository;
 import core.player.repository.PlayerRepositoryCustom;
 import core.team.dto.TeamDto;
@@ -138,26 +143,29 @@ public class PlayerServiceImplUnitTest {
 		// Player List 객체 생성
 		List<PlayerDto> list = new ArrayList<>();
 		TeamDto team = new TeamDto("fakeTeam","Earth",BelongType.CLUB,"Fake team 입니다");
-		PlayerDto player1 = new PlayerDto("fakePlayer","111111-1111111",1,team);
-		PlayerDto player2 = new PlayerDto("fakePlayer","111111-2222222",2,team);
-		PlayerDto player3 = new PlayerDto("fakePlayer","111111-3333333",3,team);
-		PlayerDto player4 = new PlayerDto("fakePlayer","111111-4444444",4,team);
-		list.add(player1);
-		list.add(player2);
-		list.add(player3);
+		PlayerDto player1 = new PlayerDto("fakePlayer1","111111-1111111",1,team);
+		PlayerDto player2 = new PlayerDto("fakePlayer2","111111-2222222",2,team);
+		PlayerDto player3 = new PlayerDto("fakePlayer3","111111-3333333",3,team);
+		PlayerDto player4 = new PlayerDto("fakePlayer4","111111-4444444",4,team);
+		PlayerDto player5 = new PlayerDto("fakePlayer5","111111-5555555",5,team);
+		PlayerDto player6 = new PlayerDto("fakePlayer6","111111-6666666",6,team);
+		
 		list.add(player4);
-		when(playerRepository.findAll()).thenReturn(list.stream().map(PlayerDto::toEntity).collect(Collectors.toList()));
+		list.add(player5);
+		list.add(player6);
+		
+		PageRequest pageRequest = PageRequest.of(1, 3);
+		when(playerRepository.findAll(pageRequest)).thenReturn(new PageImpl<>(list.stream().map(PlayerDto::toEntity).collect(Collectors.toList())));
 		// when
-		List<PlayerDto> playerList = playerService.searchPlayerAll();
+		List<PlayerDto> playerList = playerService.searchPlayerAll(pageRequest);
 		
-		IndexOutOfBoundsException outboundException = assertThrows(IndexOutOfBoundsException.class,()->playerList.get(4));
+		IndexOutOfBoundsException outboundException = assertThrows(IndexOutOfBoundsException.class,()->playerList.get(3));
 		
-		assertThat(playerList.get(0)).isEqualTo(player1);
-		assertThat(playerList.get(1)).isEqualTo(player2);
-		assertThat(playerList.get(2)).isEqualTo(player3);
-		assertThat(playerList.get(3)).isEqualTo(player4);
+		assertThat(playerList.get(0)).isEqualTo(player4);
+		assertThat(playerList.get(1)).isEqualTo(player5);
+		assertThat(playerList.get(2)).isEqualTo(player6);
 		
-		assertEquals("Index 4 out of bounds for length 4",outboundException.getMessage());
+		assertEquals("Index 3 out of bounds for length 3",outboundException.getMessage());
 		
 	}
 	

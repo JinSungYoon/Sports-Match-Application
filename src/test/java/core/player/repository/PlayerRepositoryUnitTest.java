@@ -20,6 +20,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.domain.PageRequest;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -96,39 +97,6 @@ public class PlayerRepositoryUnitTest {
 		PlayerEntity rtnPlayer = playerRepository.findByPlayerName("player1");
 		Assertions.assertThat(rtnPlayer).isEqualTo(player1);
 		Assertions.assertThat(rtnPlayer.getId()).isEqualTo(1L);
-	}
-
-	@Test
-	@DisplayName("Player 찾기")
-	public void findPlayerTest() {
-		log.debug("============================================ Start findByPlayrNameLike ============================================");
-		TeamEntity team1 = new TeamEntity("team1","Seoul",BelongType.fromValue("C"),"1팀 입니다.");
-		TeamEntity team2 = new TeamEntity("team2","Seoul",BelongType.fromValue("H"),"2팀 입니다.");
-		teamRepository.save(team1);
-		teamRepository.save(team2);
-		PlayerEntity player1 = new PlayerEntity("player1","220504-1111111",1,team1);
-		PlayerEntity player2 = new PlayerEntity("player2","220504-1111111",2,team2);
-		PlayerEntity player3 = new PlayerEntity("player3","220504-1111111",3,team1);
-		PlayerEntity player4 = new PlayerEntity("player4","220504-1111111",4,team2);
-		PlayerEntity player5 = new PlayerEntity("player5","220504-1111111",5,team2);
-		PlayerEntity player6 = new PlayerEntity("player6","220504-1111111",6,team1);
-		PlayerEntity player7 = new PlayerEntity("player7","220504-1111111",7,team2);
-		List<PlayerEntity> repository = new ArrayList<>();
-		repository.add(player1);
-		repository.add(player2);
-		repository.add(player3);
-		repository.add(player4);
-		repository.add(player5);
-		repository.add(player6);
-		repository.add(player7);
-		playerRepository.saveAll(repository);
-		
-		List<PlayerEntity> list =  playerRepository.findByPlayerNameContaining("player");
-		
-		assertThat(list.get(1)).isEqualTo(player2); 
-		
-		list.forEach(item -> System.out.println(item));
-		log.debug("============================================ End findByPlayrNameLike ============================================");
 	}
 	
 	@Test

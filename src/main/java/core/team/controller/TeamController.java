@@ -1,5 +1,7 @@
 package core.team.controller;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -37,8 +39,8 @@ public class TeamController {
 	
 	// 모든 팀의 정보를 조회
 	@GetMapping("/teams/all")
-	public ResponseEntity<?> searchAllTeams(){
-		return new ResponseEntity<>(teamService.searchAllTeams(),HttpStatus.OK);
+	public ResponseEntity<?> searchAllTeams(@PageableDefault(page = 0, size = 10) Pageable pageable){
+		return new ResponseEntity<>(teamService.searchAllTeams(pageable),HttpStatus.OK);
 	}
 	
 	// team 정보를 조건 검색

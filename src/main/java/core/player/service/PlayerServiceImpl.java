@@ -12,8 +12,13 @@ import java.util.stream.Collectors;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import core.common.encryption.AES256Util;
 import core.player.dto.PlayerDto;
@@ -43,8 +48,8 @@ public class PlayerServiceImpl implements PlayerService {
 	
 	@Override
 	@Transactional(readOnly=true)
-	public List<PlayerDto> searchPlayerAll() {
-		List<PlayerEntity> entityList = playerRepository.findAll();
+	public List<PlayerDto> searchPlayerAll(Pageable pageable) {
+		Page<PlayerEntity> entityList = playerRepository.findAll(pageable);
 		List<PlayerDto> dtoList = entityList.stream().map(PlayerEntity::toDto).collect(Collectors.toList());
 		return dtoList;
 	}
@@ -104,34 +109,29 @@ public class PlayerServiceImpl implements PlayerService {
 		
 		List<PlayerDto> list= new ArrayList<PlayerDto>();
 		
-		List<Integer> uniformList = players.stream().map(PlayerDto::getUniformNo).distinct().collect(Collectors.toList());
-		// 입력받는 players의 수와 uniform 숫자만 중복없이 정렬했을때의 수가 같다면 그대로 진행. 
-		if(uniformList.size()==players.size()) {
-			// team이 존재하는 선수들 먼저 저장.
-			Map<TeamDto, List<PlayerDto>> havingTeam =  players.stream().filter(dto->dto.getTeam()!=null).collect(Collectors.groupingBy(dto->dto.getTeam()));
-			for(TeamDto team : havingTeam.keySet()) {
-				List<PlayerEntity> existingPlayerList = playerRepository.findByTeam_teamName(team.getTeamName());
-				List<Integer> existingUniformList =  existingPlayerList.stream().map(PlayerEntity::getUniformNo).collect(Collectors.toList());
-				List<Integer> newUniformList = havingTeam.get(team).stream().map(PlayerDto::getUniformNo).collect(Collectors.toList());
-				// DB에서 존재하는 Team의 Uniform 번호들과 신규로 등록하려는 Uniform 번허들이 갖지 않다면 저장 / 같다면 Exception 발생
-				if(!existingUniformList.containsAll(newUniformList)) {
-					List<PlayerEntity> newPlayerEntityList =  havingTeam.get(team).stream().map(PlayerDto::toEntity).collect(Collectors.toList());
-					List<PlayerEntity> savePlayerEntityList = playerRepository.saveAll(newPlayerEntityList);
-					List<PlayerDto> dtoList =  savePlayerEntityList.stream().map(item->item.toDto()).collect(Collectors.toList());
-					list.addAll(dtoList);
-				}else {
-					throw new Exception("기존에 존재하는 Uniform 번호와 중복 될 수 없습니다.");
-				}
+		// team이 존재하는 선수들 먼저 저장.
+		Map<TeamDto, List<PlayerDto>> havingTeam =  players.stream().filter(dto->dto.getTeam()!=null).collect(Collectors.groupingBy(dto->dto.getTeam()));
+		for(TeamDto team : havingTeam.keySet()) {
+			List<PlayerEntity> existingPlayerList = playerRepository.findByTeam_teamName(team.getTeamName());
+			List<Integer> existingUniformList =  existingPlayerList.stream().map(PlayerEntity::getUniformNo).collect(Collectors.toList());
+			List<Integer> newUniformList = havingTeam.get(team).stream().map(PlayerDto::getUniformNo).collect(Collectors.toList());
+			// DB에 존재하는 값과 새로 등록하려는 값의 중복값만 existingUniformList에 남긴다. 중복값이 있으면 error message를 / 중복값이 없으면 저장을 한다.
+			existingUniformList.retainAll(newUniformList);
+			if(existingUniformList.isEmpty()) {
+				List<PlayerEntity> newPlayerEntityList =  havingTeam.get(team).stream().map(PlayerDto::toEntity).collect(Collectors.toList());
+				List<PlayerEntity> savePlayerEntityList = playerRepository.saveAll(newPlayerEntityList);
+				List<PlayerDto> dtoList =  savePlayerEntityList.stream().map(item->item.toDto()).collect(Collectors.toList());
+				list.addAll(dtoList);
+			}else {
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Uniform 번호와 중복 될 수 없습니다.\n"+existingUniformList.toString(),new Exception());
 			}
-			// team이 존재하지 않는 선수들 저장.
-			List<PlayerDto> nonHavingTeam =  players.stream().filter(dto->dto.getTeam()==null).collect(Collectors.toList());
-			List<PlayerEntity> newPlayerEntityList =  nonHavingTeam.stream().map(PlayerDto::toEntity).collect(Collectors.toList());
-			List<PlayerEntity> savePlayerEntityList = playerRepository.saveAll(newPlayerEntityList);
-			List<PlayerDto> dtoList =  savePlayerEntityList.stream().map(item->item.toDto()).collect(Collectors.toList());
-			list.addAll(dtoList);
-		}else{
-			throw new Exception("Uniform 번호는 중복 될 수 없습니다.");
 		}
+		// team이 존재하지 않는 선수들 저장.
+		List<PlayerDto> nonHavingTeam =  players.stream().filter(dto->dto.getTeam()==null).collect(Collectors.toList());
+		List<PlayerEntity> newPlayerEntityList =  nonHavingTeam.stream().map(PlayerDto::toEntity).collect(Collectors.toList());
+		List<PlayerEntity> savePlayerEntityList = playerRepository.saveAll(newPlayerEntityList);
+		List<PlayerDto> dtoList =  savePlayerEntityList.stream().map(item->item.toDto()).collect(Collectors.toList());
+		list.addAll(dtoList);
 		
 		return list;
 		
@@ -139,12 +139,12 @@ public class PlayerServiceImpl implements PlayerService {
 	
 	@Override
 	@Transactional
-	public PlayerDto updatePlayer(Long id,PlayerDto player) throws NoSuchAlgorithmException, UnsupportedEncodingException, GeneralSecurityException {
+	public PlayerDto updatePlayer(Long id,PlayerDto player) throws NoSuchAlgorithmException, UnsupportedEncodingException, GeneralSecurityException, IllegalArgumentException{
 		// 개인정보를 암호화 한다.
 		player = personalInformationEncryption(player);
 
 		// DB에 Id에 해당하는 Player가 존재하는지 찾은 후 Update를 진행한다.
-		PlayerEntity originPlayer = playerRepository.findById(id).orElseThrow(()->new IllegalArgumentException("Id가 존재하지 않습니다."));
+		PlayerEntity originPlayer = playerRepository.findById(id).orElseThrow(()-> new ResponseStatusException(HttpStatus.BAD_REQUEST,"Id가 존재하지 않습니다.",new IllegalArgumentException()));
 		originPlayer.setPlayerEntity(player);
 		return originPlayer.toDto();
 	}
@@ -170,8 +170,5 @@ public class PlayerServiceImpl implements PlayerService {
 		List<PlayerEntity> list = playerReppositoryCustom.findPlayer(playerName, uniformNo, teamName);
 		return list.stream().map(item->item.toDto()).collect(Collectors.toList());
 	}
-
-	
-	
 
 }

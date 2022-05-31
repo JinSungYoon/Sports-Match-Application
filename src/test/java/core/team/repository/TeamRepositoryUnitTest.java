@@ -1,6 +1,7 @@
 package core.team.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +20,8 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -74,6 +77,29 @@ public class TeamRepositoryUnitTest {
 	public void createTeamNullPointError() {
 		TeamEntity team = new TeamEntity(null,"Naju",BelongType.MIDDLE_SCHOOL,"에러를 만드는 팀입니다.");
 		Assertions.assertThrows(ConstraintViolationException.class, ()-> teamRepository.save(team));
+	}
+	
+	@Test
+	@DisplayName("팀 전체 찾기")
+	void findTeamAllTest() {
+		TeamEntity team1 = new TeamEntity("team1","서울시 서대문구",BelongType.CLUB,"Team1입니다. 서울시 화이팅!!!");
+		TeamEntity team2 = new TeamEntity("team2","경기도 동안구",BelongType.CLUB,"Team2입니다. 경기도 화이팅!!!");
+		TeamEntity team3 = new TeamEntity("team3","서울시 은평구",BelongType.HIGH_SCHOOL,"Team3입니다. 서울시 화이팅!!!");
+		TeamEntity team4 = new TeamEntity("team4","경기도 분당구",BelongType.HIGH_SCHOOL,"Team4입니다. 경기도 화이팅!!!");
+		TeamEntity team5 = new TeamEntity("team5","서울시 마포구",BelongType.CLUB,"Team5입니다. 서울시 화이팅!!!");
+		List<TeamEntity> teamList = new ArrayList<TeamEntity>();
+		teamList.add(team1);
+		teamList.add(team2);
+		teamList.add(team3);
+		teamList.add(team4);
+		teamList.add(team5);
+		teamRepository.saveAll(teamList);
+		PageRequest pageRequest = PageRequest.of(1, 2);
+		Page<TeamEntity> list = teamRepository.findAll(pageRequest);
+		
+		assertEquals(list.getSize(), 2);
+		assertEquals(list.getTotalPages(),3);
+		assertEquals(list.getTotalElements(),5L);
 	}
 	
 	@Test
