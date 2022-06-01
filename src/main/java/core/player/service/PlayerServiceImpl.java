@@ -165,8 +165,8 @@ public class PlayerServiceImpl implements PlayerService {
 	}
 
 	@Override
-	public List<PlayerDto> searchPlayers(String playerName,Integer uniformNo,String teamName) {
-		List<PlayerEntity> list = playerReppositoryCustom.findPlayer(playerName, uniformNo, teamName);
+	public List<PlayerDto> searchPlayers(String playerName,Integer uniformNo,String teamName,Pageable pageable) {
+		List<PlayerEntity> list = playerReppositoryCustom.findPlayer(playerName, uniformNo, teamName,pageable);
 		return list.stream().map(item->item.toDto()).collect(Collectors.toList());
 	}
 

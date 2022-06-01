@@ -26,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -178,16 +179,21 @@ public class PlayerControllerIntegreTest {
 		list.add(new PlayerDto("player3","220530-1111111",2,team2));
 		list.add(new PlayerDto("player4","220530-1111111",2,team1));
 		list.add(new PlayerDto("player5","220530-1111111",3,team2));
-		rtnList.add(new PlayerDto("player2","220530-1111111",1,team2));
-		rtnList.add(new PlayerDto("player3","220530-1111111",2,team2));
-		rtnList.add(new PlayerDto("player5","220530-1111111",3,team2));
-		
+		list.add(new PlayerDto("player6","220530-1111111",4,team2));
+		list.add(new PlayerDto("player7","220530-1111111",5,team2));
+		list.add(new PlayerDto("player8","220530-1111111",3,team1));
+		list.add(new PlayerDto("player9","220530-1111111",6,team2));
+		rtnList.add(new PlayerDto("player6","220530-1111111",4,team2));
+		rtnList.add(new PlayerDto("player7","220530-1111111",5,team2));
+		rtnList.add(new PlayerDto("player9","220530-1111111",6,team2));
+
+		// 모든 Player를 등록
 		playerService.registerPlayers(list);
 		
-		List<PlayerDto> getList = playerService.searchPlayers(null, null, "team2");
+		PageRequest pageRequest = PageRequest.of(1, 3);
 		
 		// when
-		ResultActions resultAction = mockMvc.perform(get("/players?teamName={teamName}","team2")
+		ResultActions resultAction = mockMvc.perform(get("/players?teamName={teamName}&page={page}&size={size}","team2","1","3")
 				.accept(MediaType.APPLICATION_JSON_UTF8));
 		
 		// then
@@ -195,7 +201,9 @@ public class PlayerControllerIntegreTest {
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$").isArray())
 			.andExpect(jsonPath("$",hasSize(3)))
-			.andExpect(jsonPath("$.[0].playerName").value("player2"))
+			.andExpect(jsonPath("$.[0].playerName").value("player6"))
+			.andExpect(jsonPath("$.[1].uniformNo").value("5"))
+			.andExpect(jsonPath("$.[2].team.teamName").value("team2"))
 			.andDo(MockMvcResultHandlers.print());
 	}
 	

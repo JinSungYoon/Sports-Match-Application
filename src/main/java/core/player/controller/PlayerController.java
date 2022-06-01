@@ -52,8 +52,8 @@ public class PlayerController {
 	}
 	
 	@GetMapping("/players")
-	public ResponseEntity<?> searchPlayers(@RequestParam(value="playerName",required=false)String playerName,@RequestParam(value="uniformNo",required=false)Integer uniformNo,@RequestParam(value="teamName",required=false)String teamName){
-		return new ResponseEntity<>(playerService.searchPlayers(playerName, uniformNo, teamName),HttpStatus.OK);
+	public ResponseEntity<?> searchPlayers(@RequestParam(value="playerName",required=false)String playerName,@RequestParam(value="uniformNo",required=false)Integer uniformNo,@RequestParam(value="teamName",required=false)String teamName,@PageableDefault(page=0,size=10) Pageable pageable){
+		return new ResponseEntity<>(playerService.searchPlayers(playerName, uniformNo, teamName,pageable),HttpStatus.OK);
 	}
 	
 	@PatchMapping("/player/{id}")

@@ -180,21 +180,27 @@ public class PlayerServiceImplUnitTest {
 		List<PlayerDto> list = new ArrayList<>();
 		TeamDto team1 = new TeamDto("fakeTeam1","Earth",BelongType.CLUB,"Fake team1 입니다");
 		TeamDto team2 = new TeamDto("fakeTeam2","Space",BelongType.PROTEAM,"Fake team2 입니다");
-		PlayerDto player1 = new PlayerDto("bluePlayer","111111-1111111",1,team1);
-		PlayerDto player2 = new PlayerDto("skyBluePlayer","111111-2222222",1,team2);
-		PlayerDto player3 = new PlayerDto("pinkPlayer","111111-3333333",2,team2);
-		PlayerDto player4 = new PlayerDto("orangeYellowPlayer","111111-4444444",2,team1);
-		PlayerDto player5 = new PlayerDto("redPlayer","111111-5555555",3,team1);
+		TeamDto team3 = new TeamDto("fakeTeam3","Mars",BelongType.UNIVERSITY,"Fake team3 입니다");
+		PlayerDto player1 = new PlayerDto("redPlayer","111111-1111111",1,team1);
+		PlayerDto player2 = new PlayerDto("orangePlayer","111111-2222222",1,team2);
+		PlayerDto player3 = new PlayerDto("yellowPlayer","111111-3333333",2,team2);
+		PlayerDto player4 = new PlayerDto("greenYellowPlayer","111111-4444444",1,team3);
+		PlayerDto player5 = new PlayerDto("bluePlayer","111111-5555555",2,team1);
+		PlayerDto player6 = new PlayerDto("indigoPlayer","111111-6666666",3,team1);
+		PlayerDto player7 = new PlayerDto("purplePlayer","111111-7777777",2,team3);
+		PlayerDto player8 = new PlayerDto("whitePlayer","111111-8888888",3,team2);
+		PlayerDto player9 = new PlayerDto("blackPlayer","111111-9999999",4,team1);
 		list.add(player1);
-		list.add(player4);
 		list.add(player5);
-
+		list.add(player6);
+		//list.add(player9);
+		PageRequest pageRequest = PageRequest.of(0, 3);
 		// when
-		when(playerRepositoryCustom.findPlayer(null, null, "fakeTeam1")).thenReturn(list.stream().map(PlayerDto::toEntity).collect(Collectors.toList()));
-		List<PlayerDto> rtnList = playerService.searchPlayers(null, null, "fakeTeam1");
+		when(playerRepositoryCustom.findPlayer(null, null, "fakeTeam1",pageRequest)).thenReturn(list.stream().map(PlayerDto::toEntity).collect(Collectors.toList()));
+		List<PlayerDto> rtnList = playerService.searchPlayers(null, null, "fakeTeam1",pageRequest);
 		
 		assertThat(rtnList.size()).isEqualTo(3);
-		assertThat(rtnList.get(0).getPlayerName()).isEqualTo("bluePlayer");
+		assertThat(rtnList.get(0).getPlayerName()).isEqualTo("redPlayer");
 		assertThat(rtnList.get(1).getUniformNo()).isEqualTo(2);
 		assertThat(rtnList.get(2).getTeam().getTeamName()).isEqualTo("fakeTeam1");
 		

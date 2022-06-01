@@ -13,7 +13,7 @@ import core.player.dto.PlayerDto;
 public interface PlayerService {
 	PlayerDto searchOnePlayer(Long id);
 	List<PlayerDto> searchPlayerAll(Pageable pageable);
-	List<PlayerDto> searchPlayers(String playerName,Integer uniformNo,String teamName);
+	List<PlayerDto> searchPlayers(String playerName,Integer uniformNo,String teamName,Pageable pageable);
 	PlayerDto registerPlayer(PlayerDto player) throws NoSuchAlgorithmException, UnsupportedEncodingException, GeneralSecurityException;
 	List<PlayerDto> registerPlayers(List<PlayerDto> players) throws Exception;
 	PlayerDto updatePlayer(Long id,PlayerDto player) throws NoSuchAlgorithmException, UnsupportedEncodingException, GeneralSecurityException;

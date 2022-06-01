@@ -90,8 +90,8 @@ public class PlayerRepositoryUnitTest {
 		playerRepository.save(player1);
 		playerRepository.save(player2);
 		playerRepository.save(player3);
-		
-		TeamEntity rtnTeam = teamRepositoryCustom.findTeam("team1",null,null,null).get(0);
+		PageRequest pageRequest = PageRequest.of(0, 2);
+		TeamEntity rtnTeam = teamRepositoryCustom.findTeam("team1",null,null,null,pageRequest).get(0);
 		Assertions.assertThat(rtnTeam).isEqualTo(team1);
 		
 		PlayerEntity rtnPlayer = playerRepository.findByPlayerName("player1");
@@ -156,15 +156,24 @@ public class PlayerRepositoryUnitTest {
 		// given
 		TeamEntity team1 = new TeamEntity("team1","Seoul",BelongType.fromValue("C"),"1팀 입니다.");
 		TeamEntity team2 = new TeamEntity("team2","Seoul",BelongType.fromValue("H"),"2팀 입니다.");
+		TeamEntity team3 = new TeamEntity("team3","Seoul",BelongType.fromValue("U"),"3팀 입니다.");
 		teamRepository.save(team1);
 		teamRepository.save(team2);
+		teamRepository.save(team3);
 		PlayerEntity player1 = new PlayerEntity("가선수","220504-1111111",1,team1);
 		PlayerEntity player2 = new PlayerEntity("나선수","220504-1111111",1,team2);
 		PlayerEntity player3 = new PlayerEntity("다선수","220504-1111111",2,team1);
 		PlayerEntity player4 = new PlayerEntity("라선수","220504-1111111",2,team2);
-		PlayerEntity player5 = new PlayerEntity("마선수","220504-1111111",3,team2);
+		PlayerEntity player5 = new PlayerEntity("마선수","220504-1111111",1,team3);
 		PlayerEntity player6 = new PlayerEntity("바선수","220504-1111111",3,team1);
-		PlayerEntity player7 = new PlayerEntity("사선수","220504-1111111",4,team2);
+		PlayerEntity player7 = new PlayerEntity("사선수","220504-1111111",3,team2);
+		PlayerEntity player8 = new PlayerEntity("아선수","220504-1111111",2,team3);
+		PlayerEntity player9 = new PlayerEntity("자선수","220504-1111111",4,team2);
+		PlayerEntity player10 = new PlayerEntity("차선수","220504-1111111",4,team1);
+		PlayerEntity player11 = new PlayerEntity("카선수","220504-1111111",5,team2);
+		PlayerEntity player12 = new PlayerEntity("타선수","220504-1111111",3,team3);
+		PlayerEntity player13 = new PlayerEntity("파선수","220504-1111111",4,team3);
+		PlayerEntity player14 = new PlayerEntity("하선수","220504-1111111",6,team2);
 		playerRepository.save(player1);
 		playerRepository.save(player2);
 		playerRepository.save(player3);
@@ -172,18 +181,26 @@ public class PlayerRepositoryUnitTest {
 		playerRepository.save(player5);
 		playerRepository.save(player6);
 		playerRepository.save(player7);
+		playerRepository.save(player8);
+		playerRepository.save(player9);
+		playerRepository.save(player10);
+		playerRepository.save(player11);
+		playerRepository.save(player12);
+		playerRepository.save(player13);
+		playerRepository.save(player14);
 		
 		// when
-		List<PlayerEntity> playerList1 =  playerRepositoryCustom.findPlayer("가선수", null, null);
-		List<PlayerEntity> playerList2 =  playerRepositoryCustom.findPlayer(null, 3, null);
-		List<PlayerEntity> playerList3 =  playerRepositoryCustom.findPlayer(null, null, "team2");
+		PageRequest pageRequest = PageRequest.of(1, 2);
+		List<PlayerEntity> playerList1 =  playerRepositoryCustom.findPlayer("선수", null, null,pageRequest);
+		List<PlayerEntity> playerList2 =  playerRepositoryCustom.findPlayer(null, 3, null,pageRequest);
+		List<PlayerEntity> playerList3 =  playerRepositoryCustom.findPlayer(null, null, "team2",pageRequest);
 		
 		// then
-		Assertions.assertThat(playerList1.size()).isEqualTo(1);
-		Assertions.assertThat(playerList2.size()).isEqualTo(2);
-		Assertions.assertThat(playerList3.size()).isEqualTo(4);
-		Assertions.assertThat(playerList1.get(0)).isEqualTo(player1);
-		Assertions.assertThat(playerList2.get(0)).isEqualTo(player5);
-		Assertions.assertThat(playerList3.get(0)).isEqualTo(player2);
+		Assertions.assertThat(playerList1.size()).isEqualTo(2);
+		Assertions.assertThat(playerList2.size()).isEqualTo(1);
+		Assertions.assertThat(playerList3.size()).isEqualTo(2);
+		Assertions.assertThat(playerList1.get(0)).isEqualTo(player3);
+		Assertions.assertThat(playerList2.get(0)).isEqualTo(player12);
+		Assertions.assertThat(playerList3.get(0)).isEqualTo(player7);
 	}
 }
