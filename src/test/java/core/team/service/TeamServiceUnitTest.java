@@ -58,9 +58,10 @@ public class TeamServiceUnitTest {
 		rtnList.add(team1);
 		rtnList.add(team3);
 		rtnList.add(team5);
-		when(teamRepositoryImpl.findTeam(null, "서울시", null, null)).thenReturn(rtnList.stream().map(TeamDto::toEntity).collect(Collectors.toList()));
+		PageRequest pageRequest = PageRequest.of(0, 2);
+		when(teamRepositoryImpl.findTeam(null, "서울시", null, null,pageRequest)).thenReturn(rtnList.stream().map(TeamDto::toEntity).collect(Collectors.toList()));
 		// when
-		List<TeamDto> expectDto = teamService.searchTeams(null, "서울시", null, null);
+		List<TeamDto> expectDto = teamService.searchTeams(null, "서울시", null, null,pageRequest);
 		// then
 		assertThat(expectDto.size()).isEqualTo(3);
 		assertThat(expectDto.get(0)).isEqualTo(rtnList.get(0));

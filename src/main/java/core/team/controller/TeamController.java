@@ -45,8 +45,8 @@ public class TeamController {
 	
 	// team 정보를 조건 검색
 	@GetMapping("/teams")
-	public ResponseEntity<?> searchTeams(@RequestParam(value="teamName",required=false) String teamName,@RequestParam(value="location",required=false) String location,@RequestParam(value="belongType",required=false) BelongType belongType,@RequestParam(value="introduction",required=false) String introduction){
-		return new ResponseEntity<>(teamService.searchTeams(teamName, location, belongType, introduction),HttpStatus.OK);
+	public ResponseEntity<?> searchTeams(@RequestParam(value="teamName",required=false) String teamName,@RequestParam(value="location",required=false) String location,@RequestParam(value="belongType",required=false) BelongType belongType,@RequestParam(value="introduction",required=false) String introduction,@PageableDefault(page=0,size=10)Pageable pageable){
+		return new ResponseEntity<>(teamService.searchTeams(teamName, location, belongType, introduction,pageable),HttpStatus.OK);
 	}
 	
 	// team 정보를 수정

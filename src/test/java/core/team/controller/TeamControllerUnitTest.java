@@ -148,12 +148,13 @@ public class TeamControllerUnitTest {
 		TeamDto teamDto5 = new TeamDto("PinkTeam","경기 팔달구",BelongType.HIGH_SCHOOL,"핑크팀입니다.");
 		rtnlist.add(teamDto2);
 		rtnlist.add(teamDto5);
-		when(teamService.searchTeams(null, "경기", null, null)).thenReturn(rtnlist);
+		PageRequest pageRequest = PageRequest.of(0, 2);
+		when(teamService.searchTeams(null, "경기", null, null,pageRequest)).thenReturn(rtnlist);
 		
 		String content = new ObjectMapper().writeValueAsString(rtnlist);
 		
 		// when
-		ResultActions resultAction = mockMvc.perform(get("/teams?location={location}","경기")
+		ResultActions resultAction = mockMvc.perform(get("/teams?location={location}&page={page}&size={size}","경기",0,2)
 				.contentType(MediaType.APPLICATION_JSON_UTF8)
 				.content(content));
 		// then

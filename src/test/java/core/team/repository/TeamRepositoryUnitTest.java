@@ -116,8 +116,9 @@ public class TeamRepositoryUnitTest {
 		teamList.add(team3);
 		teamList.add(team4);
 		teamList.add(team5);
+		PageRequest pageRequest = PageRequest.of(0, 2);
 		teamRepository.saveAll(teamList);
-		List<TeamEntity> rtnTeamList = teamRepositoryCustom.findTeam(null,"경기",null,null);
+		List<TeamEntity> rtnTeamList = teamRepositoryCustom.findTeam(null,"경기",null,null,pageRequest);
 		assertThat(rtnTeamList.get(0)).isEqualTo(team2);
 	}
 	

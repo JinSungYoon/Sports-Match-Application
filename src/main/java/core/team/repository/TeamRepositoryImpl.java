@@ -2,6 +2,8 @@ package core.team.repository;
 
 import java.util.List;
 
+import org.springframework.data.domain.Pageable;
+
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -20,11 +22,13 @@ public class TeamRepositoryImpl implements TeamRepositoryCustom {
 	QTeamEntity team = QTeamEntity.teamEntity;
 	
 	@Override
-	public List<TeamEntity> findTeam(String teamName,String location,BelongType belongType,String introduction) {
+	public List<TeamEntity> findTeam(String teamName,String location,BelongType belongType,String introduction,Pageable pageable) {
 		List<TeamEntity> teams = queryFactory
 				.select(team.teamEntity)
 				.from(team.teamEntity)
 				.where(eqTeamName(teamName),containLocation(location),eqBelongType(belongType),containIntroduction(introduction))
+				.offset(pageable.getOffset())
+				.limit(pageable.getPageSize())
 				.orderBy(team.id.asc(),team.location.asc(),team.belongType.asc())
 				.fetch();
 				

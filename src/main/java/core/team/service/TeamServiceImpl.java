@@ -60,8 +60,8 @@ public class TeamServiceImpl implements TeamService{
 	}
 
 	@Override
-	public List<TeamDto> searchTeams(String teamName,String location,BelongType belongType,String introduction) {
-		List<TeamEntity> list = teamRepositoryImpl.findTeam(teamName, location, belongType, introduction);
+	public List<TeamDto> searchTeams(String teamName,String location,BelongType belongType,String introduction,Pageable pageable) {
+		List<TeamEntity> list = teamRepositoryImpl.findTeam(teamName, location, belongType, introduction,pageable);
 		return list.stream().map(item->item.toDto()).collect(Collectors.toList());
 	}
 	
