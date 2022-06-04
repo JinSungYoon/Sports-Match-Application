@@ -17,16 +17,19 @@ public class JoinDto {
 	@NotNull
 	private RequesterType requesterType;
 	@NotNull
-	private String teamId;
+	private Long teamId;
 	@NotNull
-	private String playerId;
+	private Long playerId;
+	@NotNull
+	private char activeYN;
 	
 	@Builder
-	public JoinDto(StatusType statusType,RequesterType requesterType,String teamId,String playerId) {
+	public JoinDto(StatusType statusType,RequesterType requesterType,Long teamId,Long playerId,char activeYN) {
 		this.statusType = statusType;
 		this.requesterType = requesterType;
 		this.teamId = teamId;
 		this.playerId = playerId;
+		this.activeYN = activeYN;
 	}
 	
 	public JoinEntity toEntity() {
@@ -36,6 +39,7 @@ public class JoinDto {
 				.requesterType(requesterType)
 				.teamId(teamId)
 				.playerId(playerId)
+				.activeYN(activeYN)
 				.build();
 	}
 }
