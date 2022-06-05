@@ -22,7 +22,7 @@ public class QPlayerEntity extends EntityPathBase<PlayerEntity> {
 
     public static final QPlayerEntity playerEntity = new QPlayerEntity("playerEntity");
 
-    public final QBaseEntity _super = new QBaseEntity(this);
+    public final core.common.entity.QBaseEntity _super = new core.common.entity.QBaseEntity(this);
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdDate = _super.createdDate;

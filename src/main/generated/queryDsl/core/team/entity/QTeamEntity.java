@@ -19,7 +19,7 @@ public class QTeamEntity extends EntityPathBase<TeamEntity> {
 
     public static final QTeamEntity teamEntity = new QTeamEntity("teamEntity");
 
-    public final core.player.entity.QBaseEntity _super = new core.player.entity.QBaseEntity(this);
+    public final core.common.entity.QBaseEntity _super = new core.common.entity.QBaseEntity(this);
 
     public final EnumPath<core.player.entity.BelongType> belongType = createEnum("belongType", core.player.entity.BelongType.class);
 
