@@ -4,16 +4,16 @@ import java.util.List;
 
 import org.springframework.data.domain.Pageable;
 
-import com.querydsl.core.Tuple;
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
+import core.join.dto.JoinDto;
+import core.join.entity.JoinEntity;
 import core.join.entity.QJoinEntity;
-import core.join.entity.RequesterType;
 import core.join.entity.StatusType;
 import core.player.entity.QPlayerEntity;
 import core.team.entity.QTeamEntity;
-import core.team.entity.TeamEntity;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -26,39 +26,43 @@ public class JoinRepositoryImpl implements JoinRepositoryCustom{
 	QTeamEntity team = QTeamEntity.teamEntity;  
 	
 	@Override
-	public List<Tuple> findPlayerJoinRequest(StatusType statusType, Long playerId,
-			 Pageable pageable) {
-		List<Tuple> proposals = queryFactory
-				.select(team.teamEntity.teamName,join.joinEntity.statusType,join.joinEntity.createdDate)
-				.from(join,team)
-				.where(join.teamId.eq(team.id),join.activeYN.eq('Y'),eqPlayerId(playerId))
+	public List<JoinDto> findPlayerJoinRequest(StatusType statusType, Long playerId,Pageable pageable) {
+		List<JoinDto> proposals = queryFactory
+				.select(Projections.fields(JoinDto.class,join.team.id,join.statusType,join.createdDate))
+				.from(join)
+				.join(join.team,team)
+				.where(join.activeYN.eq('Y'),eqPlayerId(playerId))
+				.offset(pageable.getOffset())
+				.limit(pageable.getPageSize())
+				.orderBy(join.joinId.asc(),join.updatedDate.desc())
 				.fetch();
-				
+		
 		return proposals;
 	}
 	
 	@Override
-	public List<Tuple> findTeamJoinRequest(StatusType statusType, Long teamId, Pageable pageable) {
-		List<Tuple> proposals = queryFactory
-				.select(player.playerName,join.statusType,join.createdDate)
+	public List<JoinDto> findTeamJoinRequest(StatusType statusType, Long teamId, Pageable pageable) {
+		List<JoinDto> proposals = queryFactory
+				.select(Projections.bean(JoinDto.class,join.player.id,join.statusType,join.createdDate))
 				.from(join,player)
-				.where(join.playerId.eq(player.id),join.activeYN.eq('Y'),eqTeamId(teamId))
+				.join(join.player,player)
+				.where(join.activeYN.eq('Y'),eqTeamId(teamId))
 				.fetch();
-		return null;
+		return proposals;
 	}
 	
 	private BooleanExpression eqPlayerId(Long playerId) {
 		if(playerId == null) {
 			return null;
 		}
-		return join.playerId.eq(playerId);
+		return join.player.id.eq(playerId);
 	}
 	
 	private BooleanExpression eqTeamId(Long teamId) {
 		if(teamId == null) {
 			return null;
 		}
-		return join.teamId.eq(teamId);
+		return join.team.id.eq(teamId);
 	}
 
 	

@@ -5,6 +5,8 @@ import javax.validation.constraints.NotNull;
 import core.join.entity.JoinEntity;
 import core.join.entity.RequesterType;
 import core.join.entity.StatusType;
+import core.player.entity.PlayerEntity;
+import core.team.entity.TeamEntity;
 import lombok.Builder;
 import lombok.Data;
 
@@ -24,7 +26,7 @@ public class JoinDto {
 	private char activeYN;
 	
 	@Builder
-	public JoinDto(StatusType statusType,RequesterType requesterType,Long teamId,Long playerId,char activeYN) {
+	public JoinDto(StatusType statusType,RequesterType requesterType,Long playerId,Long teamId,char activeYN) {
 		this.statusType = statusType;
 		this.requesterType = requesterType;
 		this.teamId = teamId;
@@ -32,14 +34,24 @@ public class JoinDto {
 		this.activeYN = activeYN;
 	}
 	
-	public JoinEntity toEntity() {
+	public JoinEntity toEntity(JoinDto join,PlayerEntity player,TeamEntity team) {
 		if(this == null) return null;
 		return JoinEntity.builder()
-				.statusType(statusType)
-				.requesterType(requesterType)
-				.teamId(teamId)
-				.playerId(playerId)
-				.activeYN(activeYN)
+				.statusType(join.getStatusType())
+				.requesterType(join.getRequesterType())
+				.team(team)
+				.player(player)
+				.activeYN(join.getActiveYN())
 				.build();
 	}
+	
+	public Boolean checkStatus(StatusType statusType) {
+		if(this.statusType.equals(statusType)) {
+			return true;
+		}else {
+			return false;
+		}
+		 
+	}
+	
 }

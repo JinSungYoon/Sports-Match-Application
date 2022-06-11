@@ -6,9 +6,11 @@ import org.springframework.data.domain.Pageable;
 
 import com.querydsl.core.Tuple;
 
+import core.join.dto.JoinDto;
+import core.join.entity.JoinEntity;
 import core.join.entity.StatusType;
 
 public interface JoinRepositoryCustom {
-	List<Tuple> findPlayerJoinRequest(StatusType statusType,Long playerId,Pageable pageable);
-	List<Tuple> findTeamJoinRequest(StatusType statusType,Long teamId,Pageable pageable);
+	List<JoinDto> findPlayerJoinRequest(StatusType statusType,Long playerId,Pageable pageable);
+	List<JoinDto> findTeamJoinRequest(StatusType statusType,Long teamId,Pageable pageable);
 }
