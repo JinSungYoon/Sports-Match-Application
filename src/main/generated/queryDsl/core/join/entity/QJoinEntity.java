@@ -7,6 +7,7 @@ import com.querydsl.core.types.dsl.*;
 import com.querydsl.core.types.PathMetadata;
 import javax.annotation.Generated;
 import com.querydsl.core.types.Path;
+import com.querydsl.core.types.dsl.PathInits;
 
 
 /**
@@ -16,6 +17,8 @@ import com.querydsl.core.types.Path;
 public class QJoinEntity extends EntityPathBase<JoinEntity> {
 
     private static final long serialVersionUID = -1093435357L;
+
+    private static final PathInits INITS = PathInits.DIRECT2;
 
     public static final QJoinEntity joinEntity = new QJoinEntity("joinEntity");
 
@@ -28,27 +31,37 @@ public class QJoinEntity extends EntityPathBase<JoinEntity> {
 
     public final NumberPath<Long> joinId = createNumber("joinId", Long.class);
 
-    public final NumberPath<Long> playerId = createNumber("playerId", Long.class);
+    public final core.player.entity.QPlayerEntity player;
 
     public final EnumPath<RequesterType> requesterType = createEnum("requesterType", RequesterType.class);
 
     public final EnumPath<StatusType> statusType = createEnum("statusType", StatusType.class);
 
-    public final NumberPath<Long> teamId = createNumber("teamId", Long.class);
+    public final core.team.entity.QTeamEntity team;
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> updatedDate = _super.updatedDate;
 
     public QJoinEntity(String variable) {
-        super(JoinEntity.class, forVariable(variable));
+        this(JoinEntity.class, forVariable(variable), INITS);
     }
 
     public QJoinEntity(Path<? extends JoinEntity> path) {
-        super(path.getType(), path.getMetadata());
+        this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
     }
 
     public QJoinEntity(PathMetadata metadata) {
-        super(JoinEntity.class, metadata);
+        this(metadata, PathInits.getFor(metadata, INITS));
+    }
+
+    public QJoinEntity(PathMetadata metadata, PathInits inits) {
+        this(JoinEntity.class, metadata, inits);
+    }
+
+    public QJoinEntity(Class<? extends JoinEntity> type, PathMetadata metadata, PathInits inits) {
+        super(type, metadata, inits);
+        this.player = inits.isInitialized("player") ? new core.player.entity.QPlayerEntity(forProperty("player"), inits.get("player")) : null;
+        this.team = inits.isInitialized("team") ? new core.team.entity.QTeamEntity(forProperty("team")) : null;
     }
 
 }
