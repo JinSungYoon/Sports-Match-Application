@@ -18,9 +18,11 @@ import core.player.entity.PlayerEntity;
 import core.team.entity.TeamEntity;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 
 @Entity
 @Getter
+@ToString
 @Table(name = "JOINING")
 public class JoinEntity extends BaseEntity {
 	

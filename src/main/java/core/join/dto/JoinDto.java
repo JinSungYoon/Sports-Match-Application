@@ -1,5 +1,7 @@
 package core.join.dto;
 
+import java.time.LocalDateTime;
+
 import javax.validation.constraints.NotNull;
 
 import core.join.entity.JoinEntity;
@@ -9,11 +11,13 @@ import core.player.entity.PlayerEntity;
 import core.team.entity.TeamEntity;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class JoinDto {
 	
-	private Long id;
+	private Long joinId;
 	@NotNull
 	private StatusType statusType;
 	@NotNull
@@ -24,6 +28,21 @@ public class JoinDto {
 	private Long playerId;
 	@NotNull
 	private char activeYN;
+	
+	private LocalDateTime createDate;
+	private LocalDateTime updateDate;
+	
+	
+	public JoinDto(Long joinId,Long teamId,Long playerId,RequesterType requesterType,StatusType statusType,char activeYN,LocalDateTime createDate,LocalDateTime updateDate) {
+		this.joinId = joinId;
+		this.teamId = teamId;
+		this.playerId = playerId;
+		this.requesterType = requesterType;
+		this.statusType = statusType;
+		this.activeYN = activeYN;
+		this.createDate = createDate;
+		this.updateDate = updateDate;
+	}
 	
 	@Builder
 	public JoinDto(StatusType statusType,RequesterType requesterType,Long playerId,Long teamId,char activeYN) {

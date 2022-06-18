@@ -9,7 +9,6 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import core.join.dto.JoinDto;
-import core.join.entity.JoinEntity;
 import core.join.entity.QJoinEntity;
 import core.join.entity.StatusType;
 import core.player.entity.QPlayerEntity;
@@ -28,7 +27,7 @@ public class JoinRepositoryImpl implements JoinRepositoryCustom{
 	@Override
 	public List<JoinDto> findPlayerJoinRequest(StatusType statusType, Long playerId,Pageable pageable) {
 		List<JoinDto> proposals = queryFactory
-				.select(Projections.fields(JoinDto.class,join.team.id,join.statusType,join.createdDate))
+				.select(Projections.fields(JoinDto.class,join.joinId,join.team.id.as("teamId"),join.player.id.as("playerId"),join.requesterType,join.statusType,join.activeYN,join.createdDate,join.updatedDate))
 				.from(join)
 				.join(join.team,team)
 				.where(join.activeYN.eq('Y'),eqPlayerId(playerId))
@@ -43,10 +42,12 @@ public class JoinRepositoryImpl implements JoinRepositoryCustom{
 	@Override
 	public List<JoinDto> findTeamJoinRequest(StatusType statusType, Long teamId, Pageable pageable) {
 		List<JoinDto> proposals = queryFactory
-				.select(Projections.bean(JoinDto.class,join.player.id,join.statusType,join.createdDate))
+				.select(Projections.fields(JoinDto.class,join.joinId,join.team.id.as("teamId"),join.player.id.as("playerId"),join.requesterType,join.statusType,join.activeYN,join.createdDate,join.updatedDate))
 				.from(join,player)
 				.join(join.player,player)
 				.where(join.activeYN.eq('Y'),eqTeamId(teamId))
+				.offset(pageable.getOffset())
+				.limit(pageable.getPageSize())
 				.fetch();
 		return proposals;
 	}
