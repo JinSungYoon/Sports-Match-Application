@@ -16,7 +16,7 @@ import lombok.Getter;
 
 @Getter
 @MappedSuperclass
-@EntityListeners(value = {AuditingEntityListener.class})	// JPA 내부에서 엔티티 객체가 생성/변경되는 것을 감지하는 역할
+@EntityListeners(AuditingEntityListener.class)	// JPA 내부에서 엔티티 객체가 생성/변경되는 것을 감지하는 역할
 public abstract class BaseEntity{
 	
 	@CreatedDate	// 엔티티 생성시간

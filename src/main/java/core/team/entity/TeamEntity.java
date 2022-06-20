@@ -46,6 +46,12 @@ public class TeamEntity extends BaseEntity{
 	@Lob
 	private String introduction;
 	
+	public void initId(Long id) {
+		if(this.id == null) {
+			this.id = id;
+		}
+	}
+	
 	@Builder
 	public TeamEntity(String teamName,String location,BelongType belongType,String introduction) {
 		this.teamName   = teamName;

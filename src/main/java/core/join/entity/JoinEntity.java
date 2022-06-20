@@ -12,6 +12,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.ColumnDefault;
+
 import core.common.entity.BaseEntity;
 import core.join.dto.JoinDto;
 import core.player.entity.PlayerEntity;
@@ -28,7 +30,7 @@ public class JoinEntity extends BaseEntity {
 	
 	@Id @GeneratedValue
 	@Column(name="JOIN_ID")
-	private Long joinId;
+	private Long id;
 	
 	@Enumerated(EnumType.STRING)
 	@Column(name="STATUS_TYPE")
@@ -47,7 +49,14 @@ public class JoinEntity extends BaseEntity {
 	private TeamEntity team;
 	
 	@Column(name="ACTIVE_YN")
+	@ColumnDefault("Y")
 	private char activeYN;
+	
+	public void initId(Long id) {
+		if(this.id == null) {
+			this.id = id;
+		}
+	}
 	
 	@Builder
 	public JoinEntity(StatusType statusType,RequesterType requesterType,PlayerEntity player,TeamEntity team,char activeYN) {
@@ -66,8 +75,9 @@ public class JoinEntity extends BaseEntity {
 				.teamId(team.id)
 				.playerId(player.id)
 				.activeYN(activeYN)
+				.createdDate(createdDate)
+				.updatedDate(updatedDate)
 				.build();
 	}
-	
 	
 }

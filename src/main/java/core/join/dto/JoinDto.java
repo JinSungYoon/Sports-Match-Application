@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class JoinDto {
 	
-	private Long joinId;
+	private Long id;
 	@NotNull
 	private StatusType statusType;
 	@NotNull
@@ -29,28 +29,26 @@ public class JoinDto {
 	@NotNull
 	private char activeYN;
 	
-	private LocalDateTime createDate;
-	private LocalDateTime updateDate;
-	
-	
-	public JoinDto(Long joinId,Long teamId,Long playerId,RequesterType requesterType,StatusType statusType,char activeYN,LocalDateTime createDate,LocalDateTime updateDate) {
-		this.joinId = joinId;
-		this.teamId = teamId;
-		this.playerId = playerId;
-		this.requesterType = requesterType;
-		this.statusType = statusType;
-		this.activeYN = activeYN;
-		this.createDate = createDate;
-		this.updateDate = updateDate;
-	}
+	private LocalDateTime createdDate;
+	private LocalDateTime updatedDate;
 	
 	@Builder
-	public JoinDto(StatusType statusType,RequesterType requesterType,Long playerId,Long teamId,char activeYN) {
+	public JoinDto(Long teamId,Long playerId,RequesterType requesterType,StatusType statusType,char activeYN,LocalDateTime createdDate,LocalDateTime updatedDate) {
+		this.teamId = teamId;
+		this.playerId = playerId;
+		this.requesterType = requesterType;
+		this.statusType = statusType;
+		this.activeYN = activeYN;
+		this.createdDate = createdDate;
+		this.updatedDate = updatedDate;
+	}
+	
+	
+	public JoinDto(StatusType statusType,RequesterType requesterType,Long playerId,Long teamId) {
 		this.statusType = statusType;
 		this.requesterType = requesterType;
 		this.teamId = teamId;
 		this.playerId = playerId;
-		this.activeYN = activeYN;
 	}
 	
 	public JoinEntity toEntity(JoinDto join,PlayerEntity player,TeamEntity team) {

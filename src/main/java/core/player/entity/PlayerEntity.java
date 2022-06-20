@@ -52,6 +52,12 @@ public class PlayerEntity extends BaseEntity{
 		this.team = team;
 	}
 	
+	public void initId(Long id) {
+		if(this.id == null) {
+			this.id = id;
+		}
+	}
+	
 	@Builder
 	public PlayerEntity(String playerName,String resRegNo,int uniformNo,TeamEntity team) {
 		this.playerName = playerName;

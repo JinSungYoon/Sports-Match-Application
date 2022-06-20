@@ -25,12 +25,12 @@ public class JoinRepositoryImpl implements JoinRepositoryCustom{
 	QTeamEntity team = QTeamEntity.teamEntity;  
 	
 	@Override
-	public List<JoinDto> findPlayerJoinRequest(StatusType statusType, Long playerId,Pageable pageable) {
+	public List<JoinDto> findPlayerJoinRequest(StatusType statusType,Long playerId,Long teamId,Pageable pageable) {
 		List<JoinDto> proposals = queryFactory
 				.select(Projections.fields(JoinDto.class,join.joinId,join.team.id.as("teamId"),join.player.id.as("playerId"),join.requesterType,join.statusType,join.activeYN,join.createdDate,join.updatedDate))
 				.from(join)
 				.join(join.team,team)
-				.where(join.activeYN.eq('Y'),eqPlayerId(playerId))
+				.where(join.activeYN.eq('Y'),eqPlayerId(playerId),eqTeamId(teamId))
 				.offset(pageable.getOffset())
 				.limit(pageable.getPageSize())
 				.orderBy(join.joinId.asc(),join.updatedDate.desc())
@@ -40,14 +40,15 @@ public class JoinRepositoryImpl implements JoinRepositoryCustom{
 	}
 	
 	@Override
-	public List<JoinDto> findTeamJoinRequest(StatusType statusType, Long teamId, Pageable pageable) {
+	public List<JoinDto> findTeamJoinRequest(StatusType statusType,Long playerId ,Long teamId, Pageable pageable) {
 		List<JoinDto> proposals = queryFactory
 				.select(Projections.fields(JoinDto.class,join.joinId,join.team.id.as("teamId"),join.player.id.as("playerId"),join.requesterType,join.statusType,join.activeYN,join.createdDate,join.updatedDate))
-				.from(join,player)
+				.from(join)
 				.join(join.player,player)
-				.where(join.activeYN.eq('Y'),eqTeamId(teamId))
+				.where(join.activeYN.eq('Y'),eqPlayerId(playerId),eqTeamId(teamId))
 				.offset(pageable.getOffset())
 				.limit(pageable.getPageSize())
+				.orderBy(join.joinId.asc(),join.updatedDate.desc())
 				.fetch();
 		return proposals;
 	}
