@@ -33,7 +33,7 @@ public class JoinDto {
 	private LocalDateTime updatedDate;
 	
 	@Builder
-	public JoinDto(Long teamId,Long playerId,RequesterType requesterType,StatusType statusType,char activeYN,LocalDateTime createdDate,LocalDateTime updatedDate) {
+	public JoinDto(Long playerId, Long teamId,RequesterType requesterType,StatusType statusType,char activeYN,LocalDateTime createdDate,LocalDateTime updatedDate) {
 		this.teamId = teamId;
 		this.playerId = playerId;
 		this.requesterType = requesterType;

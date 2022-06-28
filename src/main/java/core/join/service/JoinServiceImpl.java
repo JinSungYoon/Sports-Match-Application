@@ -1,5 +1,6 @@
 package core.join.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.domain.PageRequest;
@@ -34,7 +35,7 @@ public class JoinServiceImpl implements JoinService {
 	@Override
 	public JoinDto requestJoin(JoinDto joinDto) {
 		
-		List<JoinDto> inquiryList = null;
+		List<JoinDto> inquiryList = new ArrayList<>();
 		
 		// 기존에 요청한 제안 중 동일한 대상에게 제안한 활성화된 요청이 있는지 확인한다.
 		if(joinDto.getRequesterType().equals(RequesterType.Player)) {
@@ -57,17 +58,25 @@ public class JoinServiceImpl implements JoinService {
 		PlayerEntity player = playerRepository.findById(joinDto.getPlayerId()).orElse(null);
 		
 		JoinEntity join = joinRepository.save(joinDto.toEntity(joinDto,player,team));
-		// player와 team 정로 loading
-		join.getPlayer().getId();
-		join.getTeam().getId();
-		
-		System.out.println("Join Entity : "+join);
 		
 		return join.toDto();
 	}
 
 	@Override
 	public JoinDto rejectJoin(JoinDto joinDto) {
+		
+		PageRequest page = PageRequest.of(0, 1);
+		
+		List<JoinDto> inquiryList = new ArrayList<>();
+		
+		// 기존에 요청한 제안 중 동일한 대상에게 제안한 활성화된 요청이 있는지 확인한다.
+		if(joinDto.getRequesterType().equals(RequesterType.Player)) {
+			inquiryList = joinRepositoryCustom.findPlayerJoinRequest(StatusType.PROPOSAL,joinDto.getPlayerId(), joinDto.getTeamId(), page);
+		}else {
+			inquiryList = joinRepositoryCustom.findTeamJoinRequest(StatusType.PROPOSAL,joinDto.getPlayerId(), joinDto.getTeamId(), page);
+		}
+		
+		
 		
 		return null;
 	}
@@ -80,8 +89,16 @@ public class JoinServiceImpl implements JoinService {
 
 	@Override
 	public List<JoinDto> searchJoin(JoinSearchCondition condition, Pageable pageable) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		List<JoinDto> rtnList = new ArrayList<>();
+		
+		if(condition.getRequesterType().equals(RequesterType.Player)) {
+			rtnList = joinRepositoryCustom.findPlayerJoinRequest(condition.getStatusType(), condition.getPlayerId(), condition.getTeamId(), pageable);
+		}else {
+			rtnList = joinRepositoryCustom.findTeamJoinRequest(condition.getStatusType(), condition.getPlayerId(), condition.getTeamId(), pageable);
+		}
+		
+		return rtnList;
 	}
 	
 	@Override
