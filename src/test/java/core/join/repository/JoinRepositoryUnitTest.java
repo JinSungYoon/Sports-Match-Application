@@ -10,24 +10,18 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.test.annotation.Commit;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import core.join.dto.JoinDto;
@@ -72,21 +66,20 @@ public class JoinRepositoryUnitTest {
 			return new JPAQueryFactory(entityManger);
 		}
 	}
-	
 
-	@AfterEach
-	public void init() {
-		joinRepository.deleteAll();
-		playerRepository.deleteAll();
-		teamRepository.deleteAll();
-		entityManager.createNativeQuery("ALTER TABLE joining AUTO_INCREMENT = 1;").executeUpdate();
-		entityManager.createNativeQuery("ALTER TABLE player  AUTO_INCREMENT = 1;").executeUpdate();
-		entityManager.createNativeQuery("ALTER TABLE team    AUTO_INCREMENT = 1;").executeUpdate();
-		
-	}
+//	@AfterEach
+//	public void init() {
+//		joinRepository.deleteAll();
+//		playerRepository.deleteAll();
+//		teamRepository.deleteAll();
+//		entityManager.createNativeQuery("ALTER TABLE joining AUTO_INCREMENT = 1;").executeUpdate();
+//		entityManager.createNativeQuery("ALTER TABLE player  AUTO_INCREMENT = 1;").executeUpdate();
+//		entityManager.createNativeQuery("ALTER TABLE team    AUTO_INCREMENT = 1;").executeUpdate();
+//	}
 	
 	@Test
 	@DisplayName("Player to Team 가입신청 조회")
+	@Rollback(false)
 	void findPlayerJoinRequestTest() {
 		// given
 		TeamEntity rTeam = new TeamEntity("RedTeam","Seoul",BelongType.CLUB,"I'm a red team if you like red, will you join us?");
@@ -115,14 +108,14 @@ public class JoinRepositoryUnitTest {
 		playerRepository.save(player7);
 		playerRepository.save(player8);
 		
-		JoinEntity joinEntity1 = new JoinEntity(StatusType.PROPOSAL,RequesterType.Player,player1,gTeam,'Y');
-		JoinEntity joinEntity2 = new JoinEntity(StatusType.PROPOSAL,RequesterType.Player,player1,bTeam,'Y');
-		JoinEntity joinEntity3 = new JoinEntity(StatusType.PROPOSAL,RequesterType.Player,player3,gTeam,'Y');
-		JoinEntity joinEntity4 = new JoinEntity(StatusType.PROPOSAL,RequesterType.Player,player3,bTeam,'Y');
-		JoinEntity joinEntity5 = new JoinEntity(StatusType.PROPOSAL,RequesterType.Player,player5,rTeam,'Y');
-		JoinEntity joinEntity6 = new JoinEntity(StatusType.PROPOSAL,RequesterType.Player,player5,yTeam,'Y');
-		JoinEntity joinEntity7 = new JoinEntity(StatusType.PROPOSAL,RequesterType.Player,player7,rTeam,'Y');
-		JoinEntity joinEntity8 = new JoinEntity(StatusType.PROPOSAL,RequesterType.Player,player7,yTeam,'Y');
+		JoinEntity joinEntity1 = new JoinEntity(StatusType.PROPOSAL,RequesterType.Player,player1,gTeam);
+		JoinEntity joinEntity2 = new JoinEntity(StatusType.PROPOSAL,RequesterType.Player,player1,bTeam);
+		JoinEntity joinEntity3 = new JoinEntity(StatusType.PROPOSAL,RequesterType.Player,player3,gTeam);
+		JoinEntity joinEntity4 = new JoinEntity(StatusType.PROPOSAL,RequesterType.Player,player3,bTeam);
+		JoinEntity joinEntity5 = new JoinEntity(StatusType.PROPOSAL,RequesterType.Player,player5,rTeam);
+		JoinEntity joinEntity6 = new JoinEntity(StatusType.PROPOSAL,RequesterType.Player,player5,yTeam);
+		JoinEntity joinEntity7 = new JoinEntity(StatusType.PROPOSAL,RequesterType.Player,player7,rTeam);
+		JoinEntity joinEntity8 = new JoinEntity(StatusType.PROPOSAL,RequesterType.Player,player7,yTeam);
 		joinRepository.save(joinEntity1);
 		joinRepository.save(joinEntity2);
 		joinRepository.save(joinEntity3);
@@ -139,6 +132,9 @@ public class JoinRepositoryUnitTest {
 		
 		// when
 		List<JoinDto> rtnList = joinRepositoryCustom.findPlayerJoinRequest(StatusType.PROPOSAL, 1L, null, pageRequest);
+
+		System.out.println("Result : "+rtnList);
+		
 		// then
 		for(JoinDto dto : rtnList) {
 			System.out.println("Data : "+dto);
@@ -184,14 +180,14 @@ public class JoinRepositoryUnitTest {
 		playerRepository.save(player7);
 		playerRepository.save(player8);
 		
-		JoinEntity joinEntity1 = new JoinEntity(StatusType.PROPOSAL,RequesterType.Team,player1,gTeam,'Y');
-		JoinEntity joinEntity2 = new JoinEntity(StatusType.PROPOSAL,RequesterType.Team,player1,bTeam,'Y');
-		JoinEntity joinEntity3 = new JoinEntity(StatusType.PROPOSAL,RequesterType.Team,player3,gTeam,'Y');
-		JoinEntity joinEntity4 = new JoinEntity(StatusType.PROPOSAL,RequesterType.Team,player3,bTeam,'Y');
-		JoinEntity joinEntity5 = new JoinEntity(StatusType.PROPOSAL,RequesterType.Team,player5,rTeam,'Y');
-		JoinEntity joinEntity6 = new JoinEntity(StatusType.PROPOSAL,RequesterType.Team,player5,yTeam,'Y');
-		JoinEntity joinEntity7 = new JoinEntity(StatusType.PROPOSAL,RequesterType.Team,player7,rTeam,'Y');
-		JoinEntity joinEntity8 = new JoinEntity(StatusType.PROPOSAL,RequesterType.Team,player7,yTeam,'Y');
+		JoinEntity joinEntity1 = new JoinEntity(StatusType.PROPOSAL,RequesterType.Team,player1,gTeam);
+		JoinEntity joinEntity2 = new JoinEntity(StatusType.PROPOSAL,RequesterType.Team,player1,bTeam);
+		JoinEntity joinEntity3 = new JoinEntity(StatusType.PROPOSAL,RequesterType.Team,player3,gTeam);
+		JoinEntity joinEntity4 = new JoinEntity(StatusType.PROPOSAL,RequesterType.Team,player3,bTeam);
+		JoinEntity joinEntity5 = new JoinEntity(StatusType.PROPOSAL,RequesterType.Team,player5,rTeam);
+		JoinEntity joinEntity6 = new JoinEntity(StatusType.PROPOSAL,RequesterType.Team,player5,yTeam);
+		JoinEntity joinEntity7 = new JoinEntity(StatusType.PROPOSAL,RequesterType.Team,player7,rTeam);
+		JoinEntity joinEntity8 = new JoinEntity(StatusType.PROPOSAL,RequesterType.Team,player7,yTeam);
 		joinRepository.save(joinEntity1);
 		joinRepository.save(joinEntity2);
 		joinRepository.save(joinEntity3);
@@ -213,6 +209,6 @@ public class JoinRepositoryUnitTest {
 		Assertions.assertThat(rtnList.get(0).getRequesterType()).isEqualTo(RequesterType.Team);
 		Assertions.assertThat(rtnList.get(0).getStatusType()).isEqualTo(StatusType.PROPOSAL);
 		
-		
 	}
+
 }

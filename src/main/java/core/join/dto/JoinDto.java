@@ -58,7 +58,6 @@ public class JoinDto {
 				.requesterType(join.getRequesterType())
 				.team(team)
 				.player(player)
-				.activeYN(join.getActiveYN())
 				.build();
 	}
 	

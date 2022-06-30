@@ -10,6 +10,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.ColumnDefault;
@@ -48,9 +49,16 @@ public class JoinEntity extends BaseEntity {
 	@JoinColumn(name="TEAM_ID")
 	private TeamEntity team;
 	
-	@Column(name="ACTIVE_YN")
-	@ColumnDefault("Y")
+	@Column(name="ACTIVE_YN",columnDefinition =" char(1) default 'Y'")
 	private char activeYN;
+
+	@PrePersist
+	public void prePersist() {
+		if(this.activeYN == ' ')
+			this.activeYN = 'Y';
+		else
+			this.activeYN = this.activeYN;
+	}
 	
 	public void initId(Long id) {
 		if(this.id == null) {
@@ -59,12 +67,11 @@ public class JoinEntity extends BaseEntity {
 	}
 	
 	@Builder
-	public JoinEntity(StatusType statusType,RequesterType requesterType,PlayerEntity player,TeamEntity team,char activeYN) {
+	public JoinEntity(StatusType statusType,RequesterType requesterType,PlayerEntity player,TeamEntity team) {
 		this.statusType = statusType;
 		this.requesterType = requesterType;
 		this.team = team;
 		this.player = player;
-		this.activeYN = activeYN;
 	}
 	
 	public JoinDto toDto() {

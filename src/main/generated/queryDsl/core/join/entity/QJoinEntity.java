@@ -29,7 +29,7 @@ public class QJoinEntity extends EntityPathBase<JoinEntity> {
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdDate = _super.createdDate;
 
-    public final NumberPath<Long> joinId = createNumber("joinId", Long.class);
+    public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public final core.player.entity.QPlayerEntity player;
 
