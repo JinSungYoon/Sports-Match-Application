@@ -54,10 +54,10 @@ public class JoinEntity extends BaseEntity {
 
 	@PrePersist
 	public void prePersist() {
-		if(this.activeYN == ' ')
-			this.activeYN = 'Y';
-		else
+		if(this.activeYN != 0)
 			this.activeYN = this.activeYN;
+		else
+			this.activeYN = 'Y';
 	}
 	
 	public void initId(Long id) {

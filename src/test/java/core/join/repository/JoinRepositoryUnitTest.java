@@ -10,6 +10,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,20 +19,18 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import core.join.dto.JoinDto;
 import core.join.entity.JoinEntity;
-import core.join.entity.QJoinEntity;
 import core.join.entity.RequesterType;
 import core.join.entity.StatusType;
 import core.player.entity.BelongType;
 import core.player.entity.PlayerEntity;
-import core.player.entity.QPlayerEntity;
 import core.player.repository.PlayerRepository;
 import core.team.entity.TeamEntity;
 import core.team.repository.TeamRepository;
@@ -67,19 +66,18 @@ public class JoinRepositoryUnitTest {
 		}
 	}
 
-//	@AfterEach
-//	public void init() {
-//		joinRepository.deleteAll();
-//		playerRepository.deleteAll();
-//		teamRepository.deleteAll();
-//		entityManager.createNativeQuery("ALTER TABLE joining AUTO_INCREMENT = 1;").executeUpdate();
-//		entityManager.createNativeQuery("ALTER TABLE player  AUTO_INCREMENT = 1;").executeUpdate();
-//		entityManager.createNativeQuery("ALTER TABLE team    AUTO_INCREMENT = 1;").executeUpdate();
-//	}
+	@AfterEach
+	public void init() {
+		joinRepository.deleteAll();
+		playerRepository.deleteAll();
+		teamRepository.deleteAll();
+		entityManager.createNativeQuery("ALTER TABLE joining AUTO_INCREMENT = 1;").executeUpdate();
+		entityManager.createNativeQuery("ALTER TABLE player  AUTO_INCREMENT = 1;").executeUpdate();
+		entityManager.createNativeQuery("ALTER TABLE team    AUTO_INCREMENT = 1;").executeUpdate();
+	}
 	
 	@Test
 	@DisplayName("Player to Team 가입신청 조회")
-	@Rollback(false)
 	void findPlayerJoinRequestTest() {
 		// given
 		TeamEntity rTeam = new TeamEntity("RedTeam","Seoul",BelongType.CLUB,"I'm a red team if you like red, will you join us?");
@@ -131,7 +129,7 @@ public class JoinRepositoryUnitTest {
 		expectPlayer1List.add(new JoinDto(4L,1L,RequesterType.Player,StatusType.PROPOSAL,'Y',LocalDateTime.now(),LocalDateTime.now()));
 		
 		// when
-		List<JoinDto> rtnList = joinRepositoryCustom.findPlayerJoinRequest(StatusType.PROPOSAL, 1L, null, pageRequest);
+		Page<JoinDto> rtnList = joinRepositoryCustom.findPlayerJoinRequest(StatusType.PROPOSAL, 1L, null, pageRequest);
 
 		System.out.println("Result : "+rtnList);
 		
@@ -142,11 +140,11 @@ public class JoinRepositoryUnitTest {
 			System.out.println("updateDate : "+dto.getUpdatedDate());
 		}
 		
-		Assertions.assertThat(rtnList.get(0).getTeamId()).isEqualTo(3L);
-		Assertions.assertThat(rtnList.get(1).getTeamId()).isEqualTo(4L);
-		Assertions.assertThat(rtnList.get(0).getRequesterType()).isEqualTo(RequesterType.Player);
-		Assertions.assertThat(rtnList.get(0).getStatusType()).isEqualTo(StatusType.PROPOSAL);
-		Assertions.assertThat(rtnList.get(0).getActiveYN()).isEqualTo('Y');
+		Assertions.assertThat(rtnList.getContent().get(0).getTeamId()).isEqualTo(3L);
+		Assertions.assertThat(rtnList.getContent().get(1).getTeamId()).isEqualTo(4L);
+		Assertions.assertThat(rtnList.getContent().get(0).getRequesterType()).isEqualTo(RequesterType.Player);
+		Assertions.assertThat(rtnList.getContent().get(0).getStatusType()).isEqualTo(StatusType.PROPOSAL);
+		Assertions.assertThat(rtnList.getContent().get(0).getActiveYN()).isEqualTo('Y');
 		
 	}
 	
@@ -198,17 +196,17 @@ public class JoinRepositoryUnitTest {
 		joinRepository.save(joinEntity8);
 		PageRequest pageRequest = PageRequest.of(0, 2);
 		
-		List<JoinDto> rtnList = joinRepositoryCustom.findTeamJoinRequest(StatusType.PROPOSAL, null ,2L, pageRequest);
+		Page<JoinDto> rtnList = joinRepositoryCustom.findTeamJoinRequest(StatusType.PROPOSAL, null ,2L, pageRequest);
 		
 		for(JoinDto dto : rtnList) {
 			System.out.println("dto = "+dto);
 		}
 		
-		Assertions.assertThat(rtnList.get(0).getPlayerId()).isEqualTo(5L);
-		Assertions.assertThat(rtnList.get(1).getPlayerId()).isEqualTo(7L);
-		Assertions.assertThat(rtnList.get(0).getRequesterType()).isEqualTo(RequesterType.Team);
-		Assertions.assertThat(rtnList.get(0).getStatusType()).isEqualTo(StatusType.PROPOSAL);
+		Assertions.assertThat(rtnList.getContent().get(0).getPlayerId()).isEqualTo(5L);
+		Assertions.assertThat(rtnList.getContent().get(1).getPlayerId()).isEqualTo(7L);
+		Assertions.assertThat(rtnList.getContent().get(0).getRequesterType()).isEqualTo(RequesterType.Team);
+		Assertions.assertThat(rtnList.getContent().get(0).getStatusType()).isEqualTo(StatusType.PROPOSAL);
 		
 	}
-
+		
 }

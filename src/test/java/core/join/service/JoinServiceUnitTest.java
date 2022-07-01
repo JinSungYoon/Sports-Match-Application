@@ -6,6 +6,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
@@ -65,19 +67,25 @@ public class JoinServiceUnitTest {
 		player.initId(1L);
 		
 		JoinDto proposal = new JoinDto(StatusType.PROPOSAL,RequesterType.Player,1L,1L);
-		JoinEntity expectJoinEntity = new JoinEntity(StatusType.PROPOSAL,RequesterType.Player,player,rTeam,'Y');
+		JoinEntity expectJoinEntity = new JoinEntity(StatusType.PROPOSAL,RequesterType.Player,player,rTeam);
 		expectJoinEntity.initId(1L);
-		JoinDto expecJoinDto = new JoinDto(1L,1L,RequesterType.Player,StatusType.PROPOSAL,'Y',null,null);
+		JoinDto expectJoinDto = new JoinDto(StatusType.PROPOSAL,RequesterType.Player,1L,1L);
 		
+		List<JoinDto> expectList = new ArrayList<>();
+		expectList.add(expectJoinDto);
+		
+		Page<JoinDto> expectPage = new PageImpl(expectList,PageRequest.of(0,1),expectList.size());
 		
 		// mocking
-		when(joinRepository.save(any())).thenReturn(expectJoinEntity);
+//		when(joinRepository.save(any())).thenReturn(expectJoinEntity);
+		when(joinRepository.save(any())).thenReturn(new JoinEntity(StatusType.PROPOSAL,RequesterType.Player,player,rTeam));
+		when(joinRepositoryCustom.findPlayerJoinRequest(StatusType.PROPOSAL, 1L, 1L, PageRequest.of(0, 1))).thenReturn(expectPage);
 		
 		// when
 		JoinDto rtnJoin = joinService.requestJoin(proposal);
 		
 		// then
-		Assertions.assertThat(rtnJoin).isEqualTo(expecJoinDto);
+		Assertions.assertThat(rtnJoin).isEqualTo(expectJoinDto);
 	}
 	
 	@Test
@@ -94,21 +102,22 @@ public class JoinServiceUnitTest {
 		
 		JoinDto proposal1 = new JoinDto(StatusType.PROPOSAL,RequesterType.Player,1L,1L);
 		JoinDto proposal2 = new JoinDto(StatusType.PROPOSAL,RequesterType.Player,1L,1L);
-		JoinEntity expectJoin1 = new JoinEntity(StatusType.PROPOSAL,RequesterType.Player,player,rTeam,'Y');
-		JoinEntity expectJoin2 = new JoinEntity(StatusType.PROPOSAL,RequesterType.Player,player,rTeam,'Y');
+		JoinEntity expectJoin1 = new JoinEntity(StatusType.PROPOSAL,RequesterType.Player,player,rTeam);
+		JoinEntity expectJoin2 = new JoinEntity(StatusType.PROPOSAL,RequesterType.Player,player,rTeam);
 		
 		expectJoin1.initId(1L);
 		expectJoin2.initId(2L);
-		PageRequest pageRequest = PageRequest.of(0, 1);
-		
+		PageRequest pageRequest = PageRequest.of(0,1);
 		List<JoinDto> joinList = new ArrayList<>();
+		joinList.add(expectJoin1.toDto());
+		Page<JoinDto> expectPage = new PageImpl<>(joinList,pageRequest,joinList.size());
 		
 		// mocking
-		when(joinRepositoryCustom.findPlayerJoinRequest(StatusType.PROPOSAL, 1L, 1L,pageRequest)).thenReturn(joinList);
+		when(joinRepositoryCustom.findPlayerJoinRequest(StatusType.PROPOSAL, 1L, 1L,pageRequest)).thenReturn(expectPage);
 		when(joinRepository.save(any())).thenReturn(expectJoin1);
 		JoinDto rtnJoin1 = joinService.requestJoin(proposal1);
 		joinList.add(proposal1);
-		when(joinRepositoryCustom.findPlayerJoinRequest(StatusType.PROPOSAL, 1L, 1L,pageRequest)).thenReturn(joinList);
+		when(joinRepositoryCustom.findPlayerJoinRequest(StatusType.PROPOSAL, 1L, 1L,pageRequest)).thenReturn(expectPage);
 		when(joinRepository.save(any())).thenThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST,"이미 요청한 제안입니다.",new Exception()));
 		
 		// when
@@ -116,7 +125,6 @@ public class JoinServiceUnitTest {
 		
 		// then
 		org.junit.jupiter.api.Assertions.assertEquals("400 BAD_REQUEST "+'"'+"이미 요청한 제안입니다."+'"'+"; nested exception is java.lang.Exception", existProposal.getMessage());
-		
 		
 	}
 	
@@ -141,31 +149,27 @@ public class JoinServiceUnitTest {
 		graph.initId(2L);
 		banana.initId(3L);
 		
-		JoinEntity join1 = new JoinEntity(StatusType.PROPOSAL,RequesterType.Player,apple,rTeam,'Y');
+		JoinEntity join1 = new JoinEntity(StatusType.PROPOSAL,RequesterType.Player,apple,rTeam);
 		join1.initId(1L);
-		JoinEntity join2 = new JoinEntity(StatusType.PROPOSAL,RequesterType.Player,graph,pTeam,'Y');
+		JoinEntity join2 = new JoinEntity(StatusType.PROPOSAL,RequesterType.Player,graph,pTeam);
 		join2.initId(2L);
-		JoinEntity join3 = new JoinEntity(StatusType.PROPOSAL,RequesterType.Player,graph,yTeam,'Y');
+		JoinEntity join3 = new JoinEntity(StatusType.PROPOSAL,RequesterType.Player,graph,yTeam);
 		join2.initId(3L);
 		
+		PageRequest page = PageRequest.of(0,10);
 		List<JoinDto> expectList = new ArrayList<>();
 		expectList.add(join1.toDto());
 		expectList.add(join2.toDto());
 		expectList.add(join3.toDto());
-		
-	
-//		when(joinRepository.save(join1)).thenReturn(join1);
-//		when(joinRepository.save(join2)).thenReturn(join2);
-//		when(joinRepository.save(join3)).thenReturn(join3);
+		Page<JoinDto> expectPage = new PageImpl<>(expectList,page,expectList.size());
 		
 		JoinSearchCondition condition = new JoinSearchCondition(StatusType.PROPOSAL,RequesterType.Player,null,null,' ',null,null);
-		PageRequest page = PageRequest.of(0, 5);
 		
-		when(joinRepositoryCustom.findPlayerJoinRequest(condition.getStatusType(), condition.getPlayerId(), condition.getTeamId(), page)).thenReturn(expectList);
+		when(joinRepositoryCustom.findPlayerJoinRequest(condition.getStatusType(), condition.getPlayerId(), condition.getTeamId(), page)).thenReturn(expectPage);
 		
-		List<JoinDto> rtnList = joinService.searchJoin(condition, page);
+		Page<JoinDto> rtnList = joinService.searchJoin(condition, page);
 		
-		Assertions.assertThat(rtnList).isEqualTo(expectList);
+		Assertions.assertThat(rtnList).isEqualTo(expectPage);
 		
 	}
 }

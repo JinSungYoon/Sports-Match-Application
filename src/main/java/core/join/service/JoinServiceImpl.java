@@ -3,6 +3,8 @@ package core.join.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -34,17 +36,18 @@ public class JoinServiceImpl implements JoinService {
 	
 	@Override
 	public JoinDto requestJoin(JoinDto joinDto) {
+		PageRequest page = PageRequest.of(0, 1);
 		
-		List<JoinDto> inquiryList = new ArrayList<>();
+		Page<JoinDto> inquiryList = new PageImpl<>(new ArrayList<>(),page,0);
 		
 		// 기존에 요청한 제안 중 동일한 대상에게 제안한 활성화된 요청이 있는지 확인한다.
 		if(joinDto.getRequesterType().equals(RequesterType.Player)) {
-			inquiryList = joinRepositoryCustom.findPlayerJoinRequest(StatusType.PROPOSAL, joinDto.getPlayerId(),joinDto.getTeamId(), PageRequest.of(0,1));
+			inquiryList = joinRepositoryCustom.findPlayerJoinRequest(StatusType.PROPOSAL, joinDto.getPlayerId(),joinDto.getTeamId(), page);
 		}else if(joinDto.getRequesterType().equals(RequesterType.Team)) {
-			inquiryList = joinRepositoryCustom.findTeamJoinRequest(StatusType.PROPOSAL, joinDto.getPlayerId(),joinDto.getTeamId(), PageRequest.of(0,1));
+			inquiryList = joinRepositoryCustom.findTeamJoinRequest(StatusType.PROPOSAL, joinDto.getPlayerId(),joinDto.getTeamId(), page);
 		}
 		
-		if(inquiryList.size()>1) {
+		if(inquiryList.getSize()>1) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"이미 요청한 제안입니다.",new Exception());
 		}
 		
@@ -67,7 +70,7 @@ public class JoinServiceImpl implements JoinService {
 		
 		PageRequest page = PageRequest.of(0, 1);
 		
-		List<JoinDto> inquiryList = new ArrayList<>();
+		Page<JoinDto> inquiryList = new PageImpl<>(new ArrayList<>(),page,0);
 		
 		// 기존에 요청한 제안 중 동일한 대상에게 제안한 활성화된 요청이 있는지 확인한다.
 		if(joinDto.getRequesterType().equals(RequesterType.Player)) {
@@ -75,8 +78,6 @@ public class JoinServiceImpl implements JoinService {
 		}else {
 			inquiryList = joinRepositoryCustom.findTeamJoinRequest(StatusType.PROPOSAL,joinDto.getPlayerId(), joinDto.getTeamId(), page);
 		}
-		
-		
 		
 		return null;
 	}
@@ -88,9 +89,9 @@ public class JoinServiceImpl implements JoinService {
 	}
 
 	@Override
-	public List<JoinDto> searchJoin(JoinSearchCondition condition, Pageable pageable) {
+	public Page<JoinDto> searchJoin(JoinSearchCondition condition, Pageable pageable) {
 		
-		List<JoinDto> rtnList = new ArrayList<>();
+		Page<JoinDto> rtnList = new PageImpl<>(new ArrayList<>(),pageable,0);
 		
 		if(condition.getRequesterType().equals(RequesterType.Player)) {
 			rtnList = joinRepositoryCustom.findPlayerJoinRequest(condition.getStatusType(), condition.getPlayerId(), condition.getTeamId(), pageable);
