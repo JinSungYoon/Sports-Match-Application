@@ -9,14 +9,20 @@ import core.join.dto.JoinDto;
 import core.join.dto.JoinSearchCondition;
 
 public interface JoinService {
-	// 등록 신청
+	// 가입 신청
 	JoinDto requestJoin(JoinDto joinDto);
-	// 등록 거절
+	// 가입 신청 거절
 	JoinDto rejectJoin(JoinDto joinDto);
-	// 등록 승인
+	// 가입 신청 승인
 	JoinDto approveJoin(JoinDto joinDto);
-	// 등록 조회
-	Page<JoinDto> searchJoin(JoinSearchCondition condition,Pageable pageable);
+	// 선수 가입 제안 조회
+	Page<JoinDto> searchPlayerJoinApplication(JoinSearchCondition condition,Pageable pageable);
+	// 선수 가입 제안 조회
+	Page<JoinDto> searchPlayerJoinOffer(JoinSearchCondition condition,Pageable pageable);
+	// 팀 가입 신청 조회
+	Page<JoinDto> searchTeamJoinApplication(JoinSearchCondition condition,Pageable pageable);
+	// 팀 가입 제안 조회
+	Page<JoinDto> searchTeamJoinOffer(JoinSearchCondition condition,Pageable pageable);
 	// 승인 확정
 	JoinDto confirmApprove(JoinDto joinDto);
 	// 승인 거절

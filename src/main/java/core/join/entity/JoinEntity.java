@@ -49,7 +49,7 @@ public class JoinEntity extends BaseEntity {
 	@JoinColumn(name="TEAM_ID")
 	private TeamEntity team;
 	
-	@Column(name="ACTIVE_YN",columnDefinition =" char(1) default 'Y'")
+	@Column(name="ACTIVE_YN")
 	private char activeYN;
 
 	@PrePersist

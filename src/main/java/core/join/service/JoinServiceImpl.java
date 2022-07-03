@@ -42,9 +42,9 @@ public class JoinServiceImpl implements JoinService {
 		
 		// 기존에 요청한 제안 중 동일한 대상에게 제안한 활성화된 요청이 있는지 확인한다.
 		if(joinDto.getRequesterType().equals(RequesterType.Player)) {
-			inquiryList = joinRepositoryCustom.findPlayerJoinRequest(StatusType.PROPOSAL, joinDto.getPlayerId(),joinDto.getTeamId(), page);
+			inquiryList = joinRepositoryCustom.findPlayerJoinApplication(StatusType.PROPOSAL, joinDto.getPlayerId(),joinDto.getTeamId(), page);
 		}else if(joinDto.getRequesterType().equals(RequesterType.Team)) {
-			inquiryList = joinRepositoryCustom.findTeamJoinRequest(StatusType.PROPOSAL, joinDto.getPlayerId(),joinDto.getTeamId(), page);
+			inquiryList = joinRepositoryCustom.findTeamJoinApplication(StatusType.PROPOSAL, joinDto.getPlayerId(),joinDto.getTeamId(), page);
 		}
 		
 		if(inquiryList.getSize()>1) {
@@ -74,9 +74,9 @@ public class JoinServiceImpl implements JoinService {
 		
 		// 기존에 요청한 제안 중 동일한 대상에게 제안한 활성화된 요청이 있는지 확인한다.
 		if(joinDto.getRequesterType().equals(RequesterType.Player)) {
-			inquiryList = joinRepositoryCustom.findPlayerJoinRequest(StatusType.PROPOSAL,joinDto.getPlayerId(), joinDto.getTeamId(), page);
+			inquiryList = joinRepositoryCustom.findPlayerJoinApplication(StatusType.PROPOSAL,joinDto.getPlayerId(), joinDto.getTeamId(), page);
 		}else {
-			inquiryList = joinRepositoryCustom.findTeamJoinRequest(StatusType.PROPOSAL,joinDto.getPlayerId(), joinDto.getTeamId(), page);
+			inquiryList = joinRepositoryCustom.findTeamJoinApplication(StatusType.PROPOSAL,joinDto.getPlayerId(), joinDto.getTeamId(), page);
 		}
 		
 		return null;
@@ -89,17 +89,29 @@ public class JoinServiceImpl implements JoinService {
 	}
 
 	@Override
-	public Page<JoinDto> searchJoin(JoinSearchCondition condition, Pageable pageable) {
+	public Page<JoinDto> searchPlayerJoinApplication(JoinSearchCondition condition, Pageable pageable) {
 		
 		Page<JoinDto> rtnList = new PageImpl<>(new ArrayList<>(),pageable,0);
-		
-		if(condition.getRequesterType().equals(RequesterType.Player)) {
-			rtnList = joinRepositoryCustom.findPlayerJoinRequest(condition.getStatusType(), condition.getPlayerId(), condition.getTeamId(), pageable);
-		}else {
-			rtnList = joinRepositoryCustom.findTeamJoinRequest(condition.getStatusType(), condition.getPlayerId(), condition.getTeamId(), pageable);
-		}
-		
+		rtnList = joinRepositoryCustom.findPlayerJoinApplication(condition.getStatusType(), condition.getPlayerId(), condition.getTeamId(), pageable);
 		return rtnList;
+	}
+	
+	@Override
+	public Page<JoinDto> searchPlayerJoinOffer(JoinSearchCondition condition, Pageable pageable) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Page<JoinDto> searchTeamJoinApplication(JoinSearchCondition condition, Pageable pageable) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Page<JoinDto> searchTeamJoinOffer(JoinSearchCondition condition, Pageable pageable) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 	@Override

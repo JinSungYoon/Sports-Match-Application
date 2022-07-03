@@ -79,7 +79,7 @@ public class JoinServiceUnitTest {
 		// mocking
 //		when(joinRepository.save(any())).thenReturn(expectJoinEntity);
 		when(joinRepository.save(any())).thenReturn(new JoinEntity(StatusType.PROPOSAL,RequesterType.Player,player,rTeam));
-		when(joinRepositoryCustom.findPlayerJoinRequest(StatusType.PROPOSAL, 1L, 1L, PageRequest.of(0, 1))).thenReturn(expectPage);
+		when(joinRepositoryCustom.findPlayerJoinApplication(StatusType.PROPOSAL, 1L, 1L, PageRequest.of(0, 1))).thenReturn(expectPage);
 		
 		// when
 		JoinDto rtnJoin = joinService.requestJoin(proposal);
@@ -113,11 +113,11 @@ public class JoinServiceUnitTest {
 		Page<JoinDto> expectPage = new PageImpl<>(joinList,pageRequest,joinList.size());
 		
 		// mocking
-		when(joinRepositoryCustom.findPlayerJoinRequest(StatusType.PROPOSAL, 1L, 1L,pageRequest)).thenReturn(expectPage);
+		when(joinRepositoryCustom.findPlayerJoinApplication(StatusType.PROPOSAL, 1L, 1L,pageRequest)).thenReturn(expectPage);
 		when(joinRepository.save(any())).thenReturn(expectJoin1);
 		JoinDto rtnJoin1 = joinService.requestJoin(proposal1);
 		joinList.add(proposal1);
-		when(joinRepositoryCustom.findPlayerJoinRequest(StatusType.PROPOSAL, 1L, 1L,pageRequest)).thenReturn(expectPage);
+		when(joinRepositoryCustom.findPlayerJoinApplication(StatusType.PROPOSAL, 1L, 1L,pageRequest)).thenReturn(expectPage);
 		when(joinRepository.save(any())).thenThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST,"이미 요청한 제안입니다.",new Exception()));
 		
 		// when
@@ -165,9 +165,9 @@ public class JoinServiceUnitTest {
 		
 		JoinSearchCondition condition = new JoinSearchCondition(StatusType.PROPOSAL,RequesterType.Player,null,null,' ',null,null);
 		
-		when(joinRepositoryCustom.findPlayerJoinRequest(condition.getStatusType(), condition.getPlayerId(), condition.getTeamId(), page)).thenReturn(expectPage);
+		when(joinRepositoryCustom.findPlayerJoinApplication(condition.getStatusType(), condition.getPlayerId(), condition.getTeamId(), page)).thenReturn(expectPage);
 		
-		Page<JoinDto> rtnList = joinService.searchJoin(condition, page);
+		Page<JoinDto> rtnList = joinService.searchPlayerJoinApplication(condition, page);
 		
 		Assertions.assertThat(rtnList).isEqualTo(expectPage);
 		

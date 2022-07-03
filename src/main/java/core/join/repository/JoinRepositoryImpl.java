@@ -13,6 +13,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import core.join.dto.JoinDto;
 import core.join.entity.QJoinEntity;
+import core.join.entity.RequesterType;
 import core.join.entity.StatusType;
 import core.player.entity.QPlayerEntity;
 import core.team.entity.QTeamEntity;
@@ -28,37 +29,73 @@ public class JoinRepositoryImpl implements JoinRepositoryCustom{
 	QTeamEntity team = QTeamEntity.teamEntity;  
 	
 	@Override
-	public Page<JoinDto> findPlayerJoinRequest(StatusType statusType,Long playerId,Long teamId,Pageable pageable) {
-		QueryResults<JoinDto> proposals = queryFactory
+	public Page<JoinDto> findPlayerJoinApplication(StatusType statusType,Long playerId,Long teamId,Pageable pageable) {
+		QueryResults<JoinDto> results = queryFactory
 				.select(Projections.fields(JoinDto.class,join.id,join.team.id.as("teamId"),join.player.id.as("playerId"),join.requesterType,join.statusType,join.activeYN,join.createdDate,join.updatedDate))
 				.from(join)
-				.join(join.team,team)
-				.where(join.activeYN.eq('Y'),eqPlayerId(playerId),eqTeamId(teamId))
+				.join(join.player,player)
+				.where(join.requesterType.eq(RequesterType.Player),eqPlayerId(playerId),eqTeamId(teamId),join.activeYN.eq('Y'))
 				.offset(pageable.getOffset())
 				.limit(pageable.getPageSize())
 				.orderBy(join.id.asc(),join.updatedDate.desc())
 				.fetchResults();
 		
-		List<JoinDto> content = proposals.getResults();
-		Long total = proposals.getTotal();
+		List<JoinDto> content = results.getResults();
+		Long total = results.getTotal();
 		
 		return new PageImpl<>(content,pageable,total);
 	}
 	
 	@Override
-	public Page<JoinDto> findTeamJoinRequest(StatusType statusType,Long playerId ,Long teamId, Pageable pageable) {
-		QueryResults<JoinDto> proposals = queryFactory
+	public Page<JoinDto> findPlayerJoinOffer(StatusType statusType, Long playerId, Long teamId, Pageable pageable) {
+		QueryResults<JoinDto> results = queryFactory
 				.select(Projections.fields(JoinDto.class,join.id,join.team.id.as("teamId"),join.player.id.as("playerId"),join.requesterType,join.statusType,join.activeYN,join.createdDate,join.updatedDate))
 				.from(join)
-				.join(join.player,player)
-				.where(join.activeYN.eq('Y'),eqPlayerId(playerId),eqTeamId(teamId))
+				.join(join.team,team)
+				.where(join.requesterType.eq(RequesterType.Team),eqPlayerId(playerId),eqTeamId(teamId),join.activeYN.eq('Y'))
 				.offset(pageable.getOffset())
 				.limit(pageable.getPageSize())
 				.orderBy(join.id.asc(),join.updatedDate.desc())
 				.fetchResults();
 		
-		List<JoinDto> content = proposals.getResults();
-		Long total = proposals.getTotal();
+		List<JoinDto> content = results.getResults();
+		Long total = results.getTotal();
+		
+		return new PageImpl<>(content,pageable,total);
+	}
+	
+	@Override
+	public Page<JoinDto> findTeamJoinApplication(StatusType statusType,Long playerId ,Long teamId, Pageable pageable) {
+		QueryResults<JoinDto> results = queryFactory
+				.select(Projections.fields(JoinDto.class,join.id,join.team.id.as("teamId"),join.player.id.as("playerId"),join.requesterType,join.statusType,join.activeYN,join.createdDate,join.updatedDate))
+				.from(join)
+				.join(join.team,team)
+				.where(join.requesterType.eq(RequesterType.Team),eqPlayerId(playerId),eqTeamId(teamId),join.activeYN.eq('Y'))
+				.offset(pageable.getOffset())
+				.limit(pageable.getPageSize())
+				.orderBy(join.id.asc(),join.updatedDate.desc())
+				.fetchResults();
+		
+		List<JoinDto> content = results.getResults();
+		Long total = results.getTotal();
+		
+		return new PageImpl<>(content,pageable,total);
+	}
+
+	@Override
+	public Page<JoinDto> findTeamJoinOffer(StatusType statusType, Long playerId, Long teamId, Pageable pageable) {
+		QueryResults<JoinDto> results = queryFactory
+				.select(Projections.fields(JoinDto.class,join.id,join.team.id.as("teamId"),join.player.id.as("playerId"),join.requesterType,join.statusType,join.activeYN,join.createdDate,join.updatedDate))
+				.from(join)
+				.join(join.player,player)
+				.where(join.requesterType.eq(RequesterType.Player),eqPlayerId(playerId),eqTeamId(teamId),join.activeYN.eq('Y'))
+				.offset(pageable.getOffset())
+				.limit(pageable.getPageSize())
+				.orderBy(join.id.asc(),join.updatedDate.desc())
+				.fetchResults();
+		
+		List<JoinDto> content = results.getResults();
+		Long total = results.getTotal();
 		
 		return new PageImpl<>(content,pageable,total);
 	}
@@ -76,6 +113,8 @@ public class JoinRepositoryImpl implements JoinRepositoryCustom{
 		}
 		return join.team.id.eq(teamId);
 	}
+
+	
 
 	
 
