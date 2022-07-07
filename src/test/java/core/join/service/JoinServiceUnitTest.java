@@ -66,10 +66,10 @@ public class JoinServiceUnitTest {
 		gTeam.initId(2L);
 		player.initId(1L);
 		
-		JoinDto proposal = new JoinDto(StatusType.PROPOSAL,RequesterType.Player,1L,1L);
-		JoinEntity expectJoinEntity = new JoinEntity(StatusType.PROPOSAL,RequesterType.Player,player,rTeam);
+		JoinDto proposal = new JoinDto(StatusType.PROPOSAL,RequesterType.PLAYER,1L,1L);
+		JoinEntity expectJoinEntity = new JoinEntity(StatusType.PROPOSAL,RequesterType.PLAYER,player,rTeam);
 		expectJoinEntity.initId(1L);
-		JoinDto expectJoinDto = new JoinDto(StatusType.PROPOSAL,RequesterType.Player,1L,1L);
+		JoinDto expectJoinDto = new JoinDto(StatusType.PROPOSAL,RequesterType.PLAYER,1L,1L);
 		
 		List<JoinDto> expectList = new ArrayList<>();
 		expectList.add(expectJoinDto);
@@ -78,7 +78,7 @@ public class JoinServiceUnitTest {
 		
 		// mocking
 //		when(joinRepository.save(any())).thenReturn(expectJoinEntity);
-		when(joinRepository.save(any())).thenReturn(new JoinEntity(StatusType.PROPOSAL,RequesterType.Player,player,rTeam));
+		when(joinRepository.save(any())).thenReturn(new JoinEntity(StatusType.PROPOSAL,RequesterType.PLAYER,player,rTeam));
 		when(joinRepositoryCustom.findPlayerJoinApplication(StatusType.PROPOSAL, 1L, 1L, PageRequest.of(0, 1))).thenReturn(expectPage);
 		
 		// when
@@ -100,10 +100,10 @@ public class JoinServiceUnitTest {
 		gTeam.initId(2L);
 		player.initId(1L);
 		
-		JoinDto proposal1 = new JoinDto(StatusType.PROPOSAL,RequesterType.Player,1L,1L);
-		JoinDto proposal2 = new JoinDto(StatusType.PROPOSAL,RequesterType.Player,1L,1L);
-		JoinEntity expectJoin1 = new JoinEntity(StatusType.PROPOSAL,RequesterType.Player,player,rTeam);
-		JoinEntity expectJoin2 = new JoinEntity(StatusType.PROPOSAL,RequesterType.Player,player,rTeam);
+		JoinDto proposal1 = new JoinDto(StatusType.PROPOSAL,RequesterType.PLAYER,1L,1L);
+		JoinDto proposal2 = new JoinDto(StatusType.PROPOSAL,RequesterType.PLAYER,1L,1L);
+		JoinEntity expectJoin1 = new JoinEntity(StatusType.PROPOSAL,RequesterType.PLAYER,player,rTeam);
+		JoinEntity expectJoin2 = new JoinEntity(StatusType.PROPOSAL,RequesterType.PLAYER,player,rTeam);
 		
 		expectJoin1.initId(1L);
 		expectJoin2.initId(2L);
@@ -149,11 +149,11 @@ public class JoinServiceUnitTest {
 		graph.initId(2L);
 		banana.initId(3L);
 		
-		JoinEntity join1 = new JoinEntity(StatusType.PROPOSAL,RequesterType.Player,apple,rTeam);
+		JoinEntity join1 = new JoinEntity(StatusType.PROPOSAL,RequesterType.PLAYER,apple,rTeam);
 		join1.initId(1L);
-		JoinEntity join2 = new JoinEntity(StatusType.PROPOSAL,RequesterType.Player,graph,pTeam);
+		JoinEntity join2 = new JoinEntity(StatusType.PROPOSAL,RequesterType.PLAYER,graph,pTeam);
 		join2.initId(2L);
-		JoinEntity join3 = new JoinEntity(StatusType.PROPOSAL,RequesterType.Player,graph,yTeam);
+		JoinEntity join3 = new JoinEntity(StatusType.PROPOSAL,RequesterType.PLAYER,graph,yTeam);
 		join2.initId(3L);
 		
 		PageRequest page = PageRequest.of(0,10);
@@ -163,7 +163,7 @@ public class JoinServiceUnitTest {
 		expectList.add(join3.toDto());
 		Page<JoinDto> expectPage = new PageImpl<>(expectList,page,expectList.size());
 		
-		JoinSearchCondition condition = new JoinSearchCondition(StatusType.PROPOSAL,RequesterType.Player,null,null,' ',null,null);
+		JoinSearchCondition condition = new JoinSearchCondition(StatusType.PROPOSAL,RequesterType.PLAYER,null,null,' ',null,null);
 		
 		when(joinRepositoryCustom.findPlayerJoinApplication(condition.getStatusType(), condition.getPlayerId(), condition.getTeamId(), page)).thenReturn(expectPage);
 		

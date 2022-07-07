@@ -2,8 +2,11 @@ package core.join.entity;
 
 public enum StatusType {
 	PROPOSAL("P"),
+	REJECT("R"),
 	APPROVAL("A"),
+	WITHDRAW("W"),
 	CONFIRMATION("C");
+	
 
 	private String value;
 		

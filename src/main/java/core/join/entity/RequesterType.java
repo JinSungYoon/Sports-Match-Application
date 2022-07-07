@@ -1,8 +1,8 @@
 package core.join.entity;
 
 public enum RequesterType {
-	Player("P"),
-	Team("T");
+	PLAYER("P"),
+	TEAM("T");
 
 	private String value;
 	
