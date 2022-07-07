@@ -25,6 +25,6 @@ public interface JoinService {
 	Page<JoinDto> searchTeamJoinOffer(JoinSearchCondition condition,Pageable pageable);
 	// 승인 확정
 	JoinDto confirmApprove(JoinDto joinDto);
-	// 승인 거절
-	JoinDto rejectApprove(JoinDto joinDto);
+	// 승인 철회
+	JoinDto withdrawApprove(JoinDto joinDto);
 }

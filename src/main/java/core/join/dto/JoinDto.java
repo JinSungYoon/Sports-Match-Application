@@ -24,8 +24,10 @@ public class JoinDto {
 	private RequesterType requesterType;
 	@NotNull
 	private Long teamId;
+	private String teamName;
 	@NotNull
 	private Long playerId;
+	private String playerName;
 	@NotNull
 	private char activeYN;
 	
@@ -33,9 +35,12 @@ public class JoinDto {
 	private LocalDateTime updatedDate;
 	
 	@Builder
-	public JoinDto(Long playerId, Long teamId,RequesterType requesterType,StatusType statusType,char activeYN,LocalDateTime createdDate,LocalDateTime updatedDate) {
-		this.teamId = teamId;
+	public JoinDto(Long id,Long playerId,String playerName, Long teamId, String teamName, RequesterType requesterType,StatusType statusType,char activeYN,LocalDateTime createdDate,LocalDateTime updatedDate) {
+		this.id = id;
 		this.playerId = playerId;
+		this.playerName = playerName;
+		this.teamId = teamId;
+		this.teamName = teamName;
 		this.requesterType = requesterType;
 		this.statusType = statusType;
 		this.activeYN = activeYN;
@@ -43,6 +48,27 @@ public class JoinDto {
 		this.updatedDate = updatedDate;
 	}
 	
+	public JoinDto(Long playerId,String playerName, Long teamId, String teamName, RequesterType requesterType,StatusType statusType,char activeYN,LocalDateTime createdDate,LocalDateTime updatedDate) {
+		this.playerId = playerId;
+		this.playerName = playerName;
+		this.teamId = teamId;
+		this.teamName = teamName;
+		this.requesterType = requesterType;
+		this.statusType = statusType;
+		this.activeYN = activeYN;
+		this.createdDate = createdDate;
+		this.updatedDate = updatedDate;
+	}
+	
+	public JoinDto(Long playerId,Long teamId,RequesterType requesterType,StatusType statusType,char activeYN,LocalDateTime createdDate,LocalDateTime updatedDate) {
+		this.playerId = playerId;
+		this.teamId = teamId;
+		this.requesterType = requesterType;
+		this.statusType = statusType;
+		this.activeYN = activeYN;
+		this.createdDate = createdDate;
+		this.updatedDate = updatedDate;
+	}
 	
 	public JoinDto(StatusType statusType,RequesterType requesterType,Long playerId,Long teamId) {
 		this.statusType = statusType;

@@ -13,20 +13,20 @@ import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.ColumnDefault;
-
 import core.common.entity.BaseEntity;
 import core.join.dto.JoinDto;
 import core.player.entity.PlayerEntity;
 import core.team.entity.TeamEntity;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Entity
 @Getter
 @ToString
 @Table(name = "JOINING")
+@NoArgsConstructor
 public class JoinEntity extends BaseEntity {
 	
 	@Id @GeneratedValue
@@ -74,13 +74,20 @@ public class JoinEntity extends BaseEntity {
 		this.player = player;
 	}
 	
+	public void updateStatus(StatusType status) {
+		this.statusType = status;
+	}
+	
 	public JoinDto toDto() {
 		if(this == null) return null;
 		return JoinDto.builder()
+				.id(id)
 				.statusType(statusType)
 				.requesterType(requesterType)
-				.teamId(team.id)
-				.playerId(player.id)
+				.teamId(team.getId())
+				.teamName(team.getTeamName())
+				.playerId(player.getId())
+				.playerName(player.getPlayerName())
 				.activeYN(activeYN)
 				.createdDate(createdDate)
 				.updatedDate(updatedDate)
