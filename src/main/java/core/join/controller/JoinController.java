@@ -23,7 +23,7 @@ public class JoinController {
 	
 	@PostMapping("requestJoin")
 	public ResponseEntity<?> requestJoin(@RequestBody JoinDto dto){
-		return new ResponseEntity<>(joinService.requestJoin(dto),HttpStatus.OK);
+		return new ResponseEntity<>(joinService.requestJoin(dto),HttpStatus.CREATED);
 	}
 	
 	@GetMapping("searchPlayerJoinApplication")
