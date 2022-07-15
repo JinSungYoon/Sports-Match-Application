@@ -37,6 +37,11 @@ public class JoinServiceImpl implements JoinService {
 	
 	@Override
 	public JoinDto requestJoin(JoinDto joinDto) {
+		
+		// Player,Team Entity 조회
+		TeamEntity team = teamRepository.findById(joinDto.getTeamId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,"요청하신 team이 존재하지 않습니다.",new Exception()));
+		PlayerEntity player = playerRepository.findById(joinDto.getPlayerId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,"요청하신 player가 존재하지 않습니다.",new Exception()));
+		
 		PageRequest page = PageRequest.of(0, 1);
 		
 		Page<JoinDto> inquiryList = new PageImpl<>(new ArrayList<>(),page,0);
@@ -56,10 +61,6 @@ public class JoinServiceImpl implements JoinService {
 		if(!joinDto.checkStatus(StatusType.PROPOSAL)) {
 			joinDto.setStatusType(StatusType.PROPOSAL);
 		}
-		
-		// Player,Team Entity 조회
-		TeamEntity team = teamRepository.findById(joinDto.getTeamId()).orElse(null);
-		PlayerEntity player = playerRepository.findById(joinDto.getPlayerId()).orElse(null);
 		
 		JoinEntity join = joinRepository.save(joinDto.toEntity(joinDto,player,team));
 		
@@ -86,7 +87,7 @@ public class JoinServiceImpl implements JoinService {
 		
 		Long joinId = inquiryList.getContent().get(0).getId();
 		
-		JoinEntity proposal =  joinRepository.findById(joinId).orElse(null);
+		JoinEntity proposal =  joinRepository.findById(joinId).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,"요청한 제안이 없습니다.",new Exception()));
 		
 		proposal.updateStatus(StatusType.REJECT);
 		
@@ -104,8 +105,6 @@ public class JoinServiceImpl implements JoinService {
 		
 		Page<JoinDto> rtnList = new PageImpl<>(new ArrayList<>(),pageable,0);
 		rtnList = joinRepositoryCustom.findPlayerJoinApplication(condition.getStatusType(), condition.getPlayerId(), condition.getTeamId(), pageable);
-		List<JoinDto> joinList = rtnList.getContent();
-		
 		return rtnList;
 	}
 	

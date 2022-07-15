@@ -15,7 +15,7 @@ public interface JoinService {
 	JoinDto rejectJoin(JoinDto joinDto);
 	// 가입 신청 승인
 	JoinDto approveJoin(JoinDto joinDto);
-	// 선수 가입 제안 조회
+	// 선수 가입 신청 조회
 	Page<JoinDto> searchPlayerJoinApplication(JoinSearchCondition condition,Pageable pageable);
 	// 선수 가입 제안 조회
 	Page<JoinDto> searchPlayerJoinOffer(JoinSearchCondition condition,Pageable pageable);
