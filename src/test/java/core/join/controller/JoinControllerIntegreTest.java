@@ -79,33 +79,6 @@ public class JoinControllerIntegreTest {
 	}
 	
 	@Test
-	@DisplayName("가입 신청하기")
-	public void requestJoin() throws Exception {
-		// given
-		TeamEntity team 	= new TeamEntity("team1","Seoul",BelongType.CLUB,"Our team is the best"); 
-		PlayerEntity player = new PlayerEntity("player1","220713-1111111",1,team);
-		JoinDto join = new JoinDto(RequesterType.PLAYER,StatusType.PROPOSAL,1L,1L);
-		teamRepository.save(team);
-		playerRepository.save(player);
-		
-		String content = new ObjectMapper().writeValueAsString(join);
-		
-		// when
-		ResultActions resultAction = mockMvc.perform(post("/requestJoin")
-							.contentType(MediaType.APPLICATION_JSON_UTF8)
-							.content(content)
-							.accept(MediaType.APPLICATION_JSON_UTF8));
-		// then
-		resultAction
-				.andExpect(status().isCreated())
-				.andExpect(jsonPath("$.requesterType").value("PLAYER"))
-				.andExpect(jsonPath("$.statusType").value("PROPOSAL"))
-				.andExpect(jsonPath("$.teamName").value("team1"))
-				.andExpect(jsonPath("$.playerName").value("player1"))
-				.andDo(MockMvcResultHandlers.print());
-	}
-	
-	@Test
 	@DisplayName("가입 거절하기")
 	public void rejectJoin() throws Exception{
 		// given
@@ -115,7 +88,7 @@ public class JoinControllerIntegreTest {
 		
 		teamRepository.save(team);
 		playerRepository.save(player);
-		joinService.requestJoin(proposalJoin);
+		joinService.requestPlayerJoin(1L,proposalJoin);
 		
 		JoinDto rejectJoin = new JoinDto(RequesterType.PLAYER,StatusType.REJECT,1L,1L);
 		String content = new ObjectMapper().writeValueAsString(rejectJoin);
@@ -166,12 +139,12 @@ public class JoinControllerIntegreTest {
 		JoinDto join4 = new JoinDto(RequesterType.PLAYER,StatusType.PROPOSAL,3L,3L);
 		JoinDto join5 = new JoinDto(RequesterType.PLAYER,StatusType.PROPOSAL,5L,1L);
 		JoinDto join6 = new JoinDto(RequesterType.PLAYER,StatusType.PROPOSAL,5L,2L);
-		joinService.requestJoin(join1);
-		joinService.requestJoin(join2);
-		joinService.requestJoin(join3);
-		joinService.requestJoin(join4);
-		joinService.requestJoin(join5);
-		joinService.requestJoin(join6);
+		joinService.requestPlayerJoin(1L,join1);
+		joinService.requestPlayerJoin(1L,join2);
+		joinService.requestPlayerJoin(3L,join3);
+		joinService.requestPlayerJoin(3L,join4);
+		joinService.requestPlayerJoin(5L,join5);
+		joinService.requestPlayerJoin(5L,join6);
 		
 		JoinSearchCondition cond = new JoinSearchCondition();
 		cond.setPlayerId(3L);
@@ -234,18 +207,18 @@ public class JoinControllerIntegreTest {
 		JoinDto join10 = new JoinDto(RequesterType.TEAM,StatusType.PROPOSAL,2L,3L);
 		JoinDto join11 = new JoinDto(RequesterType.TEAM,StatusType.PROPOSAL,3L,3L);
 		JoinDto join12 = new JoinDto(RequesterType.TEAM,StatusType.PROPOSAL,4L,3L);
-		joinService.requestJoin(join1);
-		joinService.requestJoin(join2);
-		joinService.requestJoin(join3);
-		joinService.requestJoin(join4);
-		joinService.requestJoin(join5);
-		joinService.requestJoin(join6);
-		joinService.requestJoin(join7);
-		joinService.requestJoin(join8);
-		joinService.requestJoin(join9);
-		joinService.requestJoin(join10);
-		joinService.requestJoin(join11);
-		joinService.requestJoin(join12);
+		joinService.requestTeamJoin(1L,join1);
+		joinService.requestTeamJoin(1L,join2);
+		joinService.requestTeamJoin(1L,join3);
+		joinService.requestTeamJoin(1L,join4);
+		joinService.requestTeamJoin(2L,join5);
+		joinService.requestTeamJoin(2L,join6);
+		joinService.requestTeamJoin(2L,join7);
+		joinService.requestTeamJoin(2L,join8);
+		joinService.requestTeamJoin(3L,join9);
+		joinService.requestTeamJoin(3L,join10);
+		joinService.requestTeamJoin(3L,join11);
+		joinService.requestTeamJoin(3L,join12);
 		
 		JoinSearchCondition cond = new JoinSearchCondition();
 		cond.setPlayerId(6L);
@@ -308,18 +281,18 @@ public class JoinControllerIntegreTest {
 		JoinDto join10 = new JoinDto(RequesterType.TEAM,StatusType.PROPOSAL,2L,3L);
 		JoinDto join11 = new JoinDto(RequesterType.TEAM,StatusType.PROPOSAL,3L,3L);
 		JoinDto join12 = new JoinDto(RequesterType.TEAM,StatusType.PROPOSAL,4L,3L);
-		joinService.requestJoin(join1);
-		joinService.requestJoin(join2);
-		joinService.requestJoin(join3);
-		joinService.requestJoin(join4);
-		joinService.requestJoin(join5);
-		joinService.requestJoin(join6);
-		joinService.requestJoin(join7);
-		joinService.requestJoin(join8);
-		joinService.requestJoin(join9);
-		joinService.requestJoin(join10);
-		joinService.requestJoin(join11);
-		joinService.requestJoin(join12);
+		joinService.requestTeamJoin(1L,join1);
+		joinService.requestTeamJoin(1L,join2);
+		joinService.requestTeamJoin(1L,join3);
+		joinService.requestTeamJoin(1L,join4);
+		joinService.requestTeamJoin(2L,join5);
+		joinService.requestTeamJoin(2L,join6);
+		joinService.requestTeamJoin(2L,join7);
+		joinService.requestTeamJoin(2L,join8);
+		joinService.requestTeamJoin(3L,join9);
+		joinService.requestTeamJoin(3L,join10);
+		joinService.requestTeamJoin(3L,join11);
+		joinService.requestTeamJoin(3L,join12);
 		
 		JoinSearchCondition cond = new JoinSearchCondition();
 		cond.setTeamId(2L);
@@ -378,12 +351,12 @@ public class JoinControllerIntegreTest {
 		JoinDto join4 = new JoinDto(RequesterType.PLAYER,StatusType.PROPOSAL,3L,3L);
 		JoinDto join5 = new JoinDto(RequesterType.PLAYER,StatusType.PROPOSAL,5L,1L);
 		JoinDto join6 = new JoinDto(RequesterType.PLAYER,StatusType.PROPOSAL,5L,2L);
-		joinService.requestJoin(join1);
-		joinService.requestJoin(join2);
-		joinService.requestJoin(join3);
-		joinService.requestJoin(join4);
-		joinService.requestJoin(join5);
-		joinService.requestJoin(join6);
+		joinService.requestPlayerJoin(1L,join1);
+		joinService.requestPlayerJoin(1L,join2);
+		joinService.requestPlayerJoin(3L,join3);
+		joinService.requestPlayerJoin(3L,join4);
+		joinService.requestPlayerJoin(5L,join5);
+		joinService.requestPlayerJoin(5L,join6);
 		
 		JoinSearchCondition cond = new JoinSearchCondition();
 		cond.setTeamId(2L);

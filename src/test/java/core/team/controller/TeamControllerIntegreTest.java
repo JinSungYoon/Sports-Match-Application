@@ -14,6 +14,7 @@ import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,15 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import core.join.dto.JoinDto;
+import core.join.entity.RequesterType;
+import core.join.entity.StatusType;
+import core.join.repository.JoinRepository;
+import core.join.service.JoinService;
+import core.player.dto.PlayerDto;
 import core.player.entity.BelongType;
+import core.player.repository.PlayerRepository;
+import core.player.service.PlayerService;
 import core.team.dto.TeamDto;
 import core.team.repository.TeamRepository;
 import core.team.service.TeamService;
@@ -49,20 +58,41 @@ public class TeamControllerIntegreTest {
 	private MockMvc mockMvc;
 	
 	@Autowired
+	private PlayerRepository playerRepository;
+	
+	@Autowired
 	private TeamRepository teamRepository;
+	
+	@Autowired
+	private JoinRepository joinRepository;
+	
+	@Autowired
+	private PlayerService playerService;
 	
 	@Autowired
 	private TeamService teamService;
 	
+	@Autowired 
+	private JoinService joinService;
+	
 	@Autowired
 	private EntityManager entityManager;
 	
-	@AfterEach
-	public void init(){		// 초기 id 생성값을 1로 초기화 하기 위한 코드
+	@BeforeEach
+	public void init() {
+		// 각각의 테스트에서 id값 생성시 1로 시작할 수 있도록
+		joinRepository.deleteAll();
+		playerRepository.deleteAll();
 		teamRepository.deleteAll();
 		entityManager
-		.createNativeQuery("ALTER TABLE team AUTO_INCREMENT = 1;")
-		.executeUpdate();
+			.createNativeQuery("ALTER TABLE joining AUTO_INCREMENT = 1;")
+			.executeUpdate();
+		entityManager
+			.createNativeQuery("ALTER TABLE player AUTO_INCREMENT = 1;")
+			.executeUpdate();
+		entityManager
+			.createNativeQuery("ALTER TABLE team AUTO_INCREMENT = 1;")
+			.executeUpdate();
 	}
 	
 	@Test
@@ -224,4 +254,30 @@ public class TeamControllerIntegreTest {
 			.andDo(MockMvcResultHandlers.print());
 	}
 	
+	@Test
+	@DisplayName("가입 신청하기")
+	public void requestTeamJoin() throws Exception {
+		// given
+		TeamDto team 	= new TeamDto("team1","Seoul",BelongType.CLUB,"Our team is the best"); 
+		PlayerDto player = new PlayerDto("player1","220713-1111111",1,team);
+		JoinDto join = new JoinDto(RequesterType.PLAYER,StatusType.PROPOSAL,1L,1L);
+		teamService.registerTeam(team);
+		playerService.registerPlayer(player);
+		
+		String content = new ObjectMapper().writeValueAsString(join);
+		
+		// when
+		ResultActions resultAction = mockMvc.perform(post("/team/{id}/request-join",1)
+							.contentType(MediaType.APPLICATION_JSON_UTF8)
+							.content(content)
+							.accept(MediaType.APPLICATION_JSON_UTF8));
+		// then
+		resultAction
+				.andExpect(status().isCreated())
+				.andExpect(jsonPath("$.requesterType").value("PLAYER"))
+				.andExpect(jsonPath("$.statusType").value("PROPOSAL"))
+				.andExpect(jsonPath("$.teamName").value("team1"))
+				.andExpect(jsonPath("$.playerName").value("player1"))
+				.andDo(MockMvcResultHandlers.print());
+	}
 }

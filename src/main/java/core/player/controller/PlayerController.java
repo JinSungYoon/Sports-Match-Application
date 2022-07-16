@@ -5,7 +5,6 @@ import java.security.GeneralSecurityException;
 import java.security.NoSuchAlgorithmException;
 
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.query.Param;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import core.join.dto.JoinDto;
+import core.join.service.JoinService;
 import core.player.dto.PlayerDto;
 import core.player.dto.PlayerListDto;
 import core.player.service.PlayerService;
@@ -30,6 +31,7 @@ import lombok.RequiredArgsConstructor;
 public class PlayerController {
 	
 	private final PlayerService playerService;
+	private final JoinService joinService;
 	
 	@PostMapping("/player")
 	public ResponseEntity<?> register(@RequestBody PlayerDto dto) throws NoSuchAlgorithmException, UnsupportedEncodingException, GeneralSecurityException{
@@ -66,4 +68,8 @@ public class PlayerController {
 		return new ResponseEntity<>(playerService.deletePlyaer(id),HttpStatus.OK);
 	};	
 	
+	@PostMapping("/player/{id}/request-join")
+	public ResponseEntity<?> requestJoin(@PathVariable Long id,@RequestBody JoinDto dto){
+		return new ResponseEntity<>(joinService.requestPlayerJoin(id, dto),HttpStatus.CREATED);
+	}
 }

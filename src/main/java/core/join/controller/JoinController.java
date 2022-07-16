@@ -20,12 +20,7 @@ import lombok.RequiredArgsConstructor;
 public class JoinController {
 	
 	private final JoinService joinService;
-	
-	@PostMapping("requestJoin")
-	public ResponseEntity<?> requestJoin(@RequestBody JoinDto dto){
-		return new ResponseEntity<>(joinService.requestJoin(dto),HttpStatus.CREATED);
-	}
-	
+		
 	@GetMapping("searchPlayerJoinApplication")
 	public ResponseEntity<?> searchPlayerJoinApplicationList(@RequestBody JoinSearchCondition condition,@PageableDefault(page = 0, size = 10) Pageable page){
 		return new ResponseEntity<>(joinService.searchPlayerJoinApplication(condition, page),HttpStatus.OK);

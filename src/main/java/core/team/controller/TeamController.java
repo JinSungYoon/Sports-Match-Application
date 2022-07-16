@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import core.join.dto.JoinDto;
+import core.join.service.JoinService;
 import core.player.entity.BelongType;
 import core.team.dto.TeamDto;
 import core.team.service.TeamService;
@@ -24,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 public class TeamController {
 	
 	private final TeamService teamService;
+	private final JoinService joinService; 
 	
 	// team을 생성
 	@PostMapping("/team")
@@ -59,6 +62,12 @@ public class TeamController {
 	@DeleteMapping("/team/{id}")
 	public ResponseEntity<?> deleteTeam(@PathVariable Long id){
 		return new ResponseEntity<>(teamService.deleteTeam(id),HttpStatus.OK);
+	}
+	
+	// team 가입 제안
+	@PostMapping("/team/{id}/request-join")
+	public ResponseEntity<?> requestJoin(@PathVariable Long id,@RequestBody JoinDto dto){
+		return new ResponseEntity<>(joinService.requestTeamJoin(id, dto),HttpStatus.CREATED);
 	}
 	
 }

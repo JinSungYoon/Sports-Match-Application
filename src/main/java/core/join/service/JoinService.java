@@ -9,10 +9,17 @@ import core.join.dto.JoinDto;
 import core.join.dto.JoinSearchCondition;
 
 public interface JoinService {
-	// 가입 신청
-	JoinDto requestJoin(JoinDto joinDto);
+
+	// Player 가입 신청
+	JoinDto requestPlayerJoin(Long id,JoinDto joinDto);
+	// Team 가입 신청
+	JoinDto requestTeamJoin(Long id,JoinDto joinDto);
 	// 가입 신청 거절
 	JoinDto rejectJoin(JoinDto joinDto);
+	// 가입 신청 거절
+	JoinDto rejectPlayerJoin(Long id,JoinDto joinDto);
+	// 가입 신청 거절
+	JoinDto rejectTeamJoin(Long id,JoinDto joinDto);
 	// 가입 신청 승인
 	JoinDto approveJoin(JoinDto joinDto);
 	// 선수 가입 신청 조회

@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +28,10 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import core.join.dto.JoinDto;
+import core.join.entity.RequesterType;
+import core.join.entity.StatusType;
+import core.join.service.JoinService;
 import core.player.dto.PlayerDto;
 import core.player.dto.PlayerListDto;
 import core.player.entity.BelongType;
@@ -46,7 +51,10 @@ class PlayerControllerUnitTest {
 	
 	@MockBean
 	private PlayerService playerService;
-		
+	
+	@MockBean
+	private JoinService joinService;
+	
 	@Test
 	@DisplayName("Player 등록하기")
 	public void register() throws Exception {
@@ -222,6 +230,28 @@ class PlayerControllerUnitTest {
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$").value(1L))
 			.andDo(MockMvcResultHandlers.print());
+	}
+	
+	@Test
+	@DisplayName("가입 신청하기")
+	public void requestPlayerJoin() throws Exception {
+		// given
+		JoinDto join = new JoinDto(RequesterType.PLAYER,StatusType.PROPOSAL,1L,1L);
+		String content = new ObjectMapper().writeValueAsString(join);
+		when(joinService.requestPlayerJoin(1L,join)).thenReturn(new JoinDto(1L,1L,"player1",1L,"team1",RequesterType.PLAYER,StatusType.PROPOSAL,'Y',LocalDateTime.now(),LocalDateTime.now()));
+		// when
+		ResultActions resultAction = mockMvc.perform(post("/player/{id}/request-join",1)
+							.contentType(MediaType.APPLICATION_JSON_UTF8)
+							.content(content)
+							.accept(MediaType.APPLICATION_JSON_UTF8));
+		// then
+		resultAction
+				.andExpect(status().isCreated())
+				.andExpect(jsonPath("$.requesterType").value("PLAYER"))
+				.andExpect(jsonPath("$.statusType").value("PROPOSAL"))
+				.andExpect(jsonPath("$.teamName").value("team1"))
+				.andExpect(jsonPath("$.playerName").value("player1"))
+				.andDo(MockMvcResultHandlers.print());
 	}
 	
 }

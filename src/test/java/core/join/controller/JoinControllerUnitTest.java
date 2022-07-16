@@ -50,28 +50,6 @@ public class JoinControllerUnitTest {
 	private JoinService joinService;
 	
 	@Test
-	@DisplayName("가입 신청하기")
-	public void requestJoin() throws Exception {
-		// given
-		JoinDto join = new JoinDto(RequesterType.PLAYER,StatusType.PROPOSAL,1L,1L);
-		String content = new ObjectMapper().writeValueAsString(join);
-		when(joinService.requestJoin(join)).thenReturn(new JoinDto(1L,1L,"player1",1L,"team1",RequesterType.PLAYER,StatusType.PROPOSAL,'Y',LocalDateTime.now(),LocalDateTime.now()));
-		// when
-		ResultActions resultAction = mockMvc.perform(post("/requestJoin")
-							.contentType(MediaType.APPLICATION_JSON_UTF8)
-							.content(content)
-							.accept(MediaType.APPLICATION_JSON_UTF8));
-		// then
-		resultAction
-				.andExpect(status().isCreated())
-				.andExpect(jsonPath("$.requesterType").value("PLAYER"))
-				.andExpect(jsonPath("$.statusType").value("PROPOSAL"))
-				.andExpect(jsonPath("$.teamName").value("team1"))
-				.andExpect(jsonPath("$.playerName").value("player1"))
-				.andDo(MockMvcResultHandlers.print());
-	}
-	
-	@Test
 	@DisplayName("가입 거절하기")
 	public void rejectJoin() throws Exception{
 		// given
