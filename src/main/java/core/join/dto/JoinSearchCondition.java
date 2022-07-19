@@ -18,12 +18,12 @@ public class JoinSearchCondition {
 	private LocalDateTime fromDate;
 	private LocalDateTime toDate;
 	
-	public JoinSearchCondition(StatusType statusType, RequesterType requesterType, Long teamId, Long playerId,
+	public JoinSearchCondition(StatusType statusType, RequesterType requesterType, Long playerId, Long teamId, 
 		char activeYN, LocalDateTime fromDate, LocalDateTime toDate) {
 		this.statusType = statusType;
 		this.requesterType = requesterType;
-		this.teamId = teamId;
 		this.playerId = playerId;
+		this.teamId = teamId;
 		this.activeYN = activeYN;
 		this.fromDate = fromDate;
 		this.toDate = toDate;

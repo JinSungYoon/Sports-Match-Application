@@ -17,9 +17,9 @@ public interface JoinService {
 	// 가입 신청 거절
 	JoinDto rejectJoin(JoinDto joinDto);
 	// 가입 신청 거절
-	JoinDto rejectPlayerJoin(Long id,JoinDto joinDto);
+	JoinDto rejectPlayerJoin(Long playerId,Long teamId);
 	// 가입 신청 거절
-	JoinDto rejectTeamJoin(Long id,JoinDto joinDto);
+	JoinDto rejectTeamJoin(Long teamId,Long playerId);
 	// 가입 신청 승인
 	JoinDto approveJoin(JoinDto joinDto);
 	// 선수 가입 신청 조회
