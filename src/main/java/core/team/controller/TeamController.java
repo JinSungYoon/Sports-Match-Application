@@ -70,4 +70,10 @@ public class TeamController {
 		return new ResponseEntity<>(joinService.requestTeamJoin(id, dto),HttpStatus.CREATED);
 	}
 	
+	// team 가입 제안 거절
+	@PatchMapping("/team/{id}/reject-join/{playerId}")
+	public ResponseEntity<?> rejectJoin(@PathVariable Long id,@PathVariable Long playerId){
+		return new ResponseEntity<>(joinService.rejectTeamJoin(id, playerId),HttpStatus.OK);
+	}
+	
 }

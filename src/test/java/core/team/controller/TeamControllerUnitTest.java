@@ -239,4 +239,27 @@ public class TeamControllerUnitTest {
 				.andExpect(jsonPath("$.playerName").value("player1"))
 				.andDo(MockMvcResultHandlers.print());
 	}
+	
+	@Test
+	@DisplayName("가입제안 거절하기")
+	public void rejectTeamJoin() throws Exception{
+		// given
+		Long playerId = 5L;
+		Long teamId = 3L;
+		JoinDto rejectJoin = new JoinDto(1L,5L,"player",3L,"team",RequesterType.PLAYER,StatusType.REJECT,'Y',LocalDateTime.now(),LocalDateTime.now());
+		when(joinService.rejectTeamJoin(playerId, teamId)).thenReturn(rejectJoin);
+		// when
+		ResultActions resultAction = mockMvc.perform(patch("/team/{id}/reject-join/{teamId}",playerId,teamId)
+											.accept(MediaType.APPLICATION_JSON_UTF8));
+		// then
+		resultAction
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.requesterType").value("PLAYER"))
+				.andExpect(jsonPath("$.statusType").value("REJECT"))
+				.andExpect(jsonPath("$.playerId").value(5L))
+				.andExpect(jsonPath("$.playerName").value("player"))
+				.andExpect(jsonPath("$.teamId").value(3L))
+				.andExpect(jsonPath("$.teamName").value("team"))
+				.andDo(MockMvcResultHandlers.print());
+	}
 }

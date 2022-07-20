@@ -12,6 +12,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -345,6 +346,33 @@ public class PlayerControllerIntegreTest {
 				.andExpect(jsonPath("$.statusType").value("PROPOSAL"))
 				.andExpect(jsonPath("$.teamName").value("team1"))
 				.andExpect(jsonPath("$.playerName").value("player1"))
+				.andDo(MockMvcResultHandlers.print());
+	}
+	
+	@Test
+	@DisplayName("가입제안 거절하기")
+	public void rejectPlayerJoin() throws Exception{
+		// given
+		TeamDto team 	= new TeamDto("team","Seoul",BelongType.CLUB,"Our team is the best"); 
+		PlayerDto player = new PlayerDto("player","220713-1111111",1,team);
+		teamService.registerTeam(team);
+		playerService.registerPlayer(player);
+		Long playerId = 1L;
+		Long teamId = 1L;
+		JoinDto requestJoin = new JoinDto(RequesterType.TEAM,StatusType.PROPOSAL,playerId,teamId);
+		joinService.requestTeamJoin(teamId, requestJoin);
+		// when
+		ResultActions resultAction = mockMvc.perform(patch("/player/{id}/reject-join/{teamId}",playerId,teamId)
+											.accept(MediaType.APPLICATION_JSON_UTF8));
+		// then
+		resultAction
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.requesterType").value("TEAM"))
+				.andExpect(jsonPath("$.statusType").value("REJECT"))
+				.andExpect(jsonPath("$.playerId").value(1L))
+				.andExpect(jsonPath("$.playerName").value("player"))
+				.andExpect(jsonPath("$.teamId").value(1L))
+				.andExpect(jsonPath("$.teamName").value("team"))
 				.andDo(MockMvcResultHandlers.print());
 	}
 }

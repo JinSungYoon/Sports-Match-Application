@@ -254,4 +254,27 @@ class PlayerControllerUnitTest {
 				.andDo(MockMvcResultHandlers.print());
 	}
 	
+	@Test
+	@DisplayName("가입제안 거절하기")
+	public void rejectPlayerJoin() throws Exception{
+		// given
+		Long playerId = 1L;
+		Long teamId = 2L;
+		JoinDto rejectJoin = new JoinDto(1L,1L,"player",2L,"team",RequesterType.TEAM,StatusType.REJECT,'Y',LocalDateTime.now(),LocalDateTime.now());
+		when(joinService.rejectPlayerJoin(playerId, teamId)).thenReturn(rejectJoin);
+		// when
+		ResultActions resultAction = mockMvc.perform(patch("/player/{id}/reject-join/{teamId}",playerId,teamId)
+											.accept(MediaType.APPLICATION_JSON_UTF8));
+		// then
+		resultAction
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.requesterType").value("TEAM"))
+				.andExpect(jsonPath("$.statusType").value("REJECT"))
+				.andExpect(jsonPath("$.playerId").value(1L))
+				.andExpect(jsonPath("$.playerName").value("player"))
+				.andExpect(jsonPath("$.teamId").value(2L))
+				.andExpect(jsonPath("$.teamName").value("team"))
+				.andDo(MockMvcResultHandlers.print());
+	}
+	
 }
