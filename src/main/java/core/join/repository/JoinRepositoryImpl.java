@@ -29,12 +29,12 @@ public class JoinRepositoryImpl implements JoinRepositoryCustom{
 	QTeamEntity team = QTeamEntity.teamEntity;  
 	
 	@Override
-	public Page<JoinDto> findPlayerJoinApplication(StatusType statusType,Long playerId,Long teamId,Pageable pageable) {
+	public Page<JoinDto> findPlayerJoinApplication(StatusType statusType,Long playerId,Pageable pageable) {
 		QueryResults<JoinDto> results = queryFactory
 				.select(Projections.fields(JoinDto.class,join.id,join.player.id.as("playerId"),join.player.playerName,join.team.id.as("teamId"),join.team.teamName,join.requesterType,join.statusType,join.activeYN,join.createdDate,join.updatedDate))
 				.from(join)
 				.join(join.player,player)
-				.where(join.requesterType.eq(RequesterType.PLAYER),eqPlayerId(playerId),eqTeamId(teamId),join.activeYN.eq('Y'))
+				.where(join.requesterType.eq(RequesterType.PLAYER),eqStatusType(statusType),eqPlayerId(playerId),join.activeYN.eq('Y'))
 				.offset(pageable.getOffset())
 				.limit(pageable.getPageSize())
 				.orderBy(join.id.asc(),join.updatedDate.desc())
@@ -47,12 +47,12 @@ public class JoinRepositoryImpl implements JoinRepositoryCustom{
 	}
 	
 	@Override
-	public Page<JoinDto> findPlayerJoinOffer(StatusType statusType, Long playerId, Long teamId, Pageable pageable) {
+	public Page<JoinDto> findPlayerJoinOffer(StatusType statusType, Long playerId, Pageable pageable) {
 		QueryResults<JoinDto> results = queryFactory
 				.select(Projections.fields(JoinDto.class,join.id,join.player.id.as("playerId"),join.player.playerName,join.team.id.as("teamId"),join.team.teamName,join.requesterType,join.statusType,join.activeYN,join.createdDate,join.updatedDate))
 				.from(join)
 				.join(join.team,team)
-				.where(join.requesterType.eq(RequesterType.TEAM),eqPlayerId(playerId),eqTeamId(teamId),join.activeYN.eq('Y'))
+				.where(join.requesterType.eq(RequesterType.TEAM),eqStatusType(statusType),eqPlayerId(playerId),join.activeYN.eq('Y'))
 				.offset(pageable.getOffset())
 				.limit(pageable.getPageSize())
 				.orderBy(join.id.asc(),join.updatedDate.desc())
@@ -65,12 +65,12 @@ public class JoinRepositoryImpl implements JoinRepositoryCustom{
 	}
 	
 	@Override
-	public Page<JoinDto> findTeamJoinApplication(StatusType statusType,Long playerId ,Long teamId, Pageable pageable) {
+	public Page<JoinDto> findTeamJoinApplication(StatusType statusType,Long teamId, Pageable pageable) {
 		QueryResults<JoinDto> results = queryFactory
 				.select(Projections.fields(JoinDto.class,join.id,join.player.id.as("playerId"),join.player.playerName,join.team.id.as("teamId"),join.team.teamName,join.requesterType,join.statusType,join.activeYN,join.createdDate,join.updatedDate))
 				.from(join)
 				.join(join.team,team)
-				.where(join.requesterType.eq(RequesterType.TEAM),eqPlayerId(playerId),eqTeamId(teamId),join.activeYN.eq('Y'))
+				.where(join.requesterType.eq(RequesterType.TEAM),eqStatusType(statusType),eqTeamId(teamId),join.activeYN.eq('Y'))
 				.offset(pageable.getOffset())
 				.limit(pageable.getPageSize())
 				.orderBy(join.id.asc(),join.updatedDate.desc())
@@ -83,12 +83,12 @@ public class JoinRepositoryImpl implements JoinRepositoryCustom{
 	}
 
 	@Override
-	public Page<JoinDto> findTeamJoinOffer(StatusType statusType, Long playerId, Long teamId, Pageable pageable) {
+	public Page<JoinDto> findTeamJoinOffer(StatusType statusType, Long teamId, Pageable pageable) {
 		QueryResults<JoinDto> results = queryFactory
 				.select(Projections.fields(JoinDto.class,join.id,join.player.id.as("playerId"),join.player.playerName,join.team.id.as("teamId"),join.team.teamName,join.requesterType,join.statusType,join.activeYN,join.createdDate,join.updatedDate))
 				.from(join)
 				.join(join.player,player)
-				.where(join.requesterType.eq(RequesterType.PLAYER),eqPlayerId(playerId),eqTeamId(teamId),join.activeYN.eq('Y'))
+				.where(join.requesterType.eq(RequesterType.PLAYER),eqStatusType(statusType),eqTeamId(teamId),join.activeYN.eq('Y'))
 				.offset(pageable.getOffset())
 				.limit(pageable.getPageSize())
 				.orderBy(join.id.asc(),join.updatedDate.desc())
@@ -98,6 +98,13 @@ public class JoinRepositoryImpl implements JoinRepositoryCustom{
 		Long total = results.getTotal();
 		
 		return new PageImpl<>(content,pageable,total);
+	}
+	
+	private BooleanExpression eqStatusType(StatusType statusType) {
+		if(statusType == null) {
+			return null;
+		}
+		return join.statusType.eq(statusType);
 	}
 	
 	private BooleanExpression eqPlayerId(Long playerId) {

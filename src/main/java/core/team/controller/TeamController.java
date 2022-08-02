@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import core.join.dto.JoinDto;
+import core.join.dto.JoinSearchCondition;
 import core.join.service.JoinService;
 import core.player.entity.BelongType;
 import core.team.dto.TeamDto;
@@ -75,5 +76,16 @@ public class TeamController {
 	public ResponseEntity<?> rejectJoin(@PathVariable Long id,@PathVariable Long playerId){
 		return new ResponseEntity<>(joinService.rejectTeamJoin(id, playerId),HttpStatus.OK);
 	}
+	
+	@GetMapping("/team/{id}/search-join-application")
+	public ResponseEntity<?> searchJoinApplication(@PathVariable Long id,@RequestBody JoinSearchCondition condition,@PageableDefault(page = 0, size = 10) Pageable page){
+		return new ResponseEntity<>(joinService.searchTeamJoinApplication(id,condition, page),HttpStatus.OK);
+	}
+	
+	@GetMapping("/team/{id}/search-join-offer")
+	public ResponseEntity<?> searchJoinOffer(@PathVariable Long id,@RequestBody JoinSearchCondition condition,@PageableDefault(page = 0, size = 10) Pageable page){
+		return new ResponseEntity<>(joinService.searchTeamJoinOffer(id,condition, page),HttpStatus.OK);
+	}
+	
 	
 }

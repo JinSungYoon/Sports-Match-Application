@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import core.join.dto.JoinDto;
+import core.join.dto.JoinSearchCondition;
 import core.join.service.JoinService;
 import core.player.dto.PlayerDto;
 import core.player.dto.PlayerListDto;
@@ -73,7 +74,7 @@ public class PlayerController {
 		return new ResponseEntity<>(playerService.deletePlyaer(id),HttpStatus.OK);
 	};	
 	
-	// plyaer 가입 신청
+	// player 가입 신청
 	@PostMapping("/player/{id}/request-join")
 	public ResponseEntity<?> requestJoin(@PathVariable Long id,@RequestBody JoinDto dto){
 		return new ResponseEntity<>(joinService.requestPlayerJoin(id, dto),HttpStatus.CREATED);
@@ -85,4 +86,13 @@ public class PlayerController {
 		return new ResponseEntity<>(joinService.rejectPlayerJoin(id, teamId),HttpStatus.OK);
 	}
 	
+	@GetMapping("/player/{id}/search-join-application")
+	public ResponseEntity<?> searchJoinApplication(@PathVariable Long id,@RequestBody JoinSearchCondition condition,@PageableDefault(page = 0, size = 10) Pageable page){
+		return new ResponseEntity<>(joinService.searchPlayerJoinApplication(id,condition, page),HttpStatus.OK);
+	}
+	
+	@GetMapping("/player/{id}/search-join-offer")
+	public ResponseEntity<?> searchJoinOffer(@PathVariable Long id,@RequestBody JoinSearchCondition condition,@PageableDefault(page = 0, size = 10) Pageable page){
+		return new ResponseEntity<>(joinService.searchPlayerJoinOffer(id,condition, page),HttpStatus.OK);
+	}
 }
