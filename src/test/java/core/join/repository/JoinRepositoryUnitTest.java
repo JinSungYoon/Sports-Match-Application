@@ -129,7 +129,7 @@ public class JoinRepositoryUnitTest {
 		expectPlayer1List.add(new JoinDto(4L,1L,RequesterType.PLAYER,StatusType.PROPOSAL,'Y',LocalDateTime.now(),LocalDateTime.now()));
 		
 		// when
-		Page<JoinDto> rtnList = joinRepositoryCustom.findPlayerJoinApplication(StatusType.PROPOSAL, 1L, null, pageRequest);
+		Page<JoinDto> rtnList = joinRepositoryCustom.findPlayerJoinApplication(StatusType.PROPOSAL, 1L, pageRequest);
 
 		System.out.println("Result : "+rtnList);
 		
@@ -196,7 +196,7 @@ public class JoinRepositoryUnitTest {
 		joinRepository.save(joinEntity8);
 		PageRequest pageRequest = PageRequest.of(0, 2);
 		
-		Page<JoinDto> rtnList = joinRepositoryCustom.findTeamJoinApplication(StatusType.PROPOSAL, null ,2L, pageRequest);
+		Page<JoinDto> rtnList = joinRepositoryCustom.findTeamJoinApplication(StatusType.PROPOSAL, 2L, pageRequest);
 		
 		for(JoinDto dto : rtnList) {
 			System.out.println("dto = "+dto);
