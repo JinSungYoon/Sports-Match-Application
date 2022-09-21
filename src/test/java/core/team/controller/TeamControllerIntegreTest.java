@@ -14,7 +14,6 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,6 +29,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import core.join.dto.JoinDto;
 import core.join.entity.RequesterType;
@@ -307,6 +307,43 @@ public class TeamControllerIntegreTest {
 				.andExpect(jsonPath("$.playerName").value("player"))
 				.andExpect(jsonPath("$.teamId").value(1L))
 				.andExpect(jsonPath("$.teamName").value("team"))
+				.andDo(MockMvcResultHandlers.print());
+	}
+	
+	@Test
+	@DisplayName("가입제안 승인하기")
+	public void approveTeamJoin() throws Exception{
+		// given
+		Long playerId = 1L;
+		Long teamId = 1L;
+		
+		TeamDto team = new TeamDto("Sparta","Space",BelongType.UNIVERSITY,"Our team is strong");
+		PlayerDto player = new PlayerDto("iron-man","220922-1111111",100,team);
+		
+		teamService.registerTeam(team);
+		playerService.registerPlayer(player);
+		
+		JoinDto proposalJoin = new JoinDto(1L,playerId,player.getPlayerName(),teamId,team.getTeamName(),RequesterType.PLAYER,StatusType.PROPOSAL,'Y',LocalDateTime.now(),LocalDateTime.now());
+		
+		joinService.requestPlayerJoin(playerId, proposalJoin);
+		
+		JoinDto approveJoin = new JoinDto(1L,playerId,player.getPlayerName(),teamId,team.getTeamName(),RequesterType.PLAYER,StatusType.APPROVAL,'Y',LocalDateTime.now(),LocalDateTime.now());
+		String content = new ObjectMapper().registerModule(new JavaTimeModule()).writeValueAsString(approveJoin);
+		
+		// when
+		ResultActions resultAction = mockMvc.perform(patch("/team/{id}/approve-join/{teamId}",playerId,teamId)
+											.contentType(MediaType.APPLICATION_JSON_UTF8)
+											.content(content)
+											.accept(MediaType.APPLICATION_JSON_UTF8));
+		// then
+		resultAction
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.requesterType").value("PLAYER"))
+				.andExpect(jsonPath("$.statusType").value("APPROVAL"))
+				.andExpect(jsonPath("$.playerId").value(1L))
+				.andExpect(jsonPath("$.playerName").value("iron-man"))
+				.andExpect(jsonPath("$.teamId").value(1L))
+				.andExpect(jsonPath("$.teamName").value("Sparta"))
 				.andDo(MockMvcResultHandlers.print());
 	}
 }

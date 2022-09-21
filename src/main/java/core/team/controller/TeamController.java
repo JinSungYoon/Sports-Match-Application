@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -74,7 +73,19 @@ public class TeamController {
 	// team 가입 제안 거절
 	@PatchMapping("/team/{id}/reject-join/{playerId}")
 	public ResponseEntity<?> rejectJoin(@PathVariable Long id,@PathVariable Long playerId){
-		return new ResponseEntity<>(joinService.rejectTeamJoin(id, playerId),HttpStatus.OK);
+		JoinDto joinDto = new JoinDto();
+		joinDto.setTeamId(id);
+		joinDto.setPlayerId(playerId);
+		return new ResponseEntity<>(joinService.rejectTeamJoin(joinDto),HttpStatus.OK);
+	}
+	
+	// team 가입 제안 승인
+	@PatchMapping("/team/{id}/approve-join/{playerId}")
+	public ResponseEntity<?> approveJoin(@PathVariable Long id,@PathVariable Long playerId){
+		JoinDto joinDto = new JoinDto();
+		joinDto.setTeamId(id);
+		joinDto.setPlayerId(playerId);
+		return new ResponseEntity<>(joinService.approveTeamJoin(joinDto),HttpStatus.OK);
 	}
 	
 	@GetMapping("/team/{id}/search-join-application")

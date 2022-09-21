@@ -93,7 +93,6 @@ public class JoinDto {
 		}else {
 			return false;
 		}
-
 	}
 	
 }

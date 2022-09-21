@@ -195,7 +195,7 @@ public class JoinServiceUnitTest {
 		join1.updateStatus(StatusType.REJECT);
 		when(joinRepository.save(join1)).thenReturn(join1);
 		
-		JoinDto returnJoin = joinService.rejectPlayerJoin(1L, 2L);		
+		JoinDto returnJoin = joinService.rejectPlayerJoin(joinDto);		
 		// then
 		Assertions.assertThat(returnJoin.getPlayerId()).isEqualTo(1L);
 		Assertions.assertThat(returnJoin.getTeamId()).isEqualTo(2L);
@@ -230,12 +230,82 @@ public class JoinServiceUnitTest {
 		join1.updateStatus(StatusType.REJECT);
 		when(joinRepository.save(join1)).thenReturn(join1);
 		
-		JoinDto returnJoin = joinService.rejectTeamJoin(2L, 1L);		
+		JoinDto returnJoin = joinService.rejectTeamJoin(joinDto);		
 		// then
 		Assertions.assertThat(returnJoin.getPlayerId()).isEqualTo(1L);
 		Assertions.assertThat(returnJoin.getTeamId()).isEqualTo(2L);
 		Assertions.assertThat(returnJoin.getRequesterType()).isEqualTo(RequesterType.PLAYER);
 		Assertions.assertThat(returnJoin.getStatusType()).isEqualTo(StatusType.REJECT);
+	}
+	
+	@Test
+	@DisplayName("선수 가입 승인")
+	void approvePlayerRequest() {
+		// given
+		TeamEntity team1 = new TeamEntity("reptileTeam","Ocean",BelongType.CLUB,"We are Reptile team");
+		TeamEntity team2 = new TeamEntity("fishTeam","Ocean",BelongType.CLUB,"We are Fish team");
+		PlayerEntity player = new PlayerEntity("turtle","220719-1111111",10,team1);
+		team1.initId(1L);
+		team2.initId(2L);
+		player.initId(1L);
+		
+		JoinEntity join1 = new JoinEntity(StatusType.PROPOSAL,RequesterType.TEAM,player,team2);
+		join1.initId(1L);
+		PageRequest pageRequest = PageRequest.of(0, 1);
+		List<JoinDto> expectList = new ArrayList<>();
+		JoinDto joinDto = new JoinDto(RequesterType.TEAM,StatusType.PROPOSAL,1L,2L);
+		expectList.add(joinDto);
+		PageImpl expectPage = new PageImpl<>(expectList,pageRequest,expectList.size());
+		
+		// when
+		when(teamRepository.findById(2L)).thenReturn(Optional.of(team2));
+		when(playerRepository.findById(1L)).thenReturn(Optional.of(player));
+		when(joinRepositoryCustom.findPlayerJoinOffer(StatusType.PROPOSAL,1L,pageRequest)).thenReturn(expectPage);
+		when(joinRepository.findById(any())).thenReturn(Optional.of(join1));
+		join1.updateStatus(StatusType.APPROVAL);
+		when(joinRepository.save(join1)).thenReturn(join1);
+		
+		JoinDto returnJoin = joinService.approvePlayerJoin(joinDto);		
+		// then
+		Assertions.assertThat(returnJoin.getPlayerId()).isEqualTo(1L);
+		Assertions.assertThat(returnJoin.getTeamId()).isEqualTo(2L);
+		Assertions.assertThat(returnJoin.getRequesterType()).isEqualTo(RequesterType.TEAM);
+		Assertions.assertThat(returnJoin.getStatusType()).isEqualTo(StatusType.APPROVAL);
+	}
+	
+	@Test
+	@DisplayName("팀 가입 승인")
+	void approveTeamRequest() {
+		// given
+		TeamEntity team1 = new TeamEntity("reptileTeam","Ocean",BelongType.CLUB,"We are Reptile team");
+		TeamEntity team2 = new TeamEntity("fishTeam","Ocean",BelongType.CLUB,"We are Fish team");
+		PlayerEntity player = new PlayerEntity("turtle","220719-1111111",10,team1);
+		team1.initId(1L);
+		team2.initId(2L);
+		player.initId(1L);
+		
+		JoinEntity join1 = new JoinEntity(StatusType.PROPOSAL,RequesterType.PLAYER,player,team2);
+		join1.initId(1L);
+		PageRequest pageRequest = PageRequest.of(0, 1);
+		List<JoinDto> expectList = new ArrayList<>();
+		JoinDto joinDto = new JoinDto(RequesterType.PLAYER,StatusType.PROPOSAL,1L,2L);
+		expectList.add(joinDto);
+		PageImpl expectPage = new PageImpl<>(expectList,pageRequest,expectList.size());
+		
+		// when
+		when(teamRepository.findById(any())).thenReturn(Optional.of(team2));
+		when(playerRepository.findById(any())).thenReturn(Optional.of(player));
+		when(joinRepositoryCustom.findTeamJoinOffer(StatusType.PROPOSAL,2L,pageRequest)).thenReturn(expectPage);
+		when(joinRepository.findById(any())).thenReturn(Optional.of(join1));
+		join1.updateStatus(StatusType.APPROVAL);
+		when(joinRepository.save(join1)).thenReturn(join1);
+		
+		JoinDto returnJoin = joinService.approveTeamJoin(joinDto);		
+		// then
+		Assertions.assertThat(returnJoin.getPlayerId()).isEqualTo(1L);
+		Assertions.assertThat(returnJoin.getTeamId()).isEqualTo(2L);
+		Assertions.assertThat(returnJoin.getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(returnJoin.getStatusType()).isEqualTo(StatusType.APPROVAL);
 	}
 	
 	@Test

@@ -21,12 +21,16 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import core.join.dto.JoinDto;
 import core.join.entity.RequesterType;
@@ -50,10 +54,13 @@ class PlayerControllerUnitTest {
 	private MockMvc mockMvc;
 	
 	@MockBean
-	private PlayerService playerService;
+	PlayerService playerService;
 	
 	@MockBean
-	private JoinService joinService;
+	JoinService joinService;
+	
+	@DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+	private LocalDateTime currentDateTime;
 	
 	@Test
 	@DisplayName("Player 등록하기")
@@ -150,9 +157,6 @@ class PlayerControllerUnitTest {
 		list.add(new PlayerDto("player7","220530-1111111",5,team2));
 		list.add(new PlayerDto("player8","220530-1111111",3,team1));
 		list.add(new PlayerDto("player9","220530-1111111",6,team2));
-//		rtnList.add(new PlayerDto("player2","220530-1111111",1,team2));
-//		rtnList.add(new PlayerDto("player3","220530-1111111",2,team2));
-//		rtnList.add(new PlayerDto("player5","220530-1111111",3,team2));
 		rtnList.add(new PlayerDto("player6","220530-1111111",4,team2));
 		rtnList.add(new PlayerDto("player7","220530-1111111",5,team2));
 		rtnList.add(new PlayerDto("player9","220530-1111111",6,team2));
@@ -205,9 +209,9 @@ class PlayerControllerUnitTest {
 		// when
 		
 		ResultActions resultAction = mockMvc.perform(patch("/player/{id}",id)
-				.contentType(MediaType.APPLICATION_JSON_UTF8)
-				.content(content)
-				.accept(MediaType.APPLICATION_JSON_UTF8));
+											.contentType(MediaType.APPLICATION_JSON_UTF8)
+											.content(content)
+											.accept(MediaType.APPLICATION_JSON_UTF8));
 		// then
 		resultAction
 			.andExpect(status().isOk())
@@ -235,15 +239,16 @@ class PlayerControllerUnitTest {
 	@Test
 	@DisplayName("가입 신청하기")
 	public void requestPlayerJoin() throws Exception {
+		
 		// given
 		JoinDto join = new JoinDto(RequesterType.PLAYER,StatusType.PROPOSAL,1L,1L);
-		String content = new ObjectMapper().writeValueAsString(join);
+		String content = new ObjectMapper().registerModule(new JavaTimeModule()).writeValueAsString(join);
 		when(joinService.requestPlayerJoin(1L,join)).thenReturn(new JoinDto(1L,1L,"player1",1L,"team1",RequesterType.PLAYER,StatusType.PROPOSAL,'Y',LocalDateTime.now(),LocalDateTime.now()));
 		// when
 		ResultActions resultAction = mockMvc.perform(post("/player/{id}/request-join",1)
-							.contentType(MediaType.APPLICATION_JSON_UTF8)
-							.content(content)
-							.accept(MediaType.APPLICATION_JSON_UTF8));
+											.contentType(MediaType.APPLICATION_JSON_UTF8)
+											.content(content)
+											.accept(MediaType.APPLICATION_JSON_UTF8));
 		// then
 		resultAction
 				.andExpect(status().isCreated())
@@ -260,10 +265,14 @@ class PlayerControllerUnitTest {
 		// given
 		Long playerId = 1L;
 		Long teamId = 2L;
-		JoinDto rejectJoin = new JoinDto(1L,1L,"player",2L,"team",RequesterType.TEAM,StatusType.REJECT,'Y',LocalDateTime.now(),LocalDateTime.now());
-		when(joinService.rejectPlayerJoin(playerId, teamId)).thenReturn(rejectJoin);
+		
+		JoinDto rejectJoin = new JoinDto(1L,playerId,"player",teamId,"team",RequesterType.TEAM,StatusType.REJECT,'Y',LocalDateTime.now(),LocalDateTime.now());
+		String content = new ObjectMapper().registerModule(new JavaTimeModule()).writeValueAsString(rejectJoin);
+		when(joinService.rejectPlayerJoin(rejectJoin)).thenReturn(rejectJoin);
 		// when
 		ResultActions resultAction = mockMvc.perform(patch("/player/{id}/reject-join/{teamId}",playerId,teamId)
+											.contentType(MediaType.APPLICATION_JSON_UTF8)
+											.content(content)
 											.accept(MediaType.APPLICATION_JSON_UTF8));
 		// then
 		resultAction
@@ -275,6 +284,46 @@ class PlayerControllerUnitTest {
 				.andExpect(jsonPath("$.teamId").value(2L))
 				.andExpect(jsonPath("$.teamName").value("team"))
 				.andDo(MockMvcResultHandlers.print());
+	}
+	
+	@Test
+	@DisplayName("가입제안 승인하기")
+	public void approvePlayerJoin() throws Exception{
+		// given
+		Long playerId = 1L;
+		Long teamId = 2L;
+		
+		JoinDto requestJoin = new JoinDto(1L,1L,"player",2L,"team",RequesterType.TEAM,StatusType.PROPOSAL,'Y',LocalDateTime.now(),LocalDateTime.now());
+		
+		JoinDto approveJoin = new JoinDto(1L,1L,"player",2L,"team",RequesterType.TEAM,StatusType.APPROVAL,'Y',LocalDateTime.now(),LocalDateTime.now());
+		
+		String content = new ObjectMapper().registerModule(new JavaTimeModule()).writeValueAsString(approveJoin);
+
+		joinService.requestTeamJoin(playerId, requestJoin);
+		
+		when(joinService.approvePlayerJoin(approveJoin)).thenReturn(approveJoin);
+		
+		MultiValueMap<String, String> param = new LinkedMultiValueMap<>();
+		param.add("id",String.valueOf(playerId));
+		param.add("teamId",String.valueOf(teamId));
+		
+		// when
+		ResultActions resultAction = mockMvc.perform(patch("/player/{id}/approve-join/{teamId}",playerId,teamId)
+											.contentType(MediaType.APPLICATION_JSON)
+											.content(content)
+											.accept(MediaType.APPLICATION_JSON));
+		
+		// then
+		resultAction
+				.andExpect(jsonPath("$.requesterType").value("TEAM"))
+				.andExpect(jsonPath("$.statusType").value("APPROVAL"))
+				.andExpect(jsonPath("$.playerId").value(1L))
+				.andExpect(jsonPath("$.playerName").value("player"))
+				.andExpect(jsonPath("$.teamId").value(2L))
+				.andExpect(jsonPath("$.teamName").value("team"))
+				.andExpect(status().isOk())
+				.andDo(MockMvcResultHandlers.print());
+				
 	}
 	
 }

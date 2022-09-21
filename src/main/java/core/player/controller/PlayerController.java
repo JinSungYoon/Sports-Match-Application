@@ -83,7 +83,19 @@ public class PlayerController {
 	// player 가입 제안 거절
 	@PatchMapping("/player/{id}/reject-join/{teamId}")
 	public ResponseEntity<?> rejectJoin(@PathVariable Long id,@PathVariable Long teamId){
-		return new ResponseEntity<>(joinService.rejectPlayerJoin(id, teamId),HttpStatus.OK);
+		JoinDto joinDto = new JoinDto();
+		joinDto.setPlayerId(id);
+		joinDto.setTeamId(teamId);
+		return new ResponseEntity<>(joinService.rejectPlayerJoin(joinDto),HttpStatus.OK);
+	}
+	
+	// player 가입 제안 승인
+	@PatchMapping("/player/{id}/approve-join/{teamId}")
+	public ResponseEntity<?> approveJoin(@PathVariable Long id,@PathVariable Long teamId){
+		JoinDto joinDto = new JoinDto();
+		joinDto.setPlayerId(id);
+		joinDto.setTeamId(teamId);
+		return new ResponseEntity<>(joinService.approvePlayerJoin(joinDto),HttpStatus.OK);
 	}
 	
 	@GetMapping("/player/{id}/search-join-application")

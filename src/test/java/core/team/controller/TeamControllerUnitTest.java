@@ -30,6 +30,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import core.join.dto.JoinDto;
 import core.join.entity.RequesterType;
@@ -247,9 +248,12 @@ public class TeamControllerUnitTest {
 		Long playerId = 5L;
 		Long teamId = 3L;
 		JoinDto rejectJoin = new JoinDto(1L,5L,"player",3L,"team",RequesterType.PLAYER,StatusType.REJECT,'Y',LocalDateTime.now(),LocalDateTime.now());
-		when(joinService.rejectTeamJoin(playerId, teamId)).thenReturn(rejectJoin);
+		String content = new ObjectMapper().registerModule(new JavaTimeModule()).writeValueAsString(rejectJoin);
+		when(joinService.rejectTeamJoin(rejectJoin)).thenReturn(rejectJoin);
 		// when
 		ResultActions resultAction = mockMvc.perform(patch("/team/{id}/reject-join/{teamId}",playerId,teamId)
+											.contentType(MediaType.APPLICATION_JSON_UTF8)
+											.content(content)
 											.accept(MediaType.APPLICATION_JSON_UTF8));
 		// then
 		resultAction
@@ -257,6 +261,32 @@ public class TeamControllerUnitTest {
 				.andExpect(jsonPath("$.requesterType").value("PLAYER"))
 				.andExpect(jsonPath("$.statusType").value("REJECT"))
 				.andExpect(jsonPath("$.playerId").value(5L))
+				.andExpect(jsonPath("$.playerName").value("player"))
+				.andExpect(jsonPath("$.teamId").value(3L))
+				.andExpect(jsonPath("$.teamName").value("team"))
+				.andDo(MockMvcResultHandlers.print());
+	}
+	
+	@Test
+	@DisplayName("가입제안 승인하기")
+	public void approveTeamJoin() throws Exception{
+		// given
+		Long playerId = 10L;
+		Long teamId = 3L;
+		JoinDto approveJoin = new JoinDto(1L,10L,"player",3L,"team",RequesterType.PLAYER,StatusType.APPROVAL,'Y',LocalDateTime.now(),LocalDateTime.now());
+		String content = new ObjectMapper().registerModule(new JavaTimeModule()).writeValueAsString(approveJoin);
+		when(joinService.approveTeamJoin(approveJoin)).thenReturn(approveJoin);
+		// when
+		ResultActions resultAction = mockMvc.perform(patch("/team/{id}/approve-join/{teamId}",playerId,teamId)
+											.contentType(MediaType.APPLICATION_JSON_UTF8)
+											.content(content)
+											.accept(MediaType.APPLICATION_JSON_UTF8));
+		// then
+		resultAction
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.requesterType").value("PLAYER"))
+				.andExpect(jsonPath("$.statusType").value("APPROVAL"))
+				.andExpect(jsonPath("$.playerId").value(10L))
 				.andExpect(jsonPath("$.playerName").value("player"))
 				.andExpect(jsonPath("$.teamId").value(3L))
 				.andExpect(jsonPath("$.teamName").value("team"))

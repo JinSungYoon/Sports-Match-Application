@@ -15,11 +15,9 @@ import org.springframework.web.server.ResponseStatusException;
 import core.join.dto.JoinDto;
 import core.join.dto.JoinSearchCondition;
 import core.join.entity.JoinEntity;
-import core.join.entity.RequesterType;
 import core.join.entity.StatusType;
 import core.join.repository.JoinRepository;
 import core.join.repository.JoinRepositoryCustom;
-import core.join.repository.JoinRepositoryImpl;
 import core.player.entity.PlayerEntity;
 import core.player.repository.PlayerRepository;
 import core.team.entity.TeamEntity;
@@ -38,7 +36,7 @@ public class JoinServiceImpl implements JoinService {
 	@Override
 	public JoinDto requestPlayerJoin(Long id, JoinDto joinDto) {
 
-		if(!id.equals(joinDto.getPlayerId())) {
+		if(id != joinDto.getPlayerId()) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"타인의 가입 요청은 할 수 없습니다.",new Exception());
 		}
 		
@@ -71,7 +69,7 @@ public class JoinServiceImpl implements JoinService {
 	public JoinDto requestTeamJoin(Long id, JoinDto joinDto) {
 		
 		// 본인의 요청인지 확인
-		if(!id.equals(joinDto.getTeamId())) {
+		if(id != joinDto.getTeamId()) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"타팀의 가입 요청은 할 수 없습니다.",new Exception());
 		}
 		
@@ -101,18 +99,18 @@ public class JoinServiceImpl implements JoinService {
 	}
 	
 	@Override
-	public JoinDto rejectPlayerJoin(Long playerId,Long teamId) {
+	public JoinDto rejectPlayerJoin(JoinDto joinDto) {
 		
 		// Player,Team Entity 조회
-		TeamEntity team = teamRepository.findById(teamId).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,"요청하신 team이 존재하지 않습니다.",new Exception()));
-		PlayerEntity player = playerRepository.findById(playerId).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,"요청하신 player가 존재하지 않습니다.",new Exception()));
+		TeamEntity team = teamRepository.findById(joinDto.getTeamId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,"요청하신 team이 존재하지 않습니다.",new Exception()));
+		PlayerEntity player = playerRepository.findById(joinDto.getPlayerId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,"요청하신 player가 존재하지 않습니다.",new Exception()));
 		
 		PageRequest page = PageRequest.of(0, 1);
 		
 		Page<JoinDto> inquiryList = new PageImpl<>(new ArrayList<>(),page,0);
 		
 		// 거절할 제안이 있는지 확인.
-		inquiryList = joinRepositoryCustom.findPlayerJoinOffer(StatusType.PROPOSAL, playerId, page);
+		inquiryList = joinRepositoryCustom.findPlayerJoinOffer(StatusType.PROPOSAL, joinDto.getPlayerId(), page);
 		
 		if(inquiryList.getTotalElements()<=0) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"거절할 제안이 없습니다.",new Exception());
@@ -130,18 +128,18 @@ public class JoinServiceImpl implements JoinService {
 	}
 
 	@Override
-	public JoinDto rejectTeamJoin(Long teamId, Long playerId) {
+	public JoinDto rejectTeamJoin(JoinDto joinDto) {
 
 		// Player,Team Entity 조회
-		TeamEntity team = teamRepository.findById(teamId).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,"요청하신 team이 존재하지 않습니다.",new Exception()));
-		PlayerEntity player = playerRepository.findById(playerId).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,"요청하신 player가 존재하지 않습니다.",new Exception()));
+		TeamEntity team = teamRepository.findById(joinDto.getTeamId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,"요청하신 team이 존재하지 않습니다.",new Exception()));
+		PlayerEntity player = playerRepository.findById(joinDto.getPlayerId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,"요청하신 player가 존재하지 않습니다.",new Exception()));
 		
 		PageRequest page = PageRequest.of(0, 1);
 		
 		Page<JoinDto> inquiryList = new PageImpl<>(new ArrayList<>(),page,0);
 		
 		// 거절할 제안이 있는지 확인.
-		inquiryList = joinRepositoryCustom.findTeamJoinOffer(StatusType.PROPOSAL, teamId, page);
+		inquiryList = joinRepositoryCustom.findTeamJoinOffer(StatusType.PROPOSAL, joinDto.getTeamId(), page);
 		
 		if(inquiryList.getTotalElements()<=0) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"거절할 제안이 없습니다.",new Exception());
@@ -159,9 +157,59 @@ public class JoinServiceImpl implements JoinService {
 	}
 
 	@Override
-	public JoinDto approveJoin(JoinDto joinDto) {
-		// TODO Auto-generated method stub
-		return null;
+	public JoinDto approvePlayerJoin(JoinDto joinDto) {
+		// Player,Team Entity 조회
+		TeamEntity team = teamRepository.findById(joinDto.getTeamId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,"요청하신 team이 존재하지 않습니다.",new Exception()));
+		PlayerEntity player = playerRepository.findById(joinDto.getPlayerId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,"요청하신 player가 존재하지 않습니다.",new Exception()));
+		
+		PageRequest page = PageRequest.of(0, 1);
+		
+		Page<JoinDto> inquiryList = new PageImpl<>(new ArrayList<>(),page,0);
+		
+		// Player에게 제안한 요청이 있는지 확인.
+		inquiryList = joinRepositoryCustom.findPlayerJoinOffer(StatusType.PROPOSAL, joinDto.getPlayerId(), page);
+		
+		if(inquiryList.getTotalElements()<=0) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"승인할 제안이 없습니다.",new Exception());
+		}
+		
+		Long joinId = inquiryList.getContent().get(0).getId();
+		
+		JoinEntity proposal =  joinRepository.findById(joinId).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,"요청한 제안이 없습니다.",new Exception()));
+		
+		proposal.updateStatus(StatusType.APPROVAL);
+		
+		proposal = joinRepository.save(proposal);
+		
+		return proposal.toDto();
+	}
+	
+	@Override
+	public JoinDto approveTeamJoin(JoinDto joinDto) {
+		// Player,Team Entity 조회
+		TeamEntity team = teamRepository.findById(joinDto.getTeamId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,"요청하신 team이 존재하지 않습니다.",new Exception()));
+		PlayerEntity player = playerRepository.findById(joinDto.getPlayerId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,"요청하신 player가 존재하지 않습니다.",new Exception()));
+		
+		PageRequest page = PageRequest.of(0, 1);
+		
+		Page<JoinDto> inquiryList = new PageImpl<>(new ArrayList<>(),page,0);
+		
+		// Player에게 제안한 요청이 있는지 확인.
+		inquiryList = joinRepositoryCustom.findTeamJoinOffer(StatusType.PROPOSAL, joinDto.getTeamId(), page);
+		
+		if(inquiryList.getTotalElements()<=0) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"승인할 제안이 없습니다.",new Exception());
+		}
+		
+		Long joinId = inquiryList.getContent().get(0).getId();
+		
+		JoinEntity proposal =  joinRepository.findById(joinId).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,"요청한 제안이 없습니다.",new Exception()));
+		
+		proposal.updateStatus(StatusType.APPROVAL);
+		
+		proposal = joinRepository.save(proposal);
+		
+		return proposal.toDto();
 	}
 
 	@Override

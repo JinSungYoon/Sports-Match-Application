@@ -25,6 +25,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.data.domain.PageRequest;
@@ -33,8 +34,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import core.join.dto.JoinDto;
 import core.join.entity.RequesterType;
@@ -361,8 +365,14 @@ public class PlayerControllerIntegreTest {
 		Long teamId = 1L;
 		JoinDto requestJoin = new JoinDto(RequesterType.TEAM,StatusType.PROPOSAL,playerId,teamId);
 		joinService.requestTeamJoin(teamId, requestJoin);
+		
+		JoinDto rejectJoin = new JoinDto(1L,1L,"player",1L,"team",RequesterType.TEAM,StatusType.REJECT,'Y',LocalDateTime.now(),LocalDateTime.now());
+		String content = new ObjectMapper().registerModule(new JavaTimeModule()).writeValueAsString(rejectJoin);
+		
 		// when
 		ResultActions resultAction = mockMvc.perform(patch("/player/{id}/reject-join/{teamId}",playerId,teamId)
+											.contentType(MediaType.APPLICATION_JSON_UTF8)
+											.content(content)
 											.accept(MediaType.APPLICATION_JSON_UTF8));
 		// then
 		resultAction
@@ -373,6 +383,41 @@ public class PlayerControllerIntegreTest {
 				.andExpect(jsonPath("$.playerName").value("player"))
 				.andExpect(jsonPath("$.teamId").value(1L))
 				.andExpect(jsonPath("$.teamName").value("team"))
+				.andDo(MockMvcResultHandlers.print());
+	}
+	
+	@Test
+	@DisplayName("가입제안 승인하기")
+	public void approvePlayerJoin() throws Exception{
+		// given
+		Long playerId = 1L;
+		Long teamId = 2L;
+		
+		TeamDto team = new TeamDto("sparta","space",BelongType.CLUB,"Hello our club is too strong");
+		PlayerDto player = new PlayerDto("hulk","20220920-1111111",1,team);
+		
+		teamService.registerTeam(team);
+		playerService.registerPlayer(player);
+		
+		JoinDto approveJoin = new JoinDto(1L,1L,"player",2L,"team",RequesterType.TEAM,StatusType.APPROVAL,'Y',LocalDateTime.now(),LocalDateTime.now()); 
+		joinService.requestTeamJoin(teamId, approveJoin);
+		
+		String content = new ObjectMapper().registerModule(new JavaTimeModule()).writeValueAsString(approveJoin);
+		
+		// when
+		ResultActions resultAction = mockMvc.perform(patch("/player/{id}/approve-join/{teamId}",playerId,teamId)
+											.contentType(MediaType.APPLICATION_JSON_UTF8)
+											.content(content)
+											.accept(MediaType.APPLICATION_JSON_UTF8));
+		// then
+		resultAction
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.requesterType").value("TEAM"))
+				.andExpect(jsonPath("$.statusType").value("APPROVAL"))
+				.andExpect(jsonPath("$.playerId").value(1L))
+				.andExpect(jsonPath("$.playerName").value("hulk"))
+				.andExpect(jsonPath("$.teamId").value(2L))
+				.andExpect(jsonPath("$.teamName").value("sparta"))
 				.andDo(MockMvcResultHandlers.print());
 	}
 }
