@@ -223,7 +223,7 @@ public class TeamControllerUnitTest {
 	@DisplayName("가입 신청하기")
 	public void requestTeamJoin() throws Exception {
 		// given
-		JoinDto join = new JoinDto(RequesterType.PLAYER,StatusType.PROPOSAL,1L,1L);
+		JoinDto join = new JoinDto(1L,1L,RequesterType.PLAYER,StatusType.PROPOSAL);
 		String content = new ObjectMapper().writeValueAsString(join);
 		when(joinService.requestTeamJoin(1L,join)).thenReturn(new JoinDto(1L,1L,"player1",1L,"team1",RequesterType.PLAYER,StatusType.PROPOSAL,'Y',LocalDateTime.now(),LocalDateTime.now()));
 		// when

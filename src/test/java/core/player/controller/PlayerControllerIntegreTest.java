@@ -332,7 +332,7 @@ public class PlayerControllerIntegreTest {
 		// given
 		TeamDto team 	= new TeamDto("team1","Seoul",BelongType.CLUB,"Our team is the best"); 
 		PlayerDto player = new PlayerDto("player1","220713-1111111",1,team);
-		JoinDto join = new JoinDto(RequesterType.PLAYER,StatusType.PROPOSAL,1L,1L);
+		JoinDto join = new JoinDto(1L,1L,RequesterType.PLAYER,StatusType.PROPOSAL);
 		teamService.registerTeam(team);
 		playerService.registerPlayer(player);
 		
@@ -363,7 +363,7 @@ public class PlayerControllerIntegreTest {
 		playerService.registerPlayer(player);
 		Long playerId = 1L;
 		Long teamId = 1L;
-		JoinDto requestJoin = new JoinDto(RequesterType.TEAM,StatusType.PROPOSAL,playerId,teamId);
+		JoinDto requestJoin = new JoinDto(playerId,teamId,RequesterType.TEAM,StatusType.PROPOSAL);
 		joinService.requestTeamJoin(teamId, requestJoin);
 		
 		JoinDto rejectJoin = new JoinDto(1L,1L,"player",1L,"team",RequesterType.TEAM,StatusType.REJECT,'Y',LocalDateTime.now(),LocalDateTime.now());

@@ -68,7 +68,7 @@ public class JoinServiceUnitTest {
 		gTeam.initId(2L);
 		player.initId(1L);
 		
-		JoinDto proposal = new JoinDto(RequesterType.PLAYER,StatusType.PROPOSAL,1L,1L);
+		JoinDto proposal = new JoinDto(1L,1L,RequesterType.PLAYER,StatusType.PROPOSAL);
 		
 		List<JoinDto> searhList = new ArrayList<>();
 		
@@ -102,7 +102,7 @@ public class JoinServiceUnitTest {
 		gTeam.initId(2L);
 		player.initId(1L);
 		
-		JoinDto proposal = new JoinDto(RequesterType.TEAM,StatusType.PROPOSAL,1L,2L);
+		JoinDto proposal = new JoinDto(1L,2L,RequesterType.TEAM,StatusType.PROPOSAL);
 		
 		List<JoinDto> searhList = new ArrayList<>();
 		
@@ -136,8 +136,8 @@ public class JoinServiceUnitTest {
 		gTeam.initId(2L);
 		player.initId(1L);
 		
-		JoinDto proposal1 = new JoinDto(RequesterType.PLAYER,StatusType.PROPOSAL,1L,1L);
-		JoinDto proposal2 = new JoinDto(RequesterType.PLAYER,StatusType.PROPOSAL,1L,1L);
+		JoinDto proposal1 = new JoinDto(1L,1L,RequesterType.PLAYER,StatusType.PROPOSAL);
+		JoinDto proposal2 = new JoinDto(1L,1L,RequesterType.PLAYER,StatusType.PROPOSAL);
 		JoinEntity expectJoin1 = new JoinEntity(StatusType.PROPOSAL,RequesterType.PLAYER,player,rTeam);
 		
 		
@@ -183,7 +183,7 @@ public class JoinServiceUnitTest {
 		join1.initId(1L);
 		PageRequest pageRequest = PageRequest.of(0, 1);
 		List<JoinDto> expectList = new ArrayList<>();
-		JoinDto joinDto = new JoinDto(RequesterType.TEAM,StatusType.PROPOSAL,1L,2L);
+		JoinDto joinDto = new JoinDto(1L,2L,RequesterType.TEAM,StatusType.PROPOSAL);
 		expectList.add(joinDto);
 		PageImpl expectPage = new PageImpl<>(expectList,pageRequest,expectList.size());
 		
@@ -218,7 +218,7 @@ public class JoinServiceUnitTest {
 		join1.initId(1L);
 		PageRequest pageRequest = PageRequest.of(0, 1);
 		List<JoinDto> expectList = new ArrayList<>();
-		JoinDto joinDto = new JoinDto(RequesterType.PLAYER,StatusType.PROPOSAL,1L,2L);
+		JoinDto joinDto = new JoinDto(1L,2L,RequesterType.PLAYER,StatusType.PROPOSAL);
 		expectList.add(joinDto);
 		PageImpl expectPage = new PageImpl<>(expectList,pageRequest,expectList.size());
 		
@@ -253,7 +253,7 @@ public class JoinServiceUnitTest {
 		join1.initId(1L);
 		PageRequest pageRequest = PageRequest.of(0, 1);
 		List<JoinDto> expectList = new ArrayList<>();
-		JoinDto joinDto = new JoinDto(RequesterType.TEAM,StatusType.PROPOSAL,1L,2L);
+		JoinDto joinDto = new JoinDto(1L,2L,RequesterType.TEAM,StatusType.PROPOSAL);
 		expectList.add(joinDto);
 		PageImpl expectPage = new PageImpl<>(expectList,pageRequest,expectList.size());
 		
@@ -288,7 +288,7 @@ public class JoinServiceUnitTest {
 		join1.initId(1L);
 		PageRequest pageRequest = PageRequest.of(0, 1);
 		List<JoinDto> expectList = new ArrayList<>();
-		JoinDto joinDto = new JoinDto(RequesterType.PLAYER,StatusType.PROPOSAL,1L,2L);
+		JoinDto joinDto = new JoinDto(1L,2L,RequesterType.PLAYER,StatusType.PROPOSAL);
 		expectList.add(joinDto);
 		PageImpl expectPage = new PageImpl<>(expectList,pageRequest,expectList.size());
 		

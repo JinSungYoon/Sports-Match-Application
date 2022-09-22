@@ -70,7 +70,7 @@ public class JoinDto {
 		this.updatedDate = updatedDate;
 	}
 	
-	public JoinDto(RequesterType requesterType,StatusType statusType,Long playerId,Long teamId) {
+	public JoinDto(Long playerId,Long teamId,RequesterType requesterType,StatusType statusType) {
 		this.statusType = statusType;
 		this.requesterType = requesterType;
 		this.teamId = teamId;

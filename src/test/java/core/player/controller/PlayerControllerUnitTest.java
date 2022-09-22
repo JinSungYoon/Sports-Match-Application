@@ -241,7 +241,7 @@ class PlayerControllerUnitTest {
 	public void requestPlayerJoin() throws Exception {
 		
 		// given
-		JoinDto join = new JoinDto(RequesterType.PLAYER,StatusType.PROPOSAL,1L,1L);
+		JoinDto join = new JoinDto(1L,1L,RequesterType.PLAYER,StatusType.PROPOSAL);
 		String content = new ObjectMapper().registerModule(new JavaTimeModule()).writeValueAsString(join);
 		when(joinService.requestPlayerJoin(1L,join)).thenReturn(new JoinDto(1L,1L,"player1",1L,"team1",RequesterType.PLAYER,StatusType.PROPOSAL,'Y',LocalDateTime.now(),LocalDateTime.now()));
 		// when
