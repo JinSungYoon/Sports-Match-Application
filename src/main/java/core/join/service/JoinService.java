@@ -15,13 +15,13 @@ public interface JoinService {
 	// Team 가입 신청
 	JoinDto requestTeamJoin(Long id,JoinDto joinDto);
 	// 가입 신청 거절
-	JoinDto rejectPlayerJoin(JoinDto joinDto);
+	JoinDto rejectPlayerJoin(JoinDto joinDto) throws Exception;
 	// 가입 신청 거절
-	JoinDto rejectTeamJoin(JoinDto joinDto);
+	JoinDto rejectTeamJoin(JoinDto joinDto) throws Exception;
 	// 가입 신청 승인
-	JoinDto approvePlayerJoin(JoinDto joinDto);
+	JoinDto approvePlayerJoin(JoinDto joinDto) throws Exception;
 	// 가입 신청 승인
-	JoinDto approveTeamJoin(JoinDto joinDto);
+	JoinDto approveTeamJoin(JoinDto joinDto) throws Exception;
 	// 선수 가입 신청 조회
 	Page<JoinDto> searchPlayerJoinApplication(Long playerId,JoinSearchCondition condition,Pageable pageable);
 	// 선수 가입 제안 조회

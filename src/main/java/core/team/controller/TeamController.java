@@ -72,7 +72,7 @@ public class TeamController {
 	
 	// team 가입 제안 거절
 	@PatchMapping("/team/{id}/reject-join/{playerId}")
-	public ResponseEntity<?> rejectJoin(@PathVariable Long id,@PathVariable Long playerId){
+	public ResponseEntity<?> rejectJoin(@PathVariable Long id,@PathVariable Long playerId) throws Exception{
 		JoinDto joinDto = new JoinDto();
 		joinDto.setTeamId(id);
 		joinDto.setPlayerId(playerId);
@@ -81,7 +81,7 @@ public class TeamController {
 	
 	// team 가입 제안 승인
 	@PatchMapping("/team/{id}/approve-join/{playerId}")
-	public ResponseEntity<?> approveJoin(@PathVariable Long id,@PathVariable Long playerId){
+	public ResponseEntity<?> approveJoin(@PathVariable Long id,@PathVariable Long playerId) throws Exception{
 		JoinDto joinDto = new JoinDto();
 		joinDto.setTeamId(id);
 		joinDto.setPlayerId(playerId);
