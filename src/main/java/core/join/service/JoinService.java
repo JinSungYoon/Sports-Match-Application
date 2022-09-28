@@ -31,7 +31,11 @@ public interface JoinService {
 	// 팀 가입 제안 조회
 	Page<JoinDto> searchTeamJoinOffer(Long teamId,JoinSearchCondition condition,Pageable pageable);
 	// 승인 확정
-	JoinDto confirmApprove(JoinDto joinDto);
+	JoinDto confirmPlayerApprove(JoinDto joinDto) throws Exception;
+	// 승인 확정
+	JoinDto confirmTeamApprove(JoinDto joinDto) throws Exception;
 	// 승인 철회
-	JoinDto withdrawApprove(JoinDto joinDto);
+	JoinDto withdrawPlayerApprove(JoinDto joinDto) throws Exception;
+	// 승인 철회
+	JoinDto withdrawTeamApprove(JoinDto joinDto) throws Exception;
 }

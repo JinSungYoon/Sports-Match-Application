@@ -227,13 +227,44 @@ public class JoinServiceImpl implements JoinService {
 	}
 
 	@Override
-	public JoinDto confirmApprove(JoinDto joinDto) {
+	public JoinDto confirmPlayerApprove(JoinDto joinDto) throws Exception {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public JoinDto withdrawApprove(JoinDto joinDto) {
+	public JoinDto confirmTeamApprove(JoinDto joinDto) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
+	public JoinDto withdrawPlayerApprove(JoinDto joinDto) throws Exception {
+		// Player,Team Entity 조회
+		TeamEntity team = teamRepository.findById(joinDto.getTeamId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,"요청하신 team이 존재하지 않습니다.",new Exception()));
+		PlayerEntity player = playerRepository.findById(joinDto.getPlayerId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,"요청하신 player가 존재하지 않습니다.",new Exception()));
+		
+		PageRequest page = PageRequest.of(0,1);
+		
+		Page<JoinDto> inquiryList = new PageImpl<>(new ArrayList<>(),page,0);
+		
+		// Player에게 승인된 요청이 있는지 확인.
+		inquiryList = joinRepositoryCustom.findPlayerJoinOffer(StatusType.APPROVAL, joinDto.getPlayerId(), page);
+		
+		JoinEntity proposal = inquiryList.getContent().stream()
+													.filter(d->d.getTeamId()==joinDto.getTeamId())
+													.map(d->d.toEntity(joinDto, player, team))
+													.findFirst().orElseThrow(() -> new Exception("해당 팀으로부터 "+StatusType.APPROVAL+"한 요청이 없습니다."));
+		
+		proposal.updateStatus(StatusType.WITHDRAW);
+		
+		proposal = joinRepository.save(proposal);
+		
+		return proposal.toDto();
+	}
+
+	@Override
+	public JoinDto withdrawTeamApprove(JoinDto joinDto) throws Exception {
 		// TODO Auto-generated method stub
 		return null;
 	}
