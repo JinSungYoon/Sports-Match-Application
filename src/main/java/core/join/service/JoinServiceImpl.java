@@ -244,12 +244,12 @@ public class JoinServiceImpl implements JoinService {
 		TeamEntity team = teamRepository.findById(joinDto.getTeamId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,"요청하신 team이 존재하지 않습니다.",new Exception()));
 		PlayerEntity player = playerRepository.findById(joinDto.getPlayerId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,"요청하신 player가 존재하지 않습니다.",new Exception()));
 		
-		PageRequest page = PageRequest.of(0,1);
+		PageRequest page = PageRequest.of(0,100);
 		
 		Page<JoinDto> inquiryList = new PageImpl<>(new ArrayList<>(),page,0);
 		
 		// Player에게 승인된 요청이 있는지 확인.
-		inquiryList = joinRepositoryCustom.findPlayerJoinOffer(StatusType.APPROVAL, joinDto.getPlayerId(), page);
+		inquiryList = joinRepositoryCustom.findPlayerJoinApplication(StatusType.APPROVAL, joinDto.getPlayerId(), page);
 		
 		JoinEntity proposal = inquiryList.getContent().stream()
 													.filter(d->d.getTeamId()==joinDto.getTeamId())
@@ -265,8 +265,27 @@ public class JoinServiceImpl implements JoinService {
 
 	@Override
 	public JoinDto withdrawTeamApprove(JoinDto joinDto) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		// Player,Team Entity 조회
+		TeamEntity team = teamRepository.findById(joinDto.getTeamId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,"요청하신 team이 존재하지 않습니다.",new Exception()));
+		PlayerEntity player = playerRepository.findById(joinDto.getPlayerId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,"요청하신 player가 존재하지 않습니다.",new Exception()));
+		
+		PageRequest page = PageRequest.of(0,100);
+		
+		Page<JoinDto> inquiryList = new PageImpl<>(new ArrayList<>(),page,0);
+		
+		// Player에게 승인된 요청이 있는지 확인.
+		inquiryList = joinRepositoryCustom.findTeamJoinApplication(StatusType.APPROVAL, joinDto.getTeamId(), page);
+		
+		JoinEntity proposal = inquiryList.getContent().stream()
+													.filter(d->d.getPlayerId()==joinDto.getPlayerId())
+													.map(d->d.toEntity(joinDto, player, team))
+													.findFirst().orElseThrow(() -> new Exception("해당 선수로부터 "+StatusType.APPROVAL+"한 요청이 없습니다."));
+		
+		proposal.updateStatus(StatusType.WITHDRAW);
+		
+		proposal = joinRepository.save(proposal);
+		
+		return proposal.toDto();
 	}
 		
 }

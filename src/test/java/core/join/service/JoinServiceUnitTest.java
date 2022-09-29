@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.annotation.Description;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -393,5 +394,86 @@ public class JoinServiceUnitTest {
 		
 		Assertions.assertThat(rtnList).isEqualTo(expectPage);
 		
+	}
+	
+	@Test
+	public void withdrawPlayerApprove() throws Exception{
+		// given
+		TeamEntity gteam = new TeamEntity("griffindor","south",BelongType.CLUB,"Teach all children who show courage worthy of their name.");
+		TeamEntity steam = new TeamEntity("slydelin","north",BelongType.CLUB,"Teach only children of the purest bloodlines.");
+		TeamEntity hteam = new TeamEntity("hufflepuff","east",BelongType.CLUB,"I will teach them the same.");
+		TeamEntity rteam = new TeamEntity("ravenclaw","west",BelongType.CLUB,"Teach only the smartest kids.");
+		
+		gteam.initId(1L);
+		steam.initId(2L);
+		hteam.initId(3L);
+		rteam.initId(4L);
+		
+		PlayerEntity player1 = new PlayerEntity("harry potter","220930-1111111",1,gteam);
+		
+		player1.initId(1L);
+		
+		PageRequest pageRequest = PageRequest.of(0,100);
+		
+		JoinDto joinDto = new JoinDto(1L,player1.getId(),player1.getPlayerName(),steam.getId(),steam.getTeamName(),RequesterType.TEAM,StatusType.APPROVAL,'Y',LocalDateTime.now(),LocalDateTime.now());
+		JoinEntity joinEntity = joinDto.toEntity(joinDto, player1, steam);
+		List<JoinDto> expectList = new ArrayList<>();
+		expectList.add(joinDto);
+		Page<JoinDto> expectPage = new PageImpl<>(expectList,pageRequest,expectList.size());
+		
+		// when
+		when(teamRepository.findById(any())).thenReturn(Optional.of(steam));
+		when(playerRepository.findById(any())).thenReturn(Optional.of(player1));
+		when(joinRepositoryCustom.findPlayerJoinApplication(StatusType.APPROVAL, player1.getId(), pageRequest)).thenReturn(expectPage);
+		joinEntity.updateStatus(StatusType.WITHDRAW);
+		when(joinRepository.save(any())).thenReturn(joinEntity);
+		
+		JoinDto rtnDto = joinService.withdrawPlayerApprove(joinDto);
+		
+		Assertions.assertThat(rtnDto.getPlayerName()).isEqualTo("harry potter");
+		Assertions.assertThat(rtnDto.getTeamName()).isEqualTo("slydelin");
+		Assertions.assertThat(rtnDto.getRequesterType()).isEqualTo(RequesterType.TEAM);
+		Assertions.assertThat(rtnDto.getStatusType()).isEqualTo(StatusType.WITHDRAW);
+	}
+	
+	@Test
+	@Description("선수 승인 철회하기")
+	public void withdrawTeamApprove() throws Exception {
+		// given
+		TeamEntity gteam = new TeamEntity("griffindor","south",BelongType.CLUB,"Teach all children who show courage worthy of their name.");
+		TeamEntity steam = new TeamEntity("slydelin","north",BelongType.CLUB,"Teach only children of the purest bloodlines.");
+		TeamEntity hteam = new TeamEntity("hufflepuff","east",BelongType.CLUB,"I will teach them the same.");
+		TeamEntity rteam = new TeamEntity("ravenclaw","west",BelongType.CLUB,"Teach only the smartest kids.");
+		
+		gteam.initId(1L);
+		steam.initId(2L);
+		hteam.initId(3L);
+		rteam.initId(4L);
+		
+		PlayerEntity player1 = new PlayerEntity("harry potter","220930-1111111",1,gteam);
+		
+		player1.initId(1L);
+		
+		PageRequest pageRequest = PageRequest.of(0,100);
+		
+		JoinDto joinDto = new JoinDto(1L,player1.getId(),player1.getPlayerName(),steam.getId(),steam.getTeamName(),RequesterType.PLAYER,StatusType.APPROVAL,'Y',LocalDateTime.now(),LocalDateTime.now());
+		JoinEntity joinEntity = joinDto.toEntity(joinDto, player1, steam);
+		List<JoinDto> expectList = new ArrayList<>();
+		expectList.add(joinDto);
+		Page<JoinDto> expectPage = new PageImpl<>(expectList,pageRequest,expectList.size());
+		
+		// when
+		when(teamRepository.findById(any())).thenReturn(Optional.of(steam));
+		when(playerRepository.findById(any())).thenReturn(Optional.of(player1));
+		when(joinRepositoryCustom.findTeamJoinApplication(StatusType.APPROVAL, steam.getId(), pageRequest)).thenReturn(expectPage);
+		joinEntity.updateStatus(StatusType.WITHDRAW);
+		when(joinRepository.save(any())).thenReturn(joinEntity);
+		
+		JoinDto rtnDto = joinService.withdrawTeamApprove(joinDto);
+		
+		Assertions.assertThat(rtnDto.getPlayerName()).isEqualTo("harry potter");
+		Assertions.assertThat(rtnDto.getTeamName()).isEqualTo("slydelin");
+		Assertions.assertThat(rtnDto.getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(rtnDto.getStatusType()).isEqualTo(StatusType.WITHDRAW);
 	}
 }
