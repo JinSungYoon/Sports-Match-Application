@@ -9,10 +9,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
@@ -170,7 +170,7 @@ public class JoinServiceUnitTest {
 	
 	@Test
 	@DisplayName("선수 가입 거절")
-	void rejectPlayerRequest() {
+	void rejectPlayerRequest() throws Exception {
 		// given
 		TeamEntity team1 = new TeamEntity("reptileTeam","Ocean",BelongType.CLUB,"We are Reptile team");
 		TeamEntity team2 = new TeamEntity("fishTeam","Ocean",BelongType.CLUB,"We are Fish team");
@@ -179,21 +179,19 @@ public class JoinServiceUnitTest {
 		team2.initId(2L);
 		player.initId(1L);
 		
-		JoinEntity join1 = new JoinEntity(StatusType.PROPOSAL,RequesterType.TEAM,player,team2);
-		join1.initId(1L);
-		PageRequest pageRequest = PageRequest.of(0, 1);
+		PageRequest pageRequest = PageRequest.of(0, 100);
 		List<JoinDto> expectList = new ArrayList<>();
 		JoinDto joinDto = new JoinDto(1L,2L,RequesterType.TEAM,StatusType.PROPOSAL);
+		JoinEntity joinEntity = joinDto.toEntity(joinDto, player, team2);
 		expectList.add(joinDto);
-		PageImpl expectPage = new PageImpl<>(expectList,pageRequest,expectList.size());
+		Page<JoinDto> expectPage = new PageImpl<>(expectList,pageRequest,expectList.size());
 		
 		// when
 		when(teamRepository.findById(2L)).thenReturn(Optional.of(team2));
 		when(playerRepository.findById(1L)).thenReturn(Optional.of(player));
 		when(joinRepositoryCustom.findPlayerJoinOffer(StatusType.PROPOSAL,1L,pageRequest)).thenReturn(expectPage);
-		when(joinRepository.findById(any())).thenReturn(Optional.of(join1));
-		join1.updateStatus(StatusType.REJECT);
-		when(joinRepository.save(join1)).thenReturn(join1);
+		joinEntity.updateStatus(StatusType.REJECT);
+		when(joinRepository.save(any())).thenReturn(joinEntity);
 		
 		JoinDto returnJoin = joinService.rejectPlayerJoin(joinDto);		
 		// then
@@ -205,7 +203,7 @@ public class JoinServiceUnitTest {
 	
 	@Test
 	@DisplayName("팀 가입 거절")
-	void rejectTeamRequest() {
+	void rejectTeamRequest() throws Exception {
 		// given
 		TeamEntity team1 = new TeamEntity("reptileTeam","Ocean",BelongType.CLUB,"We are Reptile team");
 		TeamEntity team2 = new TeamEntity("fishTeam","Ocean",BelongType.CLUB,"We are Fish team");
@@ -213,22 +211,20 @@ public class JoinServiceUnitTest {
 		team1.initId(1L);
 		team2.initId(2L);
 		player.initId(1L);
-		
-		JoinEntity join1 = new JoinEntity(StatusType.PROPOSAL,RequesterType.PLAYER,player,team2);
-		join1.initId(1L);
-		PageRequest pageRequest = PageRequest.of(0, 1);
+				
+		PageRequest pageRequest = PageRequest.of(0, 100);
 		List<JoinDto> expectList = new ArrayList<>();
 		JoinDto joinDto = new JoinDto(1L,2L,RequesterType.PLAYER,StatusType.PROPOSAL);
+		JoinEntity joinEntity = joinDto.toEntity(joinDto, player, team2); 
 		expectList.add(joinDto);
-		PageImpl expectPage = new PageImpl<>(expectList,pageRequest,expectList.size());
+		Page<JoinDto> expectPage = new PageImpl<>(expectList,pageRequest,expectList.size());
 		
 		// when
 		when(teamRepository.findById(any())).thenReturn(Optional.of(team2));
 		when(playerRepository.findById(any())).thenReturn(Optional.of(player));
 		when(joinRepositoryCustom.findTeamJoinOffer(StatusType.PROPOSAL,2L,pageRequest)).thenReturn(expectPage);
-		when(joinRepository.findById(any())).thenReturn(Optional.of(join1));
-		join1.updateStatus(StatusType.REJECT);
-		when(joinRepository.save(join1)).thenReturn(join1);
+		joinEntity.updateStatus(StatusType.REJECT);
+		when(joinRepository.save(any())).thenReturn(joinEntity);
 		
 		JoinDto returnJoin = joinService.rejectTeamJoin(joinDto);		
 		// then
@@ -240,7 +236,7 @@ public class JoinServiceUnitTest {
 	
 	@Test
 	@DisplayName("선수 가입 승인")
-	void approvePlayerRequest() {
+	void approvePlayerRequest() throws Exception {
 		// given
 		TeamEntity team1 = new TeamEntity("reptileTeam","Ocean",BelongType.CLUB,"We are Reptile team");
 		TeamEntity team2 = new TeamEntity("fishTeam","Ocean",BelongType.CLUB,"We are Fish team");
@@ -249,21 +245,19 @@ public class JoinServiceUnitTest {
 		team2.initId(2L);
 		player.initId(1L);
 		
-		JoinEntity join1 = new JoinEntity(StatusType.PROPOSAL,RequesterType.TEAM,player,team2);
-		join1.initId(1L);
-		PageRequest pageRequest = PageRequest.of(0, 1);
+		PageRequest pageRequest = PageRequest.of(0, 100);
 		List<JoinDto> expectList = new ArrayList<>();
 		JoinDto joinDto = new JoinDto(1L,2L,RequesterType.TEAM,StatusType.PROPOSAL);
+		JoinEntity entity = joinDto.toEntity(joinDto, player, team2);
 		expectList.add(joinDto);
-		PageImpl expectPage = new PageImpl<>(expectList,pageRequest,expectList.size());
+		Page<JoinDto> expectPage = new PageImpl<>(expectList,pageRequest,expectList.size());
 		
 		// when
 		when(teamRepository.findById(2L)).thenReturn(Optional.of(team2));
 		when(playerRepository.findById(1L)).thenReturn(Optional.of(player));
 		when(joinRepositoryCustom.findPlayerJoinOffer(StatusType.PROPOSAL,1L,pageRequest)).thenReturn(expectPage);
-		when(joinRepository.findById(any())).thenReturn(Optional.of(join1));
-		join1.updateStatus(StatusType.APPROVAL);
-		when(joinRepository.save(join1)).thenReturn(join1);
+		entity.updateStatus(StatusType.APPROVAL);
+		when(joinRepository.save(any())).thenReturn(entity);
 		
 		JoinDto returnJoin = joinService.approvePlayerJoin(joinDto);		
 		// then
@@ -275,32 +269,32 @@ public class JoinServiceUnitTest {
 	
 	@Test
 	@DisplayName("팀 가입 승인")
-	void approveTeamRequest() {
+	void approveTeamRequest() throws Exception {
 		// given
 		TeamEntity team1 = new TeamEntity("reptileTeam","Ocean",BelongType.CLUB,"We are Reptile team");
 		TeamEntity team2 = new TeamEntity("fishTeam","Ocean",BelongType.CLUB,"We are Fish team");
 		PlayerEntity player = new PlayerEntity("turtle","220719-1111111",10,team1);
+		
 		team1.initId(1L);
 		team2.initId(2L);
 		player.initId(1L);
 		
-		JoinEntity join1 = new JoinEntity(StatusType.PROPOSAL,RequesterType.PLAYER,player,team2);
-		join1.initId(1L);
-		PageRequest pageRequest = PageRequest.of(0, 1);
+		PageRequest pageRequest = PageRequest.of(0, 100);
 		List<JoinDto> expectList = new ArrayList<>();
-		JoinDto joinDto = new JoinDto(1L,2L,RequesterType.PLAYER,StatusType.PROPOSAL);
+		JoinDto joinDto = new JoinDto(1L,1L,"turtle",2L,"fishTeam",RequesterType.PLAYER,StatusType.PROPOSAL,'Y',LocalDateTime.now(),LocalDateTime.now());
+		JoinEntity entity = joinDto.toEntity(joinDto, player, team2);
 		expectList.add(joinDto);
-		PageImpl expectPage = new PageImpl<>(expectList,pageRequest,expectList.size());
+		Page<JoinDto> expectPage = new PageImpl<>(expectList,pageRequest,expectList.size());
 		
 		// when
 		when(teamRepository.findById(any())).thenReturn(Optional.of(team2));
 		when(playerRepository.findById(any())).thenReturn(Optional.of(player));
 		when(joinRepositoryCustom.findTeamJoinOffer(StatusType.PROPOSAL,2L,pageRequest)).thenReturn(expectPage);
-		when(joinRepository.findById(any())).thenReturn(Optional.of(join1));
-		join1.updateStatus(StatusType.APPROVAL);
-		when(joinRepository.save(join1)).thenReturn(join1);
+		entity.updateStatus(StatusType.APPROVAL);
+		when(joinRepository.save(any())).thenReturn(entity);
 		
 		JoinDto returnJoin = joinService.approveTeamJoin(joinDto);		
+		
 		// then
 		Assertions.assertThat(returnJoin.getPlayerId()).isEqualTo(1L);
 		Assertions.assertThat(returnJoin.getTeamId()).isEqualTo(2L);

@@ -79,12 +79,17 @@ public class JoinDto {
 	
 	public JoinEntity toEntity(JoinDto join,PlayerEntity player,TeamEntity team) {
 		if(this == null) return null;
-		return JoinEntity.builder()
+		
+		JoinEntity rtnEntity = JoinEntity.builder()
 				.statusType(join.getStatusType())
 				.requesterType(join.getRequesterType())
 				.team(team)
 				.player(player)
 				.build();
+		
+		rtnEntity.initId(join.getId());
+		
+		return rtnEntity;
 	}
 	
 	public Boolean checkStatus(StatusType statusType) {

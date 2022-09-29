@@ -42,7 +42,7 @@ public class JoinServiceImpl implements JoinService {
 		TeamEntity team = teamRepository.findById(joinDto.getTeamId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,"요청하신 team이 존재하지 않습니다.",new Exception()));
 		PlayerEntity player = playerRepository.findById(joinDto.getPlayerId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,"요청하신 player가 존재하지 않습니다.",new Exception()));
 		
-		PageRequest page = PageRequest.of(0, 100);
+		PageRequest page = PageRequest.of(0, 1);
 		
 		Page<JoinDto> inquiryList = new PageImpl<>(new ArrayList<>(),page,0);
 		
@@ -75,7 +75,7 @@ public class JoinServiceImpl implements JoinService {
 		TeamEntity team = teamRepository.findById(joinDto.getTeamId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,"요청하신 team이 존재하지 않습니다.",new Exception()));
 		PlayerEntity player = playerRepository.findById(joinDto.getPlayerId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,"요청하신 player가 존재하지 않습니다.",new Exception()));
 		
-		PageRequest page = PageRequest.of(0, 100);
+		PageRequest page = PageRequest.of(0, 1);
 		
 		Page<JoinDto> inquiryList = new PageImpl<>(new ArrayList<>(),page,0);
 		
