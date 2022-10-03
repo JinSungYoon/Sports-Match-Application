@@ -98,6 +98,15 @@ public class PlayerController {
 		return new ResponseEntity<>(joinService.approvePlayerJoin(joinDto),HttpStatus.OK);
 	}
 	
+	// player 가입 제안 승인
+	@PatchMapping("/player/{id}/withdraw-approve/{teamId}")
+	public ResponseEntity<?> withdrawJoin(@PathVariable Long id,@PathVariable Long teamId) throws Exception{
+		JoinDto joinDto = new JoinDto();
+		joinDto.setPlayerId(id);
+		joinDto.setTeamId(teamId);
+		return new ResponseEntity<>(joinService.withdrawPlayerApprove(joinDto),HttpStatus.OK);
+	}
+	
 	@GetMapping("/player/{id}/search-join-application")
 	public ResponseEntity<?> searchJoinApplication(@PathVariable Long id,@RequestBody JoinSearchCondition condition,@PageableDefault(page = 0, size = 10) Pageable page){
 		return new ResponseEntity<>(joinService.searchPlayerJoinApplication(id,condition, page),HttpStatus.OK);
