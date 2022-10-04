@@ -292,4 +292,38 @@ public class TeamControllerUnitTest {
 				.andExpect(jsonPath("$.teamName").value("team"))
 				.andDo(MockMvcResultHandlers.print());
 	}
+	
+	@Test
+	@DisplayName("승인제안 철회하기")
+	public void withdrawTeamApprove() throws Exception {
+		// given
+		Long playerId = 1L;
+		Long teamId   = 2L;
+		
+		JoinDto approveJoin = new JoinDto(1L,1L,"player",2L,"team",RequesterType.PLAYER,StatusType.APPROVAL,'Y',LocalDateTime.now(),LocalDateTime.now());
+		
+		JoinDto withdrawJoin = new JoinDto(1L,1L,"player",2L,"team",RequesterType.PLAYER,StatusType.WITHDRAW,'Y',LocalDateTime.now(),LocalDateTime.now());
+		
+		String content = new ObjectMapper().registerModule(new JavaTimeModule()).writeValueAsString(approveJoin);
+
+		// when		
+		when(joinService.withdrawTeamApprove(withdrawJoin)).thenReturn(withdrawJoin);
+		
+		// then
+		ResultActions resultAction = mockMvc.perform(patch("/team/{id}/withdraw-approve/{playerId}",teamId,playerId)
+											.contentType(MediaType.APPLICATION_JSON_UTF8)
+											.content(content)
+											.accept(MediaType.APPLICATION_JSON_UTF8));
+		
+		resultAction
+						.andExpect(jsonPath("$.requesterType").value("PLAYER"))
+						.andExpect(jsonPath("$.statusType").value("WITHDRAW"))
+						.andExpect(jsonPath("$.playerId").value(1L))
+						.andExpect(jsonPath("$.playerName").value("player"))
+						.andExpect(jsonPath("$.teamId").value(2L))
+						.andExpect(jsonPath("$.teamName").value("team"))
+						.andDo(MockMvcResultHandlers.print());
+		
+	}
+	
 }

@@ -163,7 +163,7 @@ public class JoinServiceImpl implements JoinService {
 		
 		JoinEntity proposal = inquiryList.getContent().stream()
 				.filter(d->d.getPlayerId()==joinDto.getPlayerId())
-				.map(d->d.toEntity(joinDto, player, team))
+				.map(d->d.toEntity(d, player, team))
 				.findFirst().orElseThrow(() -> new Exception("해당 팀이 "+StatusType.PROPOSAL+"한 요청이 없습니다."));
 		
 		proposal.updateStatus(StatusType.APPROVAL);
@@ -188,7 +188,7 @@ public class JoinServiceImpl implements JoinService {
 		
 		JoinEntity proposal = inquiryList.getContent().stream()
 				.filter(d->d.getPlayerId()==joinDto.getPlayerId())
-				.map(d->d.toEntity(joinDto, player, team))
+				.map(d->d.toEntity(d, player, team))
 				.findFirst().orElseThrow(() -> new Exception("해당 선수가 "+StatusType.PROPOSAL+"한 요청이 없습니다."));
 		
 		proposal.updateStatus(StatusType.APPROVAL);
@@ -253,7 +253,7 @@ public class JoinServiceImpl implements JoinService {
 		
 		JoinEntity proposal = inquiryList.getContent().stream()
 													.filter(d->d.getTeamId()==joinDto.getTeamId())
-													.map(d->d.toEntity(joinDto, player, team))
+													.map(d->d.toEntity(d, player, team))
 													.findFirst().orElseThrow(() -> new Exception("해당 팀으로부터 "+StatusType.APPROVAL+"한 요청이 없습니다."));
 		
 		proposal.updateStatus(StatusType.WITHDRAW);
@@ -278,7 +278,7 @@ public class JoinServiceImpl implements JoinService {
 		
 		JoinEntity proposal = inquiryList.getContent().stream()
 													.filter(d->d.getPlayerId()==joinDto.getPlayerId())
-													.map(d->d.toEntity(joinDto, player, team))
+													.map(d->d.toEntity(d, player, team))
 													.findFirst().orElseThrow(() -> new Exception("해당 선수로부터 "+StatusType.APPROVAL+"한 요청이 없습니다."));
 		
 		proposal.updateStatus(StatusType.WITHDRAW);

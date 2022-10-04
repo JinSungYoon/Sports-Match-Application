@@ -29,6 +29,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
@@ -324,6 +325,39 @@ class PlayerControllerUnitTest {
 				.andExpect(status().isOk())
 				.andDo(MockMvcResultHandlers.print());
 				
+	}
+	
+	@Test
+	@DisplayName("승인제안 철회하기")
+	public void withdrawPlayerApprove() throws Exception {
+		// given
+		Long playerId = 1L;
+		Long teamId   = 2L;
+		
+		JoinDto approveJoin = new JoinDto(1L,1L,"player",2L,"team",RequesterType.TEAM,StatusType.APPROVAL,'Y',LocalDateTime.now(),LocalDateTime.now());
+		
+		JoinDto withdrawJoin = new JoinDto(1L,1L,"player",2L,"team",RequesterType.TEAM,StatusType.WITHDRAW,'Y',LocalDateTime.now(),LocalDateTime.now());
+		
+		String content = new ObjectMapper().registerModule(new JavaTimeModule()).writeValueAsString(approveJoin);
+
+		// when		
+		when(joinService.withdrawPlayerApprove(withdrawJoin)).thenReturn(withdrawJoin);
+		
+		// then
+		ResultActions resultAction = mockMvc.perform(patch("/player/{id}/withdraw-approve/{teamId}",playerId,teamId)
+											.contentType(MediaType.APPLICATION_JSON_UTF8)
+											.content(content)
+											.accept(MediaType.APPLICATION_JSON_UTF8));
+		
+		resultAction
+						.andExpect(jsonPath("$.requesterType").value("TEAM"))
+						.andExpect(jsonPath("$.statusType").value("WITHDRAW"))
+						.andExpect(jsonPath("$.playerId").value(1L))
+						.andExpect(jsonPath("$.playerName").value("player"))
+						.andExpect(jsonPath("$.teamId").value(2L))
+						.andExpect(jsonPath("$.teamName").value("team"))
+						.andDo(MockMvcResultHandlers.print());
+		
 	}
 	
 }
