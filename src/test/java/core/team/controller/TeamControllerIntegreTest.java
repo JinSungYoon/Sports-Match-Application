@@ -261,7 +261,7 @@ public class TeamControllerIntegreTest {
 		// given
 		TeamDto team 	= new TeamDto("team1","Seoul",BelongType.CLUB,"Our team is the best"); 
 		PlayerDto player = new PlayerDto("player1","220713-1111111",1,team);
-		JoinDto join = new JoinDto(1L,1L,RequesterType.PLAYER,StatusType.PROPOSAL);
+		JoinDto join = new JoinDto(player,team,RequesterType.PLAYER,StatusType.PROPOSAL);
 		teamService.registerTeam(team);
 		playerService.registerPlayer(player);
 		
@@ -288,7 +288,7 @@ public class TeamControllerIntegreTest {
 		// given
 		TeamDto team 	= new TeamDto("team","Seoul",BelongType.CLUB,"Our team is the best"); 
 		PlayerDto player = new PlayerDto("player","220713-1111111",1,team);
-		JoinDto join = new JoinDto(1L,1L,RequesterType.PLAYER,StatusType.PROPOSAL);
+		JoinDto join = new JoinDto(player,team,RequesterType.PLAYER,StatusType.PROPOSAL);
 		teamService.registerTeam(team);
 		playerService.registerPlayer(player);
 		Long playerId = 1L;

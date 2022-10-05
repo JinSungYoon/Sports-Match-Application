@@ -7,7 +7,9 @@ import javax.validation.constraints.NotNull;
 import core.join.entity.JoinEntity;
 import core.join.entity.RequesterType;
 import core.join.entity.StatusType;
+import core.player.dto.PlayerDto;
 import core.player.entity.PlayerEntity;
+import core.team.dto.TeamDto;
 import core.team.entity.TeamEntity;
 import lombok.Builder;
 import lombok.Data;
@@ -48,33 +50,29 @@ public class JoinDto {
 		this.updatedDate = updatedDate;
 	}
 	
-	public JoinDto(Long playerId,String playerName, Long teamId, String teamName, RequesterType requesterType,StatusType statusType,char activeYN,LocalDateTime createdDate,LocalDateTime updatedDate) {
-		this.playerId = playerId;
-		this.playerName = playerName;
-		this.teamId = teamId;
-		this.teamName = teamName;
+	public JoinDto(Long id,PlayerDto player,TeamDto team,RequesterType requesterType,StatusType statusType) {
+		this.id = id;
+		this.playerId = player.getId();
+		this.playerName = player.getPlayerName();
+		this.teamId = team.getId();
+		this.teamName = team.getTeamName();
 		this.requesterType = requesterType;
 		this.statusType = statusType;
-		this.activeYN = activeYN;
-		this.createdDate = createdDate;
-		this.updatedDate = updatedDate;
+		this.activeYN = 'Y';
+		this.createdDate = LocalDateTime.now();
+		this.updatedDate = LocalDateTime.now();
 	}
 	
-	public JoinDto(Long playerId,Long teamId,RequesterType requesterType,StatusType statusType,char activeYN,LocalDateTime createdDate,LocalDateTime updatedDate) {
-		this.playerId = playerId;
-		this.teamId = teamId;
+	public JoinDto(PlayerDto player,TeamDto team,RequesterType requesterType,StatusType statusType) {
+		this.playerId = player.getId();
+		this.playerName = player.getPlayerName();
+		this.teamId = team.getId();
+		this.teamName = team.getTeamName();
 		this.requesterType = requesterType;
 		this.statusType = statusType;
-		this.activeYN = activeYN;
-		this.createdDate = createdDate;
-		this.updatedDate = updatedDate;
-	}
-	
-	public JoinDto(Long playerId,Long teamId,RequesterType requesterType,StatusType statusType) {
-		this.statusType = statusType;
-		this.requesterType = requesterType;
-		this.teamId = teamId;
-		this.playerId = playerId;
+		this.activeYN = 'Y';
+		this.createdDate = LocalDateTime.now();
+		this.updatedDate = LocalDateTime.now();
 	}
 	
 	public JoinEntity toEntity(JoinDto join,PlayerEntity player,TeamEntity team) {

@@ -36,6 +36,7 @@ import core.join.dto.JoinDto;
 import core.join.entity.RequesterType;
 import core.join.entity.StatusType;
 import core.join.service.JoinService;
+import core.player.dto.PlayerDto;
 import core.player.entity.BelongType;
 import core.team.dto.TeamDto;
 import core.team.service.TeamService;
@@ -223,7 +224,10 @@ public class TeamControllerUnitTest {
 	@DisplayName("가입 신청하기")
 	public void requestTeamJoin() throws Exception {
 		// given
-		JoinDto join = new JoinDto(1L,1L,RequesterType.PLAYER,StatusType.PROPOSAL);
+		TeamDto team = new TeamDto("team","Earth",BelongType.CLUB,"We are the team");
+		PlayerDto player = new PlayerDto("player","221004-1111111",1,team);
+		
+		JoinDto join = new JoinDto(player,team,RequesterType.PLAYER,StatusType.PROPOSAL);
 		String content = new ObjectMapper().writeValueAsString(join);
 		when(joinService.requestTeamJoin(1L,join)).thenReturn(new JoinDto(1L,1L,"player1",1L,"team1",RequesterType.PLAYER,StatusType.PROPOSAL,'Y',LocalDateTime.now(),LocalDateTime.now()));
 		// when

@@ -125,8 +125,8 @@ public class JoinRepositoryUnitTest {
 		PageRequest pageRequest = PageRequest.of(0, 2);
 		
 		List<JoinDto> expectPlayer1List = new ArrayList<>();
-		expectPlayer1List.add(new JoinDto(3L,1L,RequesterType.PLAYER,StatusType.PROPOSAL,'Y',LocalDateTime.now(),LocalDateTime.now()));
-		expectPlayer1List.add(new JoinDto(4L,1L,RequesterType.PLAYER,StatusType.PROPOSAL,'Y',LocalDateTime.now(),LocalDateTime.now()));
+		expectPlayer1List.add(new JoinDto(player3.toDto(),rTeam.toDto(),RequesterType.PLAYER,StatusType.PROPOSAL));
+		expectPlayer1List.add(new JoinDto(player4.toDto(),rTeam.toDto(),RequesterType.PLAYER,StatusType.PROPOSAL));
 		
 		// when
 		Page<JoinDto> rtnList = joinRepositoryCustom.findPlayerJoinApplication(StatusType.PROPOSAL, 1L, pageRequest);

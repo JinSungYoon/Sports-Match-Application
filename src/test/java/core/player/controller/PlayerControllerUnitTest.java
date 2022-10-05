@@ -240,9 +240,11 @@ class PlayerControllerUnitTest {
 	@Test
 	@DisplayName("가입 신청하기")
 	public void requestPlayerJoin() throws Exception {
-		
 		// given
-		JoinDto join = new JoinDto(1L,1L,RequesterType.PLAYER,StatusType.PROPOSAL);
+		TeamDto team = new TeamDto("team","Earth",BelongType.CLUB,"We are the team");
+		PlayerDto player = new PlayerDto("player","221004-1111111",1,team);
+		
+		JoinDto join = new JoinDto(player,team,RequesterType.PLAYER,StatusType.PROPOSAL);
 		String content = new ObjectMapper().registerModule(new JavaTimeModule()).writeValueAsString(join);
 		when(joinService.requestPlayerJoin(1L,join)).thenReturn(new JoinDto(1L,1L,"player1",1L,"team1",RequesterType.PLAYER,StatusType.PROPOSAL,'Y',LocalDateTime.now(),LocalDateTime.now()));
 		// when

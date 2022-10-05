@@ -69,7 +69,7 @@ public class JoinServiceUnitTest {
 		gTeam.initId(2L);
 		player.initId(1L);
 		
-		JoinDto proposal = new JoinDto(1L,1L,RequesterType.PLAYER,StatusType.PROPOSAL);
+		JoinDto proposal = new JoinDto(player.toDto(),rTeam.toDto(),RequesterType.PLAYER,StatusType.PROPOSAL);
 		
 		List<JoinDto> searhList = new ArrayList<>();
 		
@@ -103,7 +103,7 @@ public class JoinServiceUnitTest {
 		gTeam.initId(2L);
 		player.initId(1L);
 		
-		JoinDto proposal = new JoinDto(1L,2L,RequesterType.TEAM,StatusType.PROPOSAL);
+		JoinDto proposal = new JoinDto(player.toDto(),gTeam.toDto(),RequesterType.TEAM,StatusType.PROPOSAL);
 		
 		List<JoinDto> searhList = new ArrayList<>();
 		
@@ -137,8 +137,8 @@ public class JoinServiceUnitTest {
 		gTeam.initId(2L);
 		player.initId(1L);
 		
-		JoinDto proposal1 = new JoinDto(1L,1L,RequesterType.PLAYER,StatusType.PROPOSAL);
-		JoinDto proposal2 = new JoinDto(1L,1L,RequesterType.PLAYER,StatusType.PROPOSAL);
+		JoinDto proposal1 = new JoinDto(player.toDto(),rTeam.toDto(),RequesterType.PLAYER,StatusType.PROPOSAL);
+		JoinDto proposal2 = new JoinDto(player.toDto(),rTeam.toDto(),RequesterType.PLAYER,StatusType.PROPOSAL);
 		JoinEntity expectJoin1 = new JoinEntity(StatusType.PROPOSAL,RequesterType.PLAYER,player,rTeam);
 		
 		
@@ -182,7 +182,7 @@ public class JoinServiceUnitTest {
 		
 		PageRequest pageRequest = PageRequest.of(0, 100);
 		List<JoinDto> expectList = new ArrayList<>();
-		JoinDto joinDto = new JoinDto(1L,2L,RequesterType.TEAM,StatusType.PROPOSAL);
+		JoinDto joinDto = new JoinDto(player.toDto(),team2.toDto(),RequesterType.TEAM,StatusType.PROPOSAL);
 		JoinEntity joinEntity = joinDto.toEntity(joinDto, player, team2);
 		expectList.add(joinDto);
 		Page<JoinDto> expectPage = new PageImpl<>(expectList,pageRequest,expectList.size());
@@ -215,7 +215,7 @@ public class JoinServiceUnitTest {
 				
 		PageRequest pageRequest = PageRequest.of(0, 100);
 		List<JoinDto> expectList = new ArrayList<>();
-		JoinDto joinDto = new JoinDto(1L,2L,RequesterType.PLAYER,StatusType.PROPOSAL);
+		JoinDto joinDto = new JoinDto(player.toDto(),team2.toDto(),RequesterType.PLAYER,StatusType.PROPOSAL);
 		JoinEntity joinEntity = joinDto.toEntity(joinDto, player, team2); 
 		expectList.add(joinDto);
 		Page<JoinDto> expectPage = new PageImpl<>(expectList,pageRequest,expectList.size());
@@ -248,7 +248,7 @@ public class JoinServiceUnitTest {
 		
 		PageRequest pageRequest = PageRequest.of(0, 100);
 		List<JoinDto> expectList = new ArrayList<>();
-		JoinDto joinDto = new JoinDto(1L,2L,RequesterType.TEAM,StatusType.PROPOSAL);
+		JoinDto joinDto = new JoinDto(player.toDto(),team2.toDto(),RequesterType.TEAM,StatusType.PROPOSAL);
 		JoinEntity entity = joinDto.toEntity(joinDto, player, team2);
 		expectList.add(joinDto);
 		Page<JoinDto> expectPage = new PageImpl<>(expectList,pageRequest,expectList.size());
@@ -397,6 +397,7 @@ public class JoinServiceUnitTest {
 	}
 	
 	@Test
+	@DisplayName("선수 가입 철회하기")
 	public void withdrawPlayerApprove() throws Exception{
 		// given
 		TeamEntity gteam = new TeamEntity("griffindor","south",BelongType.CLUB,"Teach all children who show courage worthy of their name.");
@@ -437,7 +438,7 @@ public class JoinServiceUnitTest {
 	}
 	
 	@Test
-	@Description("선수 승인 철회하기")
+	@DisplayName("선수 승인 철회하기")
 	public void withdrawTeamApprove() throws Exception {
 		// given
 		TeamEntity gteam = new TeamEntity("griffindor","south",BelongType.CLUB,"Teach all children who show courage worthy of their name.");
