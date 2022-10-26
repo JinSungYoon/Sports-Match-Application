@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import core.join.dto.JoinDto;
+import core.join.dto.JoinSearchCondition;
 import core.join.entity.JoinEntity;
 import core.join.entity.RequesterType;
 import core.join.entity.StatusType;
@@ -128,8 +129,11 @@ public class JoinRepositoryUnitTest {
 		expectPlayer1List.add(new JoinDto(player3.toDto(),rTeam.toDto(),RequesterType.PLAYER,StatusType.PROPOSAL));
 		expectPlayer1List.add(new JoinDto(player4.toDto(),rTeam.toDto(),RequesterType.PLAYER,StatusType.PROPOSAL));
 		
+		JoinSearchCondition condition = new JoinSearchCondition();
+		condition.setStatusType(StatusType.PROPOSAL);
+		
 		// when
-		Page<JoinDto> rtnList = joinRepositoryCustom.findPlayerJoinApplication(StatusType.PROPOSAL, 1L, pageRequest);
+		Page<JoinDto> rtnList = joinRepositoryCustom.findPlayerJoinApplication(condition, 1L, pageRequest);
 
 		System.out.println("Result : "+rtnList);
 		
@@ -196,7 +200,10 @@ public class JoinRepositoryUnitTest {
 		joinRepository.save(joinEntity8);
 		PageRequest pageRequest = PageRequest.of(0, 2);
 		
-		Page<JoinDto> rtnList = joinRepositoryCustom.findTeamJoinApplication(StatusType.PROPOSAL, 2L, pageRequest);
+		JoinSearchCondition condition = new JoinSearchCondition();
+		condition.setStatusType(StatusType.PROPOSAL);
+		
+		Page<JoinDto> rtnList = joinRepositoryCustom.findTeamJoinApplication(condition, 2L, pageRequest);
 		
 		for(JoinDto dto : rtnList) {
 			System.out.println("dto = "+dto);

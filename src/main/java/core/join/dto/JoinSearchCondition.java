@@ -23,4 +23,23 @@ public class JoinSearchCondition {
 		this.fromDate = fromDate;
 		this.toDate = toDate;
 	}
+	
+	public void setFromToDate(LocalDateTime date,Integer diff,Integer beforeAfter) {
+		LocalDateTime fromDate = date;
+		LocalDateTime toDate = date;
+		
+		// 특정 일자로부터 이전 일자를 구할때
+		if(beforeAfter == -1) {
+			fromDate.minusDays(diff);
+		}else if(beforeAfter == 1) {	// 특정 일자로부터 이후 일자를 구할때
+			toDate.plusDays(diff);
+			
+		}else if(beforeAfter == 0){		// 특정 일자로부터 앞뒤 일자를 구할떄
+			fromDate.minusDays(diff);
+			toDate.plusDays(diff);
+		}
+		
+		this.fromDate = fromDate;
+		this.toDate   = toDate;
+	}
 }

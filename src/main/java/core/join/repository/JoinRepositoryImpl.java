@@ -1,5 +1,6 @@
 package core.join.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -12,6 +13,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import core.join.dto.JoinDto;
+import core.join.dto.JoinSearchCondition;
 import core.join.entity.QJoinEntity;
 import core.join.entity.RequesterType;
 import core.join.entity.StatusType;
@@ -29,12 +31,12 @@ public class JoinRepositoryImpl implements JoinRepositoryCustom{
 	QTeamEntity team = QTeamEntity.teamEntity;  
 	
 	@Override
-	public Page<JoinDto> findPlayerJoinApplication(StatusType statusType,Long playerId,Pageable pageable) {
+	public Page<JoinDto> findPlayerJoinApplication(JoinSearchCondition condition,Long playerId,Pageable pageable) {
 		QueryResults<JoinDto> results = queryFactory
 				.select(Projections.fields(JoinDto.class,join.id,join.player.id.as("playerId"),join.player.playerName,join.team.id.as("teamId"),join.team.teamName,join.requesterType,join.statusType,join.activeYN,join.createdDate,join.updatedDate))
 				.from(join)
 				.join(join.player,player)
-				.where(join.requesterType.eq(RequesterType.PLAYER),eqStatusType(statusType),eqPlayerId(playerId),join.activeYN.eq('Y'))
+				.where(join.requesterType.eq(RequesterType.PLAYER),eqStatusType(condition.getStatusType()),eqPlayerId(playerId),join.activeYN.eq('Y'),betweenDate(condition.getFromDate(),condition.getToDate()))
 				.offset(pageable.getOffset())
 				.limit(pageable.getPageSize())
 				.orderBy(join.id.asc(),join.updatedDate.desc())
@@ -47,12 +49,12 @@ public class JoinRepositoryImpl implements JoinRepositoryCustom{
 	}
 	
 	@Override
-	public Page<JoinDto> findPlayerJoinOffer(StatusType statusType, Long playerId, Pageable pageable) {
+	public Page<JoinDto> findPlayerJoinOffer(JoinSearchCondition condition, Long playerId, Pageable pageable) {
 		QueryResults<JoinDto> results = queryFactory
 				.select(Projections.fields(JoinDto.class,join.id,join.player.id.as("playerId"),join.player.playerName,join.team.id.as("teamId"),join.team.teamName,join.requesterType,join.statusType,join.activeYN,join.createdDate,join.updatedDate))
 				.from(join)
 				.join(join.team,team)
-				.where(join.requesterType.eq(RequesterType.TEAM),eqStatusType(statusType),eqPlayerId(playerId),join.activeYN.eq('Y'))
+				.where(join.requesterType.eq(RequesterType.TEAM),eqStatusType(condition.getStatusType()),eqPlayerId(playerId),join.activeYN.eq('Y'),betweenDate(condition.getFromDate(),condition.getToDate()))
 				.offset(pageable.getOffset())
 				.limit(pageable.getPageSize())
 				.orderBy(join.id.asc(),join.updatedDate.desc())
@@ -65,12 +67,12 @@ public class JoinRepositoryImpl implements JoinRepositoryCustom{
 	}
 	
 	@Override
-	public Page<JoinDto> findTeamJoinApplication(StatusType statusType,Long teamId, Pageable pageable) {
+	public Page<JoinDto> findTeamJoinApplication(JoinSearchCondition condition,Long teamId, Pageable pageable) {
 		QueryResults<JoinDto> results = queryFactory
 				.select(Projections.fields(JoinDto.class,join.id,join.player.id.as("playerId"),join.player.playerName,join.team.id.as("teamId"),join.team.teamName,join.requesterType,join.statusType,join.activeYN,join.createdDate,join.updatedDate))
 				.from(join)
 				.join(join.team,team)
-				.where(join.requesterType.eq(RequesterType.TEAM),eqStatusType(statusType),eqTeamId(teamId),join.activeYN.eq('Y'))
+				.where(join.requesterType.eq(RequesterType.TEAM),eqStatusType(condition.getStatusType()),eqTeamId(teamId),join.activeYN.eq('Y'),betweenDate(condition.getFromDate(),condition.getToDate()))
 				.offset(pageable.getOffset())
 				.limit(pageable.getPageSize())
 				.orderBy(join.id.asc(),join.updatedDate.desc())
@@ -83,12 +85,12 @@ public class JoinRepositoryImpl implements JoinRepositoryCustom{
 	}
 
 	@Override
-	public Page<JoinDto> findTeamJoinOffer(StatusType statusType, Long teamId, Pageable pageable) {
+	public Page<JoinDto> findTeamJoinOffer(JoinSearchCondition condition, Long teamId, Pageable pageable) {
 		QueryResults<JoinDto> results = queryFactory
 				.select(Projections.fields(JoinDto.class,join.id,join.player.id.as("playerId"),join.player.playerName,join.team.id.as("teamId"),join.team.teamName,join.requesterType,join.statusType,join.activeYN,join.createdDate,join.updatedDate))
 				.from(join)
 				.join(join.player,player)
-				.where(join.requesterType.eq(RequesterType.PLAYER),eqStatusType(statusType),eqTeamId(teamId),join.activeYN.eq('Y'))
+				.where(join.requesterType.eq(RequesterType.PLAYER),eqStatusType(condition.getStatusType()),eqTeamId(teamId),join.activeYN.eq('Y'),betweenDate(condition.getFromDate(),condition.getToDate()))
 				.offset(pageable.getOffset())
 				.limit(pageable.getPageSize())
 				.orderBy(join.id.asc(),join.updatedDate.desc())
@@ -118,7 +120,20 @@ public class JoinRepositoryImpl implements JoinRepositoryCustom{
 		if(teamId == null) {
 			return null;
 		}
+		
 		return join.team.id.eq(teamId);
+	}
+	
+	private BooleanExpression betweenDate(LocalDateTime fromDate,LocalDateTime toDate) {
+		
+		if(fromDate == null) {
+			return null;
+		}else if(toDate == null) {
+			return null;
+		}
+		
+		return join.updatedDate.between(fromDate, toDate);
+		
 	}
 
 	

@@ -13,6 +13,7 @@ import org.springframework.web.server.ResponseStatusException;
 import core.join.dto.JoinDto;
 import core.join.dto.JoinSearchCondition;
 import core.join.entity.JoinEntity;
+import core.join.entity.RequesterType;
 import core.join.entity.StatusType;
 import core.join.repository.JoinRepository;
 import core.join.repository.JoinRepositoryCustom;
@@ -46,8 +47,12 @@ public class JoinServiceImpl implements JoinService {
 		
 		Page<JoinDto> inquiryList = new PageImpl<>(new ArrayList<>(),page,0);
 		
+		JoinSearchCondition condition = new JoinSearchCondition();
+		condition.setRequesterType(RequesterType.PLAYER);
+		condition.setStatusType(StatusType.PROPOSAL);
+		
 		// 기존에 요청한 제안 중 동일한 대상에게 제안한 활성화된 요청이 있는지 확인한다.
-		inquiryList = joinRepositoryCustom.findPlayerJoinApplication(StatusType.PROPOSAL, joinDto.getPlayerId(), page);
+		inquiryList = joinRepositoryCustom.findPlayerJoinApplication(condition, joinDto.getPlayerId(), page);
 		
 		if(inquiryList.getTotalElements()>0) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"이미 요청한 제안입니다.",new Exception());
@@ -79,8 +84,12 @@ public class JoinServiceImpl implements JoinService {
 		
 		Page<JoinDto> inquiryList = new PageImpl<>(new ArrayList<>(),page,0);
 		
+		JoinSearchCondition condition = new JoinSearchCondition();
+		condition.setRequesterType(RequesterType.TEAM);
+		condition.setStatusType(StatusType.PROPOSAL);
+		
 		// 기존에 요청한 제안 중 동일한 대상에게 제안한 활성화된 요청이 있는지 확인한다.
-		inquiryList = joinRepositoryCustom.findTeamJoinApplication(StatusType.PROPOSAL, joinDto.getTeamId(), page);
+		inquiryList = joinRepositoryCustom.findTeamJoinApplication(condition, joinDto.getTeamId(), page);
 		
 		if(inquiryList.getTotalElements()>0) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"이미 요청한 제안입니다.",new Exception());
@@ -107,8 +116,12 @@ public class JoinServiceImpl implements JoinService {
 		
 		Page<JoinDto> inquiryList = new PageImpl<>(new ArrayList<>(),page,0);
 		
+		JoinSearchCondition condition = new JoinSearchCondition();
+		condition.setRequesterType(RequesterType.PLAYER);
+		condition.setStatusType(StatusType.PROPOSAL);
+		
 		// 거절할 제안이 있는지 확인.
-		inquiryList = joinRepositoryCustom.findPlayerJoinOffer(StatusType.PROPOSAL, joinDto.getPlayerId(), page);
+		inquiryList = joinRepositoryCustom.findPlayerJoinOffer(condition, joinDto.getPlayerId(), page);
 		
 		JoinEntity proposal = inquiryList.getContent().stream()
 				.filter(d->d.getTeamId()==joinDto.getTeamId())
@@ -133,8 +146,12 @@ public class JoinServiceImpl implements JoinService {
 		
 		Page<JoinDto> inquiryList = new PageImpl<>(new ArrayList<>(),page,0);
 		
+		JoinSearchCondition condition = new JoinSearchCondition();
+		condition.setRequesterType(RequesterType.TEAM);
+		condition.setStatusType(StatusType.PROPOSAL);
+		
 		// 거절할 제안이 있는지 확인.
-		inquiryList = joinRepositoryCustom.findTeamJoinOffer(StatusType.PROPOSAL, joinDto.getTeamId(), page);
+		inquiryList = joinRepositoryCustom.findTeamJoinOffer(condition, joinDto.getTeamId(), page);
 		
 		JoinEntity proposal = inquiryList.getContent().stream()
 				.filter(d->d.getPlayerId()==joinDto.getPlayerId())
@@ -158,8 +175,12 @@ public class JoinServiceImpl implements JoinService {
 		
 		Page<JoinDto> inquiryList = new PageImpl<>(new ArrayList<>(),page,0);
 		
+		JoinSearchCondition condition = new JoinSearchCondition();
+		condition.setRequesterType(RequesterType.PLAYER);
+		condition.setStatusType(StatusType.PROPOSAL);
+		
 		// Player에게 제안한 요청이 있는지 확인.
-		inquiryList = joinRepositoryCustom.findPlayerJoinOffer(StatusType.PROPOSAL, joinDto.getPlayerId(), page);
+		inquiryList = joinRepositoryCustom.findPlayerJoinOffer(condition, joinDto.getPlayerId(), page);
 		
 		JoinEntity proposal = inquiryList.getContent().stream()
 				.filter(d->d.getPlayerId()==joinDto.getPlayerId())
@@ -183,8 +204,12 @@ public class JoinServiceImpl implements JoinService {
 		
 		Page<JoinDto> inquiryList = new PageImpl<>(new ArrayList<>(),page,0);
 		
+		JoinSearchCondition condition = new JoinSearchCondition();
+		condition.setRequesterType(RequesterType.TEAM);
+		condition.setStatusType(StatusType.PROPOSAL);
+		
 		// Team에게 제안한 요청이 있는지 확인.
-		inquiryList = joinRepositoryCustom.findTeamJoinOffer(StatusType.PROPOSAL, joinDto.getTeamId(), page);
+		inquiryList = joinRepositoryCustom.findTeamJoinOffer(condition, joinDto.getTeamId(), page);
 		
 		JoinEntity proposal = inquiryList.getContent().stream()
 				.filter(d->d.getPlayerId()==joinDto.getPlayerId())
@@ -197,44 +222,32 @@ public class JoinServiceImpl implements JoinService {
 		
 		return proposal.toDto();
 	}
-
-	@Override
-	public Page<JoinDto> searchPlayerJoinApplication(Long playerId,JoinSearchCondition condition, Pageable pageable) {
-		Page<JoinDto> rtnList = new PageImpl<>(new ArrayList<>(),pageable,0);
-		rtnList = joinRepositoryCustom.findPlayerJoinApplication(condition.getStatusType(), playerId, pageable);
-		return rtnList;
-	}
 	
 	@Override
-	public Page<JoinDto> searchPlayerJoinOffer(Long playerId,JoinSearchCondition condition, Pageable pageable) {
-		Page<JoinDto> rtnList = new PageImpl<>(new ArrayList<>(),pageable,0);
-		rtnList = joinRepositoryCustom.findPlayerJoinOffer(condition.getStatusType(), playerId, pageable);
-		return rtnList;
-	}
-
-	@Override
-	public Page<JoinDto> searchTeamJoinApplication(Long teamId,JoinSearchCondition condition, Pageable pageable) {
-		Page<JoinDto> rtnList = new PageImpl<>(new ArrayList<>(),pageable,0);
-		rtnList = joinRepositoryCustom.findTeamJoinApplication(condition.getStatusType(), teamId, pageable);
-		return rtnList;
-	}
-
-	@Override
-	public Page<JoinDto> searchTeamJoinOffer(Long teamId,JoinSearchCondition condition, Pageable pageable) {
-		Page<JoinDto> rtnList = new PageImpl<>(new ArrayList<>(),pageable,0);
-		rtnList = joinRepositoryCustom.findTeamJoinOffer(condition.getStatusType(), teamId, pageable);
-		return rtnList;
-	}
-
-	@Override
 	public JoinDto confirmPlayerApprove(JoinDto joinDto) throws Exception {
-		// TODO Auto-generated method stub
+		// Player, Team Entity 조회
+		// 승인된 요청이 있는지 확인
+			// 승인된 요청중 일주일 이내인 경우만 유효한 승인요청이다.
+		// 기 승인한 요청이 있을경우 기 승인 요청을 거절 처리한다.
+		// 승인 확정 후 해당 선수를 팀으로 영입하여 선수 명단에 선수의 정보를 추가한다.
+		// 선수의 소속팀과 유니폼 번호를 변경한다.
+			// 유니폼 번호는 소속팀의 가장 큰 유니폼 번호보다 1 큰 숫자를 설정한다.
 		return null;
 	}
 
 	@Override
 	public JoinDto confirmTeamApprove(JoinDto joinDto) throws Exception {
-		// TODO Auto-generated method stub
+		// Player,Team Entity 조회
+		TeamEntity team = teamRepository.findById(joinDto.getTeamId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,"요청하신 team이 존재하지 않습니다.",new Exception()));
+		PlayerEntity player = playerRepository.findById(joinDto.getPlayerId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,"요청하신 player가 존재하지 않습니다.",new Exception()));
+		// 승인된 팀 요청이 있는지 확인
+	
+		//joinRepositoryCustom.
+			// 승인된 요청중 일주일 이내인 경우만 유효한 승인요청이다.
+		// 기 승인한 요청이 있을경우 기 승인 요청을 거절 처리한다.
+		// 승인 확정 후 해당 선수를 팀으로 영입하여 선수 명단에 선수의 정보를 추가한다.
+		// 승인 확정 후 해당 선수는 소속팀과 유니폼 번호를 변경한다.
+			// 유니폼 번호는 소속팀의 가장 큰 유니폼 번호보다 1 큰 숫자를 설정한다.
 		return null;
 	}
 	
@@ -248,8 +261,12 @@ public class JoinServiceImpl implements JoinService {
 		
 		Page<JoinDto> inquiryList = new PageImpl<>(new ArrayList<>(),page,0);
 		
+		JoinSearchCondition condition = new JoinSearchCondition();
+		condition.setRequesterType(RequesterType.PLAYER);
+		condition.setStatusType(StatusType.APPROVAL);
+		
 		// Player에게 승인된 요청이 있는지 확인.
-		inquiryList = joinRepositoryCustom.findPlayerJoinApplication(StatusType.APPROVAL, joinDto.getPlayerId(), page);
+		inquiryList = joinRepositoryCustom.findPlayerJoinApplication(condition, joinDto.getPlayerId(), page);
 		
 		JoinEntity proposal = inquiryList.getContent().stream()
 													.filter(d->d.getTeamId()==joinDto.getTeamId())
@@ -274,7 +291,11 @@ public class JoinServiceImpl implements JoinService {
 		Page<JoinDto> inquiryList = new PageImpl<>(new ArrayList<>(),page,0);
 		
 		// Player에게 승인된 요청이 있는지 확인.
-		inquiryList = joinRepositoryCustom.findTeamJoinApplication(StatusType.APPROVAL, joinDto.getTeamId(), page);
+		JoinSearchCondition condition = new JoinSearchCondition();
+		condition.setRequesterType(RequesterType.TEAM);
+		condition.setStatusType(StatusType.APPROVAL);
+		
+		inquiryList = joinRepositoryCustom.findTeamJoinApplication(condition, joinDto.getTeamId(), page);
 		
 		JoinEntity proposal = inquiryList.getContent().stream()
 													.filter(d->d.getPlayerId()==joinDto.getPlayerId())
@@ -286,6 +307,34 @@ public class JoinServiceImpl implements JoinService {
 		proposal = joinRepository.save(proposal);
 		
 		return proposal.toDto();
+	}
+
+	@Override
+	public Page<JoinDto> searchPlayerJoinApplication(Long playerId,JoinSearchCondition condition, Pageable pageable) {
+		Page<JoinDto> rtnList = new PageImpl<>(new ArrayList<>(),pageable,0);
+		rtnList = joinRepositoryCustom.findPlayerJoinApplication(condition, playerId, pageable);
+		return rtnList;
+	}
+	
+	@Override
+	public Page<JoinDto> searchPlayerJoinOffer(Long playerId,JoinSearchCondition condition, Pageable pageable) {
+		Page<JoinDto> rtnList = new PageImpl<>(new ArrayList<>(),pageable,0);
+		rtnList = joinRepositoryCustom.findPlayerJoinOffer(condition, playerId, pageable);
+		return rtnList;
+	}
+
+	@Override
+	public Page<JoinDto> searchTeamJoinApplication(Long teamId,JoinSearchCondition condition, Pageable pageable) {
+		Page<JoinDto> rtnList = new PageImpl<>(new ArrayList<>(),pageable,0);
+		rtnList = joinRepositoryCustom.findTeamJoinApplication(condition, teamId, pageable);
+		return rtnList;
+	}
+
+	@Override
+	public Page<JoinDto> searchTeamJoinOffer(Long teamId,JoinSearchCondition condition, Pageable pageable) {
+		Page<JoinDto> rtnList = new PageImpl<>(new ArrayList<>(),pageable,0);
+		rtnList = joinRepositoryCustom.findTeamJoinOffer(condition, teamId, pageable);
+		return rtnList;
 	}
 		
 }
