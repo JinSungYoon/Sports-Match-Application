@@ -12,10 +12,12 @@ import org.springframework.data.domain.PageRequest;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
+import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -33,6 +35,7 @@ import core.join.repository.JoinRepositoryCustom;
 import core.player.entity.BelongType;
 import core.player.entity.PlayerEntity;
 import core.player.repository.PlayerRepository;
+import core.player.repository.PlayerRepositoryCustom;
 import core.team.entity.TeamEntity;
 import core.team.repository.TeamRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -46,6 +49,9 @@ public class JoinServiceUnitTest {
 	
 	@Mock
 	private PlayerRepository playerRepository;
+	
+	@Mock
+	private PlayerRepositoryCustom playerRepositoryCustom;
 	
 	@Mock
 	private TeamRepository teamRepository;
@@ -512,4 +518,77 @@ public class JoinServiceUnitTest {
 		Assertions.assertThat(rtnDto.getRequesterType()).isEqualTo(RequesterType.PLAYER);
 		Assertions.assertThat(rtnDto.getStatusType()).isEqualTo(StatusType.WITHDRAW);
 	}
+	
+	@Test
+	@DisplayName("팀이 선수 승인 확정하기")
+	public void confirmPlayerApprove() throws Exception {
+		// given
+		TeamEntity gteam = new TeamEntity("griffindor","south",BelongType.CLUB,"Teach all children who show courage worthy of their name.");
+		TeamEntity steam = new TeamEntity("slydelin","north",BelongType.CLUB,"Teach only children of the purest bloodlines.");
+		TeamEntity hteam = new TeamEntity("hufflepuff","east",BelongType.CLUB,"I will teach them the same.");
+		TeamEntity rteam = new TeamEntity("ravenclaw","west",BelongType.CLUB,"Teach only the smartest kids.");
+		
+		gteam.initId(1L);
+		steam.initId(2L);
+		hteam.initId(3L);
+		rteam.initId(4L);
+		
+		PlayerEntity player1 = new PlayerEntity("harry potter","221102-1111111",1,gteam);
+		PlayerEntity player2 = new PlayerEntity("Ronald Bilius Weasley","221102-1111111",10,gteam);
+		PlayerEntity player3 = new PlayerEntity("Hermione Jean Granger","221102-1111111",8,gteam);
+		
+		player1.initId(1L);
+		player2.initId(2L);
+		player3.initId(3L);
+		
+		List<PlayerEntity> playerList = new ArrayList<>();
+		playerList.add(player2);
+		playerList.add(player3);
+		
+		PageRequest page = PageRequest.of(0, 100);
+		
+		JoinSearchCondition confirmCondition = new JoinSearchCondition();
+		confirmCondition.setRequesterType(RequesterType.TEAM);
+		confirmCondition.setStatusType(StatusType.CONFIRMATION);
+		
+		List<JoinDto> emptyList = new ArrayList<>();
+		Page<JoinDto> expectConfirmPage = new PageImpl<>(emptyList,page,emptyList.size());
+		
+		JoinSearchCondition approveCondition = new JoinSearchCondition();
+		Clock clock = Clock.fixed(Instant.parse("3333-08-22T10:00:00Z"), ZoneOffset.UTC);
+		approveCondition.setRequesterType(RequesterType.TEAM);
+		approveCondition.setStatusType(StatusType.APPROVAL);
+		approveCondition.setFromToDate(LocalDateTime.now(clock), -1, 7);
+				
+		JoinDto approveJoinDto = new JoinDto(1L,1L,"harry potter",1L,"griffindor",RequesterType.TEAM,StatusType.APPROVAL,'Y',LocalDateTime.of(2022,11,01,16,45,25),LocalDateTime.of(2022,11,01,16,45,25));
+		List<JoinDto> expectApproveList = new ArrayList<>();
+		expectApproveList.add(approveJoinDto);
+		Page<JoinDto> expectApprovePage = new PageImpl<>(expectApproveList,page,expectApproveList.size()); 
+		JoinEntity approveJoinEntity = approveJoinDto.toEntity(approveJoinDto, player1, gteam); 
+		
+		JoinDto requestJoinDto = new JoinDto(1L,player1.toDto(),gteam.toDto(),RequesterType.TEAM,StatusType.CONFIRMATION);
+		
+		// Mocking Test에서는 static 메서드 사용 불가
+		// https://velog.io/@betterfuture4/%EC%86%8D%EB%8B%A5%EC%86%8D%EB%8B%A5-%ED%83%80%EC%9E%84%EB%A8%B8%EC%8B%A0-%ED%85%8C%EC%8A%A4%ED%8A%B8-%ED%95%98%EA%B8%B0feat.LocalDateTime.nowclock
+		
+		// then
+		when(teamRepository.findById(any())).thenReturn(Optional.of(gteam));
+		when(playerRepository.findById(any())).thenReturn(Optional.of(player1));
+		//when(joinRepositoryCustom.findTeamJoinApplication(confirmCondition, requestJoinDto.getTeamId(), page)).thenReturn(expectConfirmPage);
+		doReturn(expectConfirmPage).when(joinRepositoryCustom).findTeamJoinApplication(confirmCondition, requestJoinDto.getTeamId(), page);
+		//when(joinRepositoryCustom.findTeamJoinApplication(approveCondition, gteam.getId(), page)).thenReturn(expectApprovePage);
+		doReturn(expectApprovePage).when(joinRepositoryCustom).findTeamJoinApplication(approveCondition, requestJoinDto.getTeamId(), page);
+		when(playerRepositoryCustom.findPlayer(null,null,"griffindor",page)).thenReturn(playerList);
+		approveJoinEntity.updateStatus(StatusType.CONFIRMATION);
+		when(joinRepository.save(any())).thenReturn(approveJoinEntity);
+		
+		JoinDto rtnDto = joinService.confirmPlayerApprove(requestJoinDto);
+		
+		Assertions.assertThat(rtnDto.getPlayerName()).isEqualTo("harry potter");
+		Assertions.assertThat(rtnDto.getTeamName()).isEqualTo("griffindor");
+		Assertions.assertThat(rtnDto.getRequesterType()).isEqualTo(RequesterType.TEAM);
+		Assertions.assertThat(rtnDto.getStatusType()).isEqualTo(StatusType.CONFIRMATION);
+		
+	}
+	
 }

@@ -1,6 +1,9 @@
 package core.join.service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -19,6 +22,7 @@ import core.join.repository.JoinRepository;
 import core.join.repository.JoinRepositoryCustom;
 import core.player.entity.PlayerEntity;
 import core.player.repository.PlayerRepository;
+import core.player.repository.PlayerRepositoryCustom;
 import core.team.entity.TeamEntity;
 import core.team.repository.TeamRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +34,15 @@ public class JoinServiceImpl implements JoinService {
 	private final JoinRepository joinRepository;
 	private final JoinRepositoryCustom joinRepositoryCustom; 
 	private final PlayerRepository playerRepository;
+	private final PlayerRepositoryCustom playerRepositoryCustom;
 	private final TeamRepository teamRepository;
+	
+	public final Integer before = -1;
+	public final Integer after  = 1;
+	public final Integer backAndForth = 0;
+	public final Integer diffDays   = 7;
+	
+			
 	
 	@Override
 	public JoinDto requestPlayerJoin(Long id, JoinDto joinDto) {
@@ -225,28 +237,71 @@ public class JoinServiceImpl implements JoinService {
 	
 	@Override
 	public JoinDto confirmPlayerApprove(JoinDto joinDto) throws Exception {
+		// Player,Team Entity 조회
+		TeamEntity team = teamRepository.findById(joinDto.getTeamId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,"요청하신 team이 존재하지 않습니다.",new Exception()));
+		PlayerEntity player = playerRepository.findById(joinDto.getPlayerId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,"요청하신 player가 존재하지 않습니다.",new Exception()));
+		
+		PageRequest page = PageRequest.of(0, 100);
+		
+		Page<JoinDto> inquiryList = new PageImpl<>(new ArrayList<>(),page,0);
+
+		// 기 승인한 요청이 있을경우 기 승인 요청을 거절 처리한다.
+		JoinSearchCondition approvalCondition = new JoinSearchCondition();
+		approvalCondition.setRequesterType(RequesterType.TEAM);
+		approvalCondition.setStatusType(StatusType.CONFIRMATION);
+		
+		inquiryList = joinRepositoryCustom.findTeamJoinApplication(approvalCondition, joinDto.getTeamId(), page);
+		
+		// 만일 기존에 확정한 요청이 있다면 확정 요청은 철회한다.
+		if(inquiryList.getTotalElements()>0) {
+			JoinEntity confirmation = inquiryList.getContent().stream()
+					.filter(d->d.getPlayerId()==joinDto.getPlayerId())
+					.map(d->d.toEntity(d, player, team))
+					.findFirst().orElse(null);
+			
+			confirmation.updateStatus(StatusType.WITHDRAW);
+			joinRepository.save(confirmation);
+		}
+		
+		// 승인된 팀 요청이 있는지 확인
+		JoinSearchCondition confirmCondition = new JoinSearchCondition();
+		confirmCondition.setStatusType(StatusType.APPROVAL);
+		confirmCondition.setRequesterType(RequesterType.TEAM);
+		// 현재 기간으로부터 일주일 전의 Approval만 유효하다고 판단.
+		confirmCondition.setFromToDate(LocalDateTime.now(), before, diffDays);
+		
+		inquiryList = joinRepositoryCustom.findTeamJoinApplication(confirmCondition, joinDto.getTeamId(), page);
+		JoinEntity approval = inquiryList.stream()
+											.filter(d->d.getPlayerId() == joinDto.getPlayerId())
+											.map(d->d.toEntity(d,player,team))
+											.findFirst().orElseThrow(()-> new Exception("해당 선수가 "+StatusType.APPROVAL+"한 요청이 없습니다."));
+		
+		approval.updateStatus(StatusType.CONFIRMATION);
+		
+		// 승인 확정 후 해당 선수를 팀으로 영입하여 선수 명단에 선수의 정보를 추가한다.
+		
+		// 승인 확정 후 해당 선수는 소속팀과 유니폼 번호를 변경한다.
+		List<PlayerEntity> playerList = playerRepositoryCustom.findPlayer(null, null, team.getTeamName(), page);
+		
+		Integer playerMaxNo = playerList.stream()
+					.sorted(Comparator.comparing(PlayerEntity::getUniformNo,Comparator.reverseOrder()))
+					.map(PlayerEntity::getUniformNo).toList().get(0);
+					
+		// 유니폼 번호는 소속팀의 가장 큰 유니폼 번호보다 1 큰 숫자를 설정한다.
+		player.updateInfo(player.getPlayerName(), player.getResRegNo(), playerMaxNo+1, team);
+			
+		return approval.toDto();
+
+	}
+
+	@Override
+	public JoinDto confirmTeamApprove(JoinDto joinDto) throws Exception {
 		// Player, Team Entity 조회
 		// 승인된 요청이 있는지 확인
 			// 승인된 요청중 일주일 이내인 경우만 유효한 승인요청이다.
 		// 기 승인한 요청이 있을경우 기 승인 요청을 거절 처리한다.
 		// 승인 확정 후 해당 선수를 팀으로 영입하여 선수 명단에 선수의 정보를 추가한다.
 		// 선수의 소속팀과 유니폼 번호를 변경한다.
-			// 유니폼 번호는 소속팀의 가장 큰 유니폼 번호보다 1 큰 숫자를 설정한다.
-		return null;
-	}
-
-	@Override
-	public JoinDto confirmTeamApprove(JoinDto joinDto) throws Exception {
-		// Player,Team Entity 조회
-		TeamEntity team = teamRepository.findById(joinDto.getTeamId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,"요청하신 team이 존재하지 않습니다.",new Exception()));
-		PlayerEntity player = playerRepository.findById(joinDto.getPlayerId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,"요청하신 player가 존재하지 않습니다.",new Exception()));
-		// 승인된 팀 요청이 있는지 확인
-	
-		//joinRepositoryCustom.
-			// 승인된 요청중 일주일 이내인 경우만 유효한 승인요청이다.
-		// 기 승인한 요청이 있을경우 기 승인 요청을 거절 처리한다.
-		// 승인 확정 후 해당 선수를 팀으로 영입하여 선수 명단에 선수의 정보를 추가한다.
-		// 승인 확정 후 해당 선수는 소속팀과 유니폼 번호를 변경한다.
 			// 유니폼 번호는 소속팀의 가장 큰 유니폼 번호보다 1 큰 숫자를 설정한다.
 		return null;
 	}
