@@ -1,10 +1,12 @@
 package core.join.service;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -42,6 +44,8 @@ public class JoinServiceImpl implements JoinService {
 	public final Integer backAndForth = 0;
 	public final Integer diffDays   = 7;
 	
+	@Autowired
+	private Clock clock;
 			
 	
 	@Override
@@ -268,7 +272,8 @@ public class JoinServiceImpl implements JoinService {
 		confirmCondition.setStatusType(StatusType.APPROVAL);
 		confirmCondition.setRequesterType(RequesterType.TEAM);
 		// 현재 기간으로부터 일주일 전의 Approval만 유효하다고 판단.
-		confirmCondition.setFromToDate(LocalDateTime.now(), before, diffDays);
+//		clock = Clock.systemDefaultZone();
+//		confirmCondition.setFromToDate(LocalDateTime.now(clock), before, diffDays);
 		
 		inquiryList = joinRepositoryCustom.findTeamJoinApplication(confirmCondition, joinDto.getTeamId(), page);
 		JoinEntity approval = inquiryList.stream()
@@ -276,22 +281,26 @@ public class JoinServiceImpl implements JoinService {
 											.map(d->d.toEntity(d,player,team))
 											.findFirst().orElseThrow(()-> new Exception("해당 선수가 "+StatusType.APPROVAL+"한 요청이 없습니다."));
 		
-		approval.updateStatus(StatusType.CONFIRMATION);
-		
-		// 승인 확정 후 해당 선수를 팀으로 영입하여 선수 명단에 선수의 정보를 추가한다.
-		
-		// 승인 확정 후 해당 선수는 소속팀과 유니폼 번호를 변경한다.
-		List<PlayerEntity> playerList = playerRepositoryCustom.findPlayer(null, null, team.getTeamName(), page);
-		
-		Integer playerMaxNo = playerList.stream()
-					.sorted(Comparator.comparing(PlayerEntity::getUniformNo,Comparator.reverseOrder()))
-					.map(PlayerEntity::getUniformNo).toList().get(0);
-					
-		// 유니폼 번호는 소속팀의 가장 큰 유니폼 번호보다 1 큰 숫자를 설정한다.
-		player.updateInfo(player.getPlayerName(), player.getResRegNo(), playerMaxNo+1, team);
+		if(approval!=null) {
+			approval.updateStatus(StatusType.CONFIRMATION);
 			
-		return approval.toDto();
-
+			// 승인 확정 후 해당 선수를 팀으로 영입하여 선수 명단에 선수의 정보를 추가한다.
+			
+			// 승인 확정 후 해당 선수는 소속팀과 유니폼 번호를 변경한다.
+			List<PlayerEntity> playerList = playerRepositoryCustom.findPlayer(null, null, team.getTeamName(), page);
+			
+			Integer playerMaxNo = playerList.stream()
+						.sorted(Comparator.comparing(PlayerEntity::getUniformNo,Comparator.reverseOrder()))
+						.map(PlayerEntity::getUniformNo).toList().get(0);
+						
+			// 유니폼 번호는 소속팀의 가장 큰 유니폼 번호보다 1 큰 숫자를 설정한다.
+			player.updateInfo(player.getPlayerName(), player.getResRegNo(), playerMaxNo+1, team);
+			
+			return approval.toDto();
+		}else {
+			return null;
+		}
+		
 	}
 
 	@Override

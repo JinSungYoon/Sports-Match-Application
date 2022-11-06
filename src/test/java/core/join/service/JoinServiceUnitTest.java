@@ -12,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 import java.time.Clock;
@@ -555,10 +556,10 @@ public class JoinServiceUnitTest {
 		Page<JoinDto> expectConfirmPage = new PageImpl<>(emptyList,page,emptyList.size());
 		
 		JoinSearchCondition approveCondition = new JoinSearchCondition();
-		Clock clock = Clock.fixed(Instant.parse("3333-08-22T10:00:00Z"), ZoneOffset.UTC);
+		Clock clock = Clock.fixed(Instant.parse("2022-11-07T06:08:00.00Z"), ZoneOffset.UTC);
 		approveCondition.setRequesterType(RequesterType.TEAM);
 		approveCondition.setStatusType(StatusType.APPROVAL);
-		approveCondition.setFromToDate(LocalDateTime.now(clock), -1, 7);
+//		approveCondition.setFromToDate(LocalDateTime.now(clock), -1, 7);
 				
 		JoinDto approveJoinDto = new JoinDto(1L,1L,"harry potter",1L,"griffindor",RequesterType.TEAM,StatusType.APPROVAL,'Y',LocalDateTime.of(2022,11,01,16,45,25),LocalDateTime.of(2022,11,01,16,45,25));
 		List<JoinDto> expectApproveList = new ArrayList<>();
@@ -580,7 +581,7 @@ public class JoinServiceUnitTest {
 		doReturn(expectApprovePage).when(joinRepositoryCustom).findTeamJoinApplication(approveCondition, requestJoinDto.getTeamId(), page);
 		when(playerRepositoryCustom.findPlayer(null,null,"griffindor",page)).thenReturn(playerList);
 		approveJoinEntity.updateStatus(StatusType.CONFIRMATION);
-		when(joinRepository.save(any())).thenReturn(approveJoinEntity);
+		lenient().doReturn(approveJoinEntity).when(joinRepository).save(any());
 		
 		JoinDto rtnDto = joinService.confirmPlayerApprove(requestJoinDto);
 		
