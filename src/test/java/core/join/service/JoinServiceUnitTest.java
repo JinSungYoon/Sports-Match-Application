@@ -556,10 +556,11 @@ public class JoinServiceUnitTest {
 		Page<JoinDto> expectConfirmPage = new PageImpl<>(emptyList,page,emptyList.size());
 		
 		JoinSearchCondition approveCondition = new JoinSearchCondition();
-		Clock clock = Clock.fixed(Instant.parse("2022-11-07T06:08:00.00Z"), ZoneOffset.UTC);
+		//Clock clock = Clock.fixed(Instant.parse("2022-11-08T06:08:00.00Z"), ZoneOffset.UTC);
+		Clock clock = Clock.systemDefaultZone();
 		approveCondition.setRequesterType(RequesterType.TEAM);
 		approveCondition.setStatusType(StatusType.APPROVAL);
-//		approveCondition.setFromToDate(LocalDateTime.now(clock), -1, 7);
+		approveCondition.setFromToDate(LocalDateTime.now(clock), -1, 7);
 				
 		JoinDto approveJoinDto = new JoinDto(1L,1L,"harry potter",1L,"griffindor",RequesterType.TEAM,StatusType.APPROVAL,'Y',LocalDateTime.of(2022,11,01,16,45,25),LocalDateTime.of(2022,11,01,16,45,25));
 		List<JoinDto> expectApproveList = new ArrayList<>();
@@ -568,9 +569,6 @@ public class JoinServiceUnitTest {
 		JoinEntity approveJoinEntity = approveJoinDto.toEntity(approveJoinDto, player1, gteam); 
 		
 		JoinDto requestJoinDto = new JoinDto(1L,player1.toDto(),gteam.toDto(),RequesterType.TEAM,StatusType.CONFIRMATION);
-		
-		// Mocking Test에서는 static 메서드 사용 불가
-		// https://velog.io/@betterfuture4/%EC%86%8D%EB%8B%A5%EC%86%8D%EB%8B%A5-%ED%83%80%EC%9E%84%EB%A8%B8%EC%8B%A0-%ED%85%8C%EC%8A%A4%ED%8A%B8-%ED%95%98%EA%B8%B0feat.LocalDateTime.nowclock
 		
 		// then
 		when(teamRepository.findById(any())).thenReturn(Optional.of(gteam));

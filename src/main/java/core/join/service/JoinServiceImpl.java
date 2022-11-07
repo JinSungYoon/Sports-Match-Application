@@ -272,8 +272,8 @@ public class JoinServiceImpl implements JoinService {
 		confirmCondition.setStatusType(StatusType.APPROVAL);
 		confirmCondition.setRequesterType(RequesterType.TEAM);
 		// 현재 기간으로부터 일주일 전의 Approval만 유효하다고 판단.
-//		clock = Clock.systemDefaultZone();
-//		confirmCondition.setFromToDate(LocalDateTime.now(clock), before, diffDays);
+		clock = Clock.systemDefaultZone();
+		confirmCondition.setFromToDate(LocalDateTime.now(clock), before, diffDays);
 		
 		inquiryList = joinRepositoryCustom.findTeamJoinApplication(confirmCondition, joinDto.getTeamId(), page);
 		JoinEntity approval = inquiryList.stream()
