@@ -313,7 +313,7 @@ public class JoinServiceImpl implements JoinService {
 		// Player, Team Entity 조회
 		TeamEntity team = teamRepository.findById(joinDto.getTeamId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,"요청하신 team이 존재하지 않습니다.",new Exception()));
 		PlayerEntity player = playerRepository.findById(joinDto.getPlayerId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,"요청하신 player가 존재하지 않습니다.",new Exception()));
-		
+		 
 		PageRequest page = PageRequest.of(0, 100);
 		
 		Page<JoinDto> inquiryList = new PageImpl<>(new ArrayList<>(),page,0);
@@ -433,7 +433,7 @@ public class JoinServiceImpl implements JoinService {
 		
 		return proposal.toDto();
 	}
-
+	
 	@Override
 	public Page<JoinDto> searchPlayerJoinApplication(Long playerId,JoinSearchCondition condition, Pageable pageable) {
 		Page<JoinDto> rtnList = new PageImpl<>(new ArrayList<>(),pageable,0);

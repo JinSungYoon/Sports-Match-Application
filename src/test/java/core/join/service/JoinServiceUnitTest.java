@@ -11,14 +11,12 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 import java.time.Clock;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -588,4 +586,72 @@ public class JoinServiceUnitTest {
 		
 	}
 	
+	@Test
+	@DisplayName("선수가 팀 승인 확정하기")
+	public void confirmTeamApprove() throws Exception{
+		// given
+		TeamEntity gteam = new TeamEntity("griffindor","south",BelongType.CLUB,"Teach all children who show courage worthy of their name.");
+		TeamEntity steam = new TeamEntity("slydelin","north",BelongType.CLUB,"Teach only children of the purest bloodlines.");
+		TeamEntity hteam = new TeamEntity("hufflepuff","east",BelongType.CLUB,"I will teach them the same.");
+		TeamEntity rteam = new TeamEntity("ravenclaw","west",BelongType.CLUB,"Teach only the smartest kids.");
+		
+		gteam.initId(1L);
+		steam.initId(2L);
+		hteam.initId(3L);
+		rteam.initId(4L);
+		
+		PlayerEntity player1 = new PlayerEntity("Harry potter","221102-1111111",1,gteam);
+		PlayerEntity player2 = new PlayerEntity("Ronald Bilius Weasley","221102-1111111",10,gteam);
+		PlayerEntity player3 = new PlayerEntity("Hermione Jean Granger","221102-1111111",8,gteam);
+		
+		player1.initId(1L);
+		player2.initId(2L);
+		player3.initId(3L);
+		
+		List<PlayerEntity> emptyPlayer = new ArrayList<>();
+		
+		PageRequest page = PageRequest.of(0,100);
+		
+		JoinSearchCondition confirmCondition = new JoinSearchCondition();
+		confirmCondition.setRequesterType(RequesterType.PLAYER);
+		confirmCondition.setStatusType(StatusType.CONFIRMATION);
+		
+		JoinSearchCondition approveCondition = new JoinSearchCondition();
+		// 해당 국가의 시간대 설정
+		Clock clock = Clock.systemDefaultZone();
+		approveCondition.setRequesterType(RequesterType.PLAYER);
+		approveCondition.setStatusType(StatusType.APPROVAL);
+		approveCondition.setFromToDate(LocalDateTime.now(clock), -1, 7);
+		
+		JoinDto confirmJoinDto = new JoinDto(1L,player1.getId(),player1.getPlayerName(),gteam.getId(),gteam.getTeamName(),RequesterType.TEAM,StatusType.APPROVAL,'Y',LocalDateTime.of(2022,5,12,23,59,00),LocalDateTime.of(2022,5,12,23,59,00));
+		List<JoinDto> expectConfirmList = new ArrayList<>();
+		expectConfirmList.add(confirmJoinDto);
+		Page<JoinDto> expectConfirmPage = new PageImpl<>(expectConfirmList,page,expectConfirmList.size());
+		
+		JoinDto approveJoinDto = new JoinDto(1L,player1.getId(),player1.getPlayerName(),steam.getId(),steam.getTeamName(),RequesterType.TEAM,StatusType.APPROVAL,'Y',LocalDateTime.of(2022,10,12,23,59,00),LocalDateTime.of(2022,10,12,23,59,00));
+		List<JoinDto> expectApproveList = new ArrayList<>();
+		expectApproveList.add(approveJoinDto);
+		Page<JoinDto> expectApprovePage = new PageImpl<>(expectApproveList,page,expectApproveList.size());
+		
+		JoinEntity approveJoinEntity = approveJoinDto.toEntity(approveJoinDto, player1, steam);
+
+		JoinDto requestJoinDto = new JoinDto(1L,player1.toDto(),steam.toDto(),RequesterType.PLAYER,StatusType.CONFIRMATION);
+		
+		// when
+		when(teamRepository.findById(any())).thenReturn(Optional.of(steam));
+		when(playerRepository.findById(any())).thenReturn(Optional.of(player1));
+		when(joinRepositoryCustom.findPlayerJoinApplication(confirmCondition, requestJoinDto.getPlayerId(), page)).thenReturn(expectConfirmPage);
+		when(joinRepositoryCustom.findPlayerJoinApplication(approveCondition, requestJoinDto.getPlayerId(), page)).thenReturn(expectApprovePage);
+		when(playerRepositoryCustom.findPlayer(null, null, steam.getTeamName(), page)).thenReturn(emptyPlayer);
+		approveJoinEntity.updateStatus(StatusType.CONFIRMATION);
+		lenient().doReturn(approveJoinEntity).when(joinRepository).save(any());
+		
+		JoinDto rtnDto = joinService.confirmTeamApprove(requestJoinDto);
+		
+		// then
+		Assertions.assertThat(rtnDto.getPlayerName()).isEqualTo("Harry potter");
+		Assertions.assertThat(rtnDto.getTeamName()).isEqualTo("slydelin");
+		Assertions.assertThat(rtnDto.getRequesterType()).isEqualTo(RequesterType.TEAM);
+		Assertions.assertThat(rtnDto.getStatusType()).isEqualTo(StatusType.CONFIRMATION);
+	}
 }
