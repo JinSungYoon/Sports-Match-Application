@@ -573,10 +573,8 @@ public class JoinServiceUnitTest {
 		// then
 		when(teamRepository.findById(any())).thenReturn(Optional.of(gteam));
 		when(playerRepository.findById(any())).thenReturn(Optional.of(player1));
-		//when(joinRepositoryCustom.findTeamJoinApplication(confirmCondition, requestJoinDto.getTeamId(), page)).thenReturn(expectConfirmPage);
-		doReturn(expectConfirmPage).when(joinRepositoryCustom).findTeamJoinApplication(confirmCondition, requestJoinDto.getTeamId(), page);
-		//when(joinRepositoryCustom.findTeamJoinApplication(approveCondition, gteam.getId(), page)).thenReturn(expectApprovePage);
-		doReturn(expectApprovePage).when(joinRepositoryCustom).findTeamJoinApplication(approveCondition, requestJoinDto.getTeamId(), page);
+		when(joinRepositoryCustom.findTeamJoinApplication(confirmCondition, requestJoinDto.getTeamId(), page)).thenReturn(expectConfirmPage);
+		when(joinRepositoryCustom.findTeamJoinApplication(approveCondition, gteam.getId(), page)).thenReturn(expectApprovePage);
 		when(playerRepositoryCustom.findPlayer(null,null,"griffindor",page)).thenReturn(playerList);
 		approveJoinEntity.updateStatus(StatusType.CONFIRMATION);
 		lenient().doReturn(approveJoinEntity).when(joinRepository).save(any());

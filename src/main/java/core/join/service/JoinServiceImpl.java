@@ -267,11 +267,11 @@ public class JoinServiceImpl implements JoinService {
 			joinRepository.save(confirmation);
 		}
 		
-		// 승인된 팀 요청이 있는지 확인
+		// 승인된 팀 요청이 있는지 확인(현재 기간으로부터 일주일 전의 Approval만 유효하다고 판단.)
 		JoinSearchCondition confirmCondition = new JoinSearchCondition();
 		confirmCondition.setStatusType(StatusType.APPROVAL);
 		confirmCondition.setRequesterType(RequesterType.TEAM);
-		// 현재 기간으로부터 일주일 전의 Approval만 유효하다고 판단.
+		// 해당 국가의 시간대 설정
 		clock = Clock.systemDefaultZone();
 		confirmCondition.setFromToDate(LocalDateTime.now(clock), before, diffDays);
 		
@@ -289,29 +289,90 @@ public class JoinServiceImpl implements JoinService {
 			// 승인 확정 후 해당 선수는 소속팀과 유니폼 번호를 변경한다.
 			List<PlayerEntity> playerList = playerRepositoryCustom.findPlayer(null, null, team.getTeamName(), page);
 			
-			Integer playerMaxNo = playerList.stream()
+			List<Integer> UniformNoList = playerList.stream()
 						.sorted(Comparator.comparing(PlayerEntity::getUniformNo,Comparator.reverseOrder()))
-						.map(PlayerEntity::getUniformNo).toList().get(0);
-						
-			// 유니폼 번호는 소속팀의 가장 큰 유니폼 번호보다 1 큰 숫자를 설정한다.
-			player.updateInfo(player.getPlayerName(), player.getResRegNo(), playerMaxNo+1, team);
+						.map(PlayerEntity::getUniformNo).toList();
 			
+			// 현재 팀에 선수가 존재한다면
+			if(UniformNoList.size()>0) {
+				// 유니폼 번호는 소속팀의 가장 큰 유니폼 번호보다 1 큰 숫자를 설정한다.
+				player.updateInfo(player.getPlayerName(), player.getResRegNo(), UniformNoList.get(0)+1, team);
+			}else {
+				// 선수가 없다면 갖고 있던 유티폼 번호를 갖는다.
+				player.updateInfo(player.getPlayerName(), player.getResRegNo(), player.getUniformNo(), team);
+			}
+						
 			return approval.toDto();
-		}else {
-			return null;
 		}
 		
+		return null;
 	}
 
 	@Override
 	public JoinDto confirmTeamApprove(JoinDto joinDto) throws Exception {
 		// Player, Team Entity 조회
-		// 승인된 요청이 있는지 확인
-			// 승인된 요청중 일주일 이내인 경우만 유효한 승인요청이다.
+		TeamEntity team = teamRepository.findById(joinDto.getTeamId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,"요청하신 team이 존재하지 않습니다.",new Exception()));
+		PlayerEntity player = playerRepository.findById(joinDto.getPlayerId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,"요청하신 player가 존재하지 않습니다.",new Exception()));
+		
+		PageRequest page = PageRequest.of(0, 100);
+		
+		Page<JoinDto> inquiryList = new PageImpl<>(new ArrayList<>(),page,0);
+
 		// 기 승인한 요청이 있을경우 기 승인 요청을 거절 처리한다.
-		// 승인 확정 후 해당 선수를 팀으로 영입하여 선수 명단에 선수의 정보를 추가한다.
-		// 선수의 소속팀과 유니폼 번호를 변경한다.
-			// 유니폼 번호는 소속팀의 가장 큰 유니폼 번호보다 1 큰 숫자를 설정한다.
+		JoinSearchCondition approvalCondition = new JoinSearchCondition();
+		approvalCondition.setRequesterType(RequesterType.PLAYER);
+		approvalCondition.setStatusType(StatusType.CONFIRMATION);
+		
+		inquiryList = joinRepositoryCustom.findPlayerJoinApplication(approvalCondition, joinDto.getPlayerId(), page);
+		
+		// 만일 기존에 확정한 요청이 있다면 확정 요청은 철회한다.
+		if(inquiryList.getTotalElements()>0) {
+			JoinEntity confirmation = inquiryList.getContent().stream()
+					//.filter(d->d.getTeamId()==joinDto.getTeamId())
+					.map(d->d.toEntity(d, player, team))
+					.findFirst().orElse(null);
+			
+			confirmation.updateStatus(StatusType.WITHDRAW);
+			joinRepository.save(confirmation);
+		}
+		
+		// 승인된 팀 요청이 있는지 확인(현재 기간으로부터 일주일 전의 Approval만 유효하다고 판단.)
+		JoinSearchCondition confirmCondition = new JoinSearchCondition();
+		confirmCondition.setStatusType(StatusType.APPROVAL);
+		confirmCondition.setRequesterType(RequesterType.PLAYER);
+		// 해당 국가의 시간대 설정
+		clock = Clock.systemDefaultZone();
+		confirmCondition.setFromToDate(LocalDateTime.now(clock), before, diffDays);
+		
+		inquiryList = joinRepositoryCustom.findPlayerJoinApplication(confirmCondition, joinDto.getPlayerId(), page);
+		JoinEntity approval = inquiryList.stream()
+											.filter(d->d.getTeamId() == joinDto.getTeamId())
+											.map(d->d.toEntity(d,player,team))
+											.findFirst().orElseThrow(()-> new Exception("해당 팀이 "+StatusType.APPROVAL+"한 요청이 없습니다."));
+		
+		if(approval!=null){
+			approval.updateStatus(StatusType.CONFIRMATION);
+			
+			// 승인 확정 후 해당 선수를 팀으로 영입하여 선수 명단에 선수의 정보를 추가한다.
+			
+			// 승인 확정 후 해당 선수는 소속팀과 유니폼 번호를 변경한다.
+			List<PlayerEntity> playerList = playerRepositoryCustom.findPlayer(null, null, team.getTeamName(), page);
+			
+			List<Integer> UniformNoList = playerList.stream()
+					.sorted(Comparator.comparing(PlayerEntity::getUniformNo,Comparator.reverseOrder()))
+					.map(PlayerEntity::getUniformNo).toList();
+		
+			// 현재 팀에 선수가 존재한다면
+			if(UniformNoList.size()>0) {
+				// 유니폼 번호는 소속팀의 가장 큰 유니폼 번호보다 1 큰 숫자를 설정한다.
+				player.updateInfo(player.getPlayerName(), player.getResRegNo(), UniformNoList.get(0)+1, team);
+			}else {
+				// 선수가 없다면 갖고 있던 유티폼 번호를 갖는다.
+				player.updateInfo(player.getPlayerName(), player.getResRegNo(), player.getUniformNo(), team);
+			}
+						
+			return approval.toDto();
+		}
 		return null;
 	}
 	
