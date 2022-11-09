@@ -30,6 +30,10 @@ public interface JoinService {
 	JoinDto withdrawPlayerApprove(JoinDto joinDto) throws Exception;
 	// 승인 철회
 	JoinDto withdrawTeamApprove(JoinDto joinDto) throws Exception;
+	// 승인 반려
+	JoinDto returnPlayerApprove(JoinDto joinDto) throws Exception;
+	// 승인 반려
+	JoinDto returnTeamApprove(JoinDto joinDto) throws Exception;
 	// 선수 가입 신청 조회
 	Page<JoinDto> searchPlayerJoinApplication(Long playerId,JoinSearchCondition condition,Pageable pageable);
 	// 선수 가입 제안 조회

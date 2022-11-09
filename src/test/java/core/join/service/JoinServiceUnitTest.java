@@ -16,7 +16,7 @@ import static org.mockito.Mockito.when;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
-
+import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -516,6 +516,114 @@ public class JoinServiceUnitTest {
 		Assertions.assertThat(rtnDto.getTeamName()).isEqualTo("slydelin");
 		Assertions.assertThat(rtnDto.getRequesterType()).isEqualTo(RequesterType.PLAYER);
 		Assertions.assertThat(rtnDto.getStatusType()).isEqualTo(StatusType.WITHDRAW);
+	}
+	
+	@Test
+	@DisplayName("Player 승인 반려하기")
+	public void returnPlayerApproval() throws Exception {
+		// given
+		TeamEntity gteam = new TeamEntity("griffindor","south",BelongType.CLUB,"Teach all children who show courage worthy of their name.");
+		TeamEntity steam = new TeamEntity("slydelin","north",BelongType.CLUB,"Teach only children of the purest bloodlines.");
+		TeamEntity hteam = new TeamEntity("hufflepuff","east",BelongType.CLUB,"I will teach them the same.");
+		TeamEntity rteam = new TeamEntity("ravenclaw","west",BelongType.CLUB,"Teach only the smartest kids.");
+		
+		gteam.initId(1L);
+		steam.initId(2L);
+		hteam.initId(3L);
+		rteam.initId(4L);
+		
+		PlayerEntity player1 = new PlayerEntity("Harry potter","221102-1111111",1,gteam);
+		PlayerEntity player2 = new PlayerEntity("Ronald Bilius Weasley","221102-1111111",10,gteam);
+		PlayerEntity player3 = new PlayerEntity("Hermione Jean Granger","221102-1111111",8,gteam);
+		
+		player1.initId(1L);
+		player2.initId(2L);
+		player3.initId(3L);
+
+		PageRequest page = PageRequest.of(0, 100);
+		
+		JoinSearchCondition condition = new JoinSearchCondition();
+		Clock clock = Clock.systemDefaultZone();
+		condition.setRequesterType(RequesterType.PLAYER);
+		condition.setStatusType(StatusType.APPROVAL);
+		condition.setFromToDate(LocalDateTime.now(clock), -1, 7);
+		
+		List<JoinDto> joinDtoList = new ArrayList<>();
+		JoinDto approval1 = new JoinDto(1L,player1.getId(),player1.getPlayerName(),steam.getId(),steam.getTeamName(),RequesterType.TEAM,StatusType.APPROVAL,'Y',LocalDateTime.of(2022, Month.NOVEMBER, 6, 23, 59, 0),LocalDateTime.of(2022, Month.NOVEMBER, 6, 23, 59, 0));
+		joinDtoList.add(approval1);
+		Page<JoinDto> expectPage = new PageImpl<>(joinDtoList,page,joinDtoList.size());
+		
+		JoinEntity approvalEntity = approval1.toEntity(approval1,player1,steam);
+		
+		// when
+		when(teamRepository.findById(any())).thenReturn(Optional.of(steam));
+		when(playerRepository.findById(any())).thenReturn(Optional.of(player1));
+		when(joinRepositoryCustom.findPlayerJoinApplication(condition,player1.getId(),page)).thenReturn(expectPage);
+		approvalEntity.updateStatus(StatusType.RETURN);
+		when(joinRepository.save(any())).thenReturn(approvalEntity);
+		
+		JoinDto rtnDto = joinService.returnPlayerApprove(approval1);
+		
+		// then
+		Assertions.assertThat(rtnDto.getPlayerName()).isEqualTo("Harry potter");
+		Assertions.assertThat(rtnDto.getTeamName()).isEqualTo("slydelin");
+		Assertions.assertThat(rtnDto.getRequesterType()).isEqualTo(RequesterType.TEAM);
+		Assertions.assertThat(rtnDto.getStatusType()).isEqualTo(StatusType.RETURN);
+		
+	}
+	
+	@Test
+	@DisplayName("Team 승인 반려하기")
+	public void returnTeamApproval() throws Exception {
+		// given
+		TeamEntity gteam = new TeamEntity("griffindor","south",BelongType.CLUB,"Teach all children who show courage worthy of their name.");
+		TeamEntity steam = new TeamEntity("slydelin","north",BelongType.CLUB,"Teach only children of the purest bloodlines.");
+		TeamEntity hteam = new TeamEntity("hufflepuff","east",BelongType.CLUB,"I will teach them the same.");
+		TeamEntity rteam = new TeamEntity("ravenclaw","west",BelongType.CLUB,"Teach only the smartest kids.");
+		
+		gteam.initId(1L);
+		steam.initId(2L);
+		hteam.initId(3L);
+		rteam.initId(4L);
+		
+		PlayerEntity player1 = new PlayerEntity("Harry potter","221102-1111111",1,gteam);
+		PlayerEntity player2 = new PlayerEntity("Ronald Bilius Weasley","221102-1111111",10,gteam);
+		PlayerEntity player3 = new PlayerEntity("Hermione Jean Granger","221102-1111111",8,gteam);
+		
+		player1.initId(1L);
+		player2.initId(2L);
+		player3.initId(3L);
+
+		PageRequest page = PageRequest.of(0, 100);
+		
+		JoinSearchCondition condition = new JoinSearchCondition();
+		Clock clock = Clock.systemDefaultZone();
+		condition.setRequesterType(RequesterType.TEAM);
+		condition.setStatusType(StatusType.APPROVAL);
+		condition.setFromToDate(LocalDateTime.now(clock), -1, 7);
+		
+		List<JoinDto> joinDtoList = new ArrayList<>();
+		JoinDto approval1 = new JoinDto(1L,player2.getId(),player2.getPlayerName(),rteam.getId(),rteam.getTeamName(),RequesterType.PLAYER,StatusType.APPROVAL,'Y',LocalDateTime.of(2022, Month.NOVEMBER, 6, 23, 59, 0),LocalDateTime.of(2022, Month.NOVEMBER, 6, 23, 59, 0));
+		joinDtoList.add(approval1);
+		Page<JoinDto> expectPage = new PageImpl<>(joinDtoList,page,joinDtoList.size());
+		
+		JoinEntity approvalEntity = approval1.toEntity(approval1,player2,rteam);
+		
+		// when
+		when(teamRepository.findById(any())).thenReturn(Optional.of(rteam));
+		when(playerRepository.findById(any())).thenReturn(Optional.of(player2));
+		when(joinRepositoryCustom.findTeamJoinApplication(condition,rteam.getId(),page)).thenReturn(expectPage);
+		approvalEntity.updateStatus(StatusType.RETURN);
+		when(joinRepository.save(any())).thenReturn(approvalEntity);
+		
+		JoinDto rtnDto = joinService.returnTeamApprove(approval1);
+		
+		// then
+		Assertions.assertThat(rtnDto.getPlayerName()).isEqualTo("Ronald Bilius Weasley");
+		Assertions.assertThat(rtnDto.getTeamName()).isEqualTo("ravenclaw");
+		Assertions.assertThat(rtnDto.getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(rtnDto.getStatusType()).isEqualTo(StatusType.RETURN);
+
 	}
 	
 	@Test
