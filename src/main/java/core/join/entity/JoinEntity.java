@@ -67,7 +67,7 @@ public class JoinEntity extends BaseEntity {
 	}
 	
 	@Builder
-	public JoinEntity(StatusType statusType,RequesterType requesterType,PlayerEntity player,TeamEntity team) {
+	public JoinEntity(RequesterType requesterType,StatusType statusType,PlayerEntity player,TeamEntity team) {
 		this.statusType = statusType;
 		this.requesterType = requesterType;
 		this.team = team;

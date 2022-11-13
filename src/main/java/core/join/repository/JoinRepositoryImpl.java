@@ -1,13 +1,17 @@
 package core.join.repository;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Order;
 
 import com.querydsl.core.QueryResults;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -102,6 +106,69 @@ public class JoinRepositoryImpl implements JoinRepositoryCustom{
 		return new PageImpl<>(content,pageable,total);
 	}
 	
+	@Override
+	public Page<JoinDto> findJoinApplication(JoinSearchCondition condition, Long playerId, Long teamId, Pageable pageable) {
+		QueryResults<JoinDto> results = null;
+		
+						if(condition.getRequesterType().equals(RequesterType.PLAYER)) {
+							results = queryFactory
+									.select(Projections.fields(JoinDto.class,join.id,join.player.id.as("playerId"),join.player.playerName,join.team.id.as("teamId"),join.team.teamName,join.requesterType,join.statusType,join.activeYN,join.createdDate,join.updatedDate))
+									.from(join)
+									.join(join.player,player)
+									.where(join.requesterType.eq(condition.getRequesterType()),eqStatusType(condition.getStatusType()),eqPlayerId(playerId),join.activeYN.eq('Y'),betweenDate(condition.getFromDate(),condition.getToDate()))
+									.offset(pageable.getOffset())
+									.limit(pageable.getPageSize())
+									.orderBy(join.updatedDate.desc())
+									.fetchResults();
+						}else {
+							results = queryFactory
+									.select(Projections.fields(JoinDto.class,join.id,join.player.id.as("playerId"),join.player.playerName,join.team.id.as("teamId"),join.team.teamName,join.requesterType,join.statusType,join.activeYN,join.createdDate,join.updatedDate))
+									.from(join)
+									.join(join.team,team)
+									.where(join.requesterType.eq(condition.getRequesterType()),eqStatusType(condition.getStatusType()),eqPlayerId(playerId),join.activeYN.eq('Y'),betweenDate(condition.getFromDate(),condition.getToDate()))
+									.offset(pageable.getOffset())
+									.limit(pageable.getPageSize())
+									.orderBy(join.updatedDate.desc())
+									.fetchResults();
+						}
+								
+		List<JoinDto> content = results.getResults();
+		Long total = results.getTotal();
+		
+		return new PageImpl<>(content,pageable,total);
+	}
+
+	@Override
+	public Page<JoinDto> findJoinOffer(JoinSearchCondition condition, Long playerId, Long teamId, Pageable pageable) {
+		QueryResults<JoinDto> results = null;
+						if(condition.getRequesterType().equals(RequesterType.PLAYER)) {
+							results = queryFactory
+									.select(Projections.fields(JoinDto.class,join.id,join.player.id.as("playerId"),join.player.playerName,join.team.id.as("teamId"),join.team.teamName,join.requesterType,join.statusType,join.activeYN,join.createdDate,join.updatedDate))
+									.from(join)
+									.join(join.team,team)
+									.where(join.requesterType.eq(condition.getRequesterType()),eqStatusType(condition.getStatusType()),eqTeamId(teamId),join.activeYN.eq('Y'),betweenDate(condition.getFromDate(),condition.getToDate()))
+									.offset(pageable.getOffset())
+									.limit(pageable.getPageSize())
+									.orderBy(join.id.desc(),join.updatedDate.desc())
+									.fetchResults();
+						}else {
+							results = queryFactory
+									.select(Projections.fields(JoinDto.class,join.id,join.player.id.as("playerId"),join.player.playerName,join.team.id.as("teamId"),join.team.teamName,join.requesterType,join.statusType,join.activeYN,join.createdDate,join.updatedDate))
+									.from(join)
+									.join(join.player,player)
+									.where(join.requesterType.eq(condition.getRequesterType()),eqStatusType(condition.getStatusType()),eqTeamId(teamId),join.activeYN.eq('Y'),betweenDate(condition.getFromDate(),condition.getToDate()))
+									.offset(pageable.getOffset())
+									.limit(pageable.getPageSize())
+									.orderBy(join.id.desc(),join.updatedDate.desc())
+									.fetchResults();
+						}		
+				
+		List<JoinDto> content = results.getResults();
+		Long total = results.getTotal();
+		
+		return new PageImpl<>(content,pageable,total);
+	}
+	
 	private BooleanExpression eqStatusType(StatusType statusType) {
 		if(statusType == null) {
 			return null;
@@ -135,9 +202,5 @@ public class JoinRepositoryImpl implements JoinRepositoryCustom{
 		return join.updatedDate.between(fromDate, toDate);
 		
 	}
-
 	
-
-	
-
 }
