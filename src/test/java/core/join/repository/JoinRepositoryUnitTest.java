@@ -437,7 +437,9 @@ public class JoinRepositoryUnitTest {
 		condition.setStatusType(StatusType.PROPOSAL);
 		condition.setActiveYN('Y');
 		
-		PageRequest page = PageRequest.of(0, 10, Sort.by("updatedDate").descending().and(Sort.by("joinId")));
+		
+		PageRequest page = PageRequest.of(0, 10, Sort.by("updatedDate").descending().and(Sort.by("id")));
+		//PageRequest page = PageRequest.of(0, 10, Sort.by("player.playerName").descending().and(Sort.by("id")));
 		
 		Page<JoinDto> rResults = joinRepositoryCustom.findJoinApplication(condition, null, rteam.getId(), page);
 		List<JoinDto> rList = rResults.getContent();
