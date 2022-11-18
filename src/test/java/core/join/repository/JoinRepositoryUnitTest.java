@@ -490,4 +490,153 @@ public class JoinRepositoryUnitTest {
 		Assertions.assertThat(gList.get(4).getStatusType()).isEqualTo(StatusType.PROPOSAL);
 		
 	}
+	
+	@Test
+	@DisplayName("Player에게 요청한 join 조회")
+	public void findPlayerJoinOffer() {
+		// given
+		// Team,Player,Join Entity 생성
+		TeamEntity rteam = new TeamEntity("RedTeam","Seoul",BelongType.CLUB,"I'm a red team if you like red, will you join us?");
+		TeamEntity oteam = new TeamEntity("OrangedTeam","Seoul",BelongType.CLUB,"I'm a orange team if you like red, will you join us?");
+		TeamEntity yteam = new TeamEntity("YellowTeam","Seoul",BelongType.CLUB,"I'm a yellow team if you like red, will you join us?");
+		TeamEntity gteam = new TeamEntity("GreenTeam","Seoul",BelongType.CLUB,"I'm a green team if you like red, will you join us?");
+		TeamEntity bteam = new TeamEntity("BlueTeam","Seoul",BelongType.CLUB,"I'm a blue team if you like red, will you join us?");
+		TeamEntity iteam = new TeamEntity("IndigoTeam","Seoul",BelongType.CLUB,"I'm a indigo team if you like red, will you join us?");
+		TeamEntity pteam = new TeamEntity("PuppleTeam","Seoul",BelongType.CLUB,"I'm a purple team if you like red, will you join us?");
+		
+		teamRepository.save(rteam);
+		teamRepository.save(oteam);
+		teamRepository.save(yteam);
+		teamRepository.save(gteam);
+		teamRepository.save(bteam);
+		teamRepository.save(iteam);
+		teamRepository.save(pteam);
+		
+		PlayerEntity apple  = new PlayerEntity("apple","221114-1111111",1,null);
+		PlayerEntity banana = new PlayerEntity("banana","221114-1111111",1,null);
+		PlayerEntity graph = new PlayerEntity("graph","221114-1111111",1,null);
+		PlayerEntity mango = new PlayerEntity("mango","221114-1111111",1,null);
+		PlayerEntity paprika = new PlayerEntity("paprika","221114-1111111",1,null);
+
+		playerRepository.save(apple);
+		playerRepository.save(banana);
+		playerRepository.save(graph);
+		playerRepository.save(mango);
+		playerRepository.save(paprika);
+		
+		// Player -> Team
+		// apple
+		JoinEntity joinAP = new JoinEntity(RequesterType.PLAYER,StatusType.PROPOSAL,apple,gteam);
+		JoinEntity joinAR = new JoinEntity(RequesterType.PLAYER,StatusType.PROPOSAL,apple,rteam);
+		// banana
+		JoinEntity joinBG = new JoinEntity(RequesterType.PLAYER,StatusType.PROPOSAL,banana,gteam);
+		JoinEntity joinBB = new JoinEntity(RequesterType.PLAYER,StatusType.PROPOSAL,banana,bteam);
+		JoinEntity joinBY = new JoinEntity(RequesterType.PLAYER,StatusType.PROPOSAL,banana,yteam);
+		// graph
+		JoinEntity joinGG = new JoinEntity(RequesterType.PLAYER,StatusType.PROPOSAL,graph,gteam);
+		JoinEntity joinGP = new JoinEntity(RequesterType.PLAYER,StatusType.PROPOSAL,graph,pteam);
+		// mango
+		JoinEntity joinMG = new JoinEntity(RequesterType.PLAYER,StatusType.PROPOSAL,mango,gteam);
+		JoinEntity joinMY = new JoinEntity(RequesterType.PLAYER,StatusType.PROPOSAL,mango,yteam);
+		// paprika
+		JoinEntity joinPG = new JoinEntity(RequesterType.PLAYER,StatusType.PROPOSAL,paprika,gteam);
+		JoinEntity joinPT = new JoinEntity(RequesterType.PLAYER,StatusType.PROPOSAL,paprika,rteam);
+		JoinEntity joinPY = new JoinEntity(RequesterType.PLAYER,StatusType.PROPOSAL,paprika,yteam);
+		
+		// Team -> Player
+		// red
+		JoinEntity joinRa = new JoinEntity(RequesterType.TEAM,StatusType.PROPOSAL,apple,rteam);
+		JoinEntity joinRp = new JoinEntity(RequesterType.TEAM,StatusType.PROPOSAL,paprika,rteam);
+		// yellow
+		JoinEntity joinYb = new JoinEntity(RequesterType.TEAM,StatusType.PROPOSAL,banana,yteam);
+		JoinEntity joinYp = new JoinEntity(RequesterType.TEAM,StatusType.PROPOSAL,paprika,yteam);
+		JoinEntity joinYm = new JoinEntity(RequesterType.TEAM,StatusType.PROPOSAL,mango,yteam);
+		// green
+		JoinEntity joinGa = new JoinEntity(RequesterType.TEAM,StatusType.PROPOSAL,apple,gteam);
+		JoinEntity joinGb = new JoinEntity(RequesterType.TEAM,StatusType.PROPOSAL,banana,gteam);
+		JoinEntity joinGg = new JoinEntity(RequesterType.TEAM,StatusType.PROPOSAL,graph,gteam);
+		JoinEntity joinGm = new JoinEntity(RequesterType.TEAM,StatusType.PROPOSAL,mango,gteam);
+		JoinEntity joinGp = new JoinEntity(RequesterType.TEAM,StatusType.PROPOSAL,paprika,gteam);
+		// blue
+		JoinEntity joinBb = new JoinEntity(RequesterType.TEAM,StatusType.PROPOSAL,banana,bteam);
+		// pupple
+		JoinEntity joinPg = new JoinEntity(RequesterType.TEAM,StatusType.PROPOSAL,graph,pteam);
+		
+		joinRepository.save(joinAP);
+		joinRepository.save(joinAR);
+		joinRepository.save(joinBG);
+		joinRepository.save(joinBB);
+		joinRepository.save(joinBY);
+		joinRepository.save(joinGG);
+		joinRepository.save(joinGP);
+		joinRepository.save(joinMG);
+		joinRepository.save(joinMY);
+		joinRepository.save(joinPG);
+		joinRepository.save(joinPT);
+		joinRepository.save(joinPY);
+		
+		joinRepository.save(joinRa);
+		joinRepository.save(joinRp);
+		joinRepository.save(joinYb);
+		joinRepository.save(joinYp);
+		joinRepository.save(joinYm);
+		joinRepository.save(joinGa);
+		joinRepository.save(joinGb);
+		joinRepository.save(joinGg);
+		joinRepository.save(joinGm);
+		joinRepository.save(joinGp);
+		joinRepository.save(joinBb);
+		joinRepository.save(joinPg);
+		
+		JoinSearchCondition condition = new JoinSearchCondition();
+		condition.setRequesterType(RequesterType.TEAM);
+		condition.setStatusType(StatusType.PROPOSAL);
+		condition.setActiveYN('Y');
+		
+		
+		PageRequest page = PageRequest.of(0, 10, Sort.by("updatedDate").descending().and(Sort.by("id")));
+		//PageRequest page = PageRequest.of(0, 10, Sort.by("player.playerName").descending().and(Sort.by("id")));
+		
+		// when
+		// apple
+		Page<JoinDto> aResults = joinRepositoryCustom.findJoinOffer(condition, apple.getId(), null, page);
+		List<JoinDto> aList = aResults.getContent();
+		// banana
+		Page<JoinDto> bResults = joinRepositoryCustom.findJoinOffer(condition, banana.getId(), null, page);
+		List<JoinDto> bList = bResults.getContent();
+		// graph
+		Page<JoinDto> gResults = joinRepositoryCustom.findJoinOffer(condition, graph.getId(), null, page);
+		List<JoinDto> gList = gResults.getContent();
+		// mango
+		Page<JoinDto> mResults = joinRepositoryCustom.findJoinOffer(condition, mango.getId(), null, page);
+		List<JoinDto> mList = mResults.getContent();
+		// paprika
+		Page<JoinDto> pResults = joinRepositoryCustom.findJoinOffer(condition, paprika.getId(), null, page);
+		List<JoinDto> pList = pResults.getContent();
+				
+		// then
+		Assertions.assertThat(aList.get(0).getRequesterType()).isEqualTo(RequesterType.TEAM);
+		Assertions.assertThat(aList.get(0).getStatusType()).isEqualTo(StatusType.PROPOSAL);
+		Assertions.assertThat(aList.get(0).getPlayerName()).isEqualTo("apple");
+		Assertions.assertThat(aList.get(0).getTeamName()).isEqualTo("RedTeam");
+		Assertions.assertThat(aList.get(1).getRequesterType()).isEqualTo(RequesterType.TEAM);
+		Assertions.assertThat(aList.get(1).getStatusType()).isEqualTo(StatusType.PROPOSAL);
+		Assertions.assertThat(aList.get(1).getPlayerName()).isEqualTo("apple");
+		Assertions.assertThat(aList.get(1).getTeamName()).isEqualTo("GreenTeam");
+		
+		// banana
+		Assertions.assertThat(bList.get(0).getRequesterType()).isEqualTo(RequesterType.TEAM);
+		Assertions.assertThat(bList.get(0).getStatusType()).isEqualTo(StatusType.PROPOSAL);
+		Assertions.assertThat(bList.get(0).getPlayerName()).isEqualTo("banana");
+		Assertions.assertThat(bList.get(0).getTeamName()).isEqualTo("YellowTeam");
+		Assertions.assertThat(bList.get(1).getRequesterType()).isEqualTo(RequesterType.TEAM);
+		Assertions.assertThat(bList.get(1).getStatusType()).isEqualTo(StatusType.PROPOSAL);
+		Assertions.assertThat(bList.get(1).getPlayerName()).isEqualTo("banana");
+		Assertions.assertThat(bList.get(1).getTeamName()).isEqualTo("GreenTeam");
+		Assertions.assertThat(bList.get(2).getRequesterType()).isEqualTo(RequesterType.TEAM);
+		Assertions.assertThat(bList.get(2).getStatusType()).isEqualTo(StatusType.PROPOSAL);
+		Assertions.assertThat(bList.get(2).getPlayerName()).isEqualTo("banana");
+		Assertions.assertThat(bList.get(2).getTeamName()).isEqualTo("BlueTeam");
+		
+	}
 }
