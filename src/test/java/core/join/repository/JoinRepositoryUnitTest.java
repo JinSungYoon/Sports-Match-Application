@@ -1,8 +1,8 @@
 package core.join.repository;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -276,12 +276,12 @@ public class JoinRepositoryUnitTest {
 	@DisplayName("Player가 요청한 join 조회")
 	public void findPlayerJoinApplication() {
 		TeamEntity rteam = new TeamEntity("RedTeam","Seoul",BelongType.CLUB,"I'm a red team if you like red, will you join us?");
-		TeamEntity oteam = new TeamEntity("OrangedTeam","Seoul",BelongType.CLUB,"I'm a orange team if you like red, will you join us?");
+		TeamEntity oteam = new TeamEntity("OrangeTeam","Seoul",BelongType.CLUB,"I'm a orange team if you like red, will you join us?");
 		TeamEntity yteam = new TeamEntity("YellowTeam","Seoul",BelongType.CLUB,"I'm a yellow team if you like red, will you join us?");
 		TeamEntity gteam = new TeamEntity("GreenTeam","Seoul",BelongType.CLUB,"I'm a green team if you like red, will you join us?");
 		TeamEntity bteam = new TeamEntity("BlueTeam","Seoul",BelongType.CLUB,"I'm a blue team if you like red, will you join us?");
 		TeamEntity iteam = new TeamEntity("IndigoTeam","Seoul",BelongType.CLUB,"I'm a indigo team if you like red, will you join us?");
-		TeamEntity pteam = new TeamEntity("PuppleTeam","Seoul",BelongType.CLUB,"I'm a purple team if you like red, will you join us?");
+		TeamEntity pteam = new TeamEntity("PurpleTeam","Seoul",BelongType.CLUB,"I'm a purple team if you like red, will you join us?");
 		
 		teamRepository.save(rteam);
 		teamRepository.save(oteam);
@@ -376,12 +376,12 @@ public class JoinRepositoryUnitTest {
 	@DisplayName("Team이 요청한 join 조회")
 	public void findTeamJoinApplication() {
 		TeamEntity rteam = new TeamEntity("RedTeam","Seoul",BelongType.CLUB,"I'm a red team if you like red, will you join us?");
-		TeamEntity oteam = new TeamEntity("OrangedTeam","Seoul",BelongType.CLUB,"I'm a orange team if you like red, will you join us?");
+		TeamEntity oteam = new TeamEntity("OrangeTeam","Seoul",BelongType.CLUB,"I'm a orange team if you like red, will you join us?");
 		TeamEntity yteam = new TeamEntity("YellowTeam","Seoul",BelongType.CLUB,"I'm a yellow team if you like red, will you join us?");
 		TeamEntity gteam = new TeamEntity("GreenTeam","Seoul",BelongType.CLUB,"I'm a green team if you like red, will you join us?");
 		TeamEntity bteam = new TeamEntity("BlueTeam","Seoul",BelongType.CLUB,"I'm a blue team if you like red, will you join us?");
 		TeamEntity iteam = new TeamEntity("IndigoTeam","Seoul",BelongType.CLUB,"I'm a indigo team if you like red, will you join us?");
-		TeamEntity pteam = new TeamEntity("PuppleTeam","Seoul",BelongType.CLUB,"I'm a purple team if you like red, will you join us?");
+		TeamEntity pteam = new TeamEntity("PurpleTeam","Seoul",BelongType.CLUB,"I'm a purple team if you like red, will you join us?");
 		
 		teamRepository.save(rteam);
 		teamRepository.save(oteam);
@@ -417,7 +417,7 @@ public class JoinRepositoryUnitTest {
 		JoinEntity joinGm = new JoinEntity(RequesterType.TEAM,StatusType.PROPOSAL,mango,gteam);
 		JoinEntity joinGp = new JoinEntity(RequesterType.TEAM,StatusType.PROPOSAL,paprika,gteam);
 		// blue
-		// pupple
+		// purple
 		JoinEntity joinPg = new JoinEntity(RequesterType.TEAM,StatusType.PROPOSAL,graph,pteam);
 		
 		joinRepository.save(joinRa);
@@ -492,17 +492,17 @@ public class JoinRepositoryUnitTest {
 	}
 	
 	@Test
-	@DisplayName("Player에게 요청한 join 조회")
-	public void findPlayerJoinOffer() {
+	@DisplayName("요청받은 join 조회")
+	public void findJoinOffer() {
 		// given
 		// Team,Player,Join Entity 생성
 		TeamEntity rteam = new TeamEntity("RedTeam","Seoul",BelongType.CLUB,"I'm a red team if you like red, will you join us?");
-		TeamEntity oteam = new TeamEntity("OrangedTeam","Seoul",BelongType.CLUB,"I'm a orange team if you like red, will you join us?");
+		TeamEntity oteam = new TeamEntity("OrangeTeam","Seoul",BelongType.CLUB,"I'm a orange team if you like red, will you join us?");
 		TeamEntity yteam = new TeamEntity("YellowTeam","Seoul",BelongType.CLUB,"I'm a yellow team if you like red, will you join us?");
 		TeamEntity gteam = new TeamEntity("GreenTeam","Seoul",BelongType.CLUB,"I'm a green team if you like red, will you join us?");
 		TeamEntity bteam = new TeamEntity("BlueTeam","Seoul",BelongType.CLUB,"I'm a blue team if you like red, will you join us?");
 		TeamEntity iteam = new TeamEntity("IndigoTeam","Seoul",BelongType.CLUB,"I'm a indigo team if you like red, will you join us?");
-		TeamEntity pteam = new TeamEntity("PuppleTeam","Seoul",BelongType.CLUB,"I'm a purple team if you like red, will you join us?");
+		TeamEntity pteam = new TeamEntity("PurpleTeam","Seoul",BelongType.CLUB,"I'm a purple team if you like red, will you join us?");
 		
 		teamRepository.save(rteam);
 		teamRepository.save(oteam);
@@ -559,7 +559,7 @@ public class JoinRepositoryUnitTest {
 		JoinEntity joinGp = new JoinEntity(RequesterType.TEAM,StatusType.PROPOSAL,paprika,gteam);
 		// blue
 		JoinEntity joinBb = new JoinEntity(RequesterType.TEAM,StatusType.PROPOSAL,banana,bteam);
-		// pupple
+		// purple
 		JoinEntity joinPg = new JoinEntity(RequesterType.TEAM,StatusType.PROPOSAL,graph,pteam);
 		
 		joinRepository.save(joinAP);
@@ -637,6 +637,460 @@ public class JoinRepositoryUnitTest {
 		Assertions.assertThat(bList.get(2).getStatusType()).isEqualTo(StatusType.PROPOSAL);
 		Assertions.assertThat(bList.get(2).getPlayerName()).isEqualTo("banana");
 		Assertions.assertThat(bList.get(2).getTeamName()).isEqualTo("BlueTeam");
+			
+	}
+	
+	@Test
+	@DisplayName("요청받은 join 조회")
+	public void findJoinOffers() {
+		// given
+		// Team,Player,Join Entity 생성
+		TeamEntity rteam = new TeamEntity("RedTeam","Seoul",BelongType.CLUB,"I'm a red team if you like red, will you join us?");
+		TeamEntity oteam = new TeamEntity("OrangeTeam","Seoul",BelongType.CLUB,"I'm a orange team if you like red, will you join us?");
+		TeamEntity yteam = new TeamEntity("YellowTeam","Seoul",BelongType.CLUB,"I'm a yellow team if you like red, will you join us?");
+		TeamEntity gteam = new TeamEntity("GreenTeam","Seoul",BelongType.CLUB,"I'm a green team if you like red, will you join us?");
+		TeamEntity bteam = new TeamEntity("BlueTeam","Seoul",BelongType.CLUB,"I'm a blue team if you like red, will you join us?");
+		TeamEntity iteam = new TeamEntity("IndigoTeam","Seoul",BelongType.CLUB,"I'm a indigo team if you like red, will you join us?");
+		TeamEntity pteam = new TeamEntity("PurpleTeam","Seoul",BelongType.CLUB,"I'm a purple team if you like red, will you join us?");
 		
+		teamRepository.save(rteam);
+		teamRepository.save(oteam);
+		teamRepository.save(yteam);
+		teamRepository.save(gteam);
+		teamRepository.save(bteam);
+		teamRepository.save(iteam);
+		teamRepository.save(pteam);
+		
+		PlayerEntity apple  	= new PlayerEntity("apple","221114-1111111",1,null);
+		PlayerEntity banana		= new PlayerEntity("banana","221114-1111111",1,null);
+		PlayerEntity graph 		= new PlayerEntity("graph","221114-1111111",1,null);
+		PlayerEntity kiwi  		= new PlayerEntity("kiwi","221114-1111111",1,null);
+		PlayerEntity mango 		= new PlayerEntity("mango","221114-1111111",1,null);
+		PlayerEntity paprika 	= new PlayerEntity("paprika","221114-1111111",1,null);
+		PlayerEntity tomato		= new PlayerEntity("tomato","221114-1111111",1,null);
+		
+		playerRepository.save(apple);
+		playerRepository.save(banana);
+		playerRepository.save(graph);
+		playerRepository.save(kiwi);
+		playerRepository.save(mango);
+		playerRepository.save(paprika);
+		playerRepository.save(tomato);
+		
+		//Player, Proposal(홀수)
+		JoinEntity PP1 = new JoinEntity(RequesterType.PLAYER,StatusType.PROPOSAL,apple,rteam);
+		JoinEntity PP2 = new JoinEntity(RequesterType.PLAYER,StatusType.PROPOSAL,graph,rteam);
+		JoinEntity PP3 = new JoinEntity(RequesterType.PLAYER,StatusType.PROPOSAL,mango,rteam);
+		JoinEntity PP4 = new JoinEntity(RequesterType.PLAYER,StatusType.PROPOSAL,tomato,rteam);
+		
+		//Player, Reject(짝수)
+		JoinEntity PRJ1 = new JoinEntity(RequesterType.PLAYER,StatusType.REJECT,banana,oteam);
+		JoinEntity PRJ2 = new JoinEntity(RequesterType.PLAYER,StatusType.REJECT,kiwi,oteam);
+		JoinEntity PRJ3 = new JoinEntity(RequesterType.PLAYER,StatusType.REJECT,paprika,oteam);
+		
+		//Player, Approval(홀수)
+		JoinEntity PA1 = new JoinEntity(RequesterType.PLAYER,StatusType.APPROVAL,apple,yteam);
+		JoinEntity PA2 = new JoinEntity(RequesterType.PLAYER,StatusType.APPROVAL,graph,yteam);
+		JoinEntity PA3 = new JoinEntity(RequesterType.PLAYER,StatusType.APPROVAL,mango,yteam);
+		JoinEntity PA4 = new JoinEntity(RequesterType.PLAYER,StatusType.APPROVAL,tomato,yteam);
+
+		//Player, Withdraw(짝수)
+		JoinEntity PW1 = new JoinEntity(RequesterType.PLAYER,StatusType.WITHDRAW,banana,gteam);
+		JoinEntity PW2 = new JoinEntity(RequesterType.PLAYER,StatusType.WITHDRAW,kiwi,gteam);
+		JoinEntity PW3 = new JoinEntity(RequesterType.PLAYER,StatusType.WITHDRAW,paprika,gteam);
+		
+		//Player, Return(홀수)
+		JoinEntity PRT1 = new JoinEntity(RequesterType.PLAYER,StatusType.RETURN,apple,bteam);
+		JoinEntity PRT2 = new JoinEntity(RequesterType.PLAYER,StatusType.RETURN,graph,bteam);
+		JoinEntity PRT3 = new JoinEntity(RequesterType.PLAYER,StatusType.RETURN,mango,bteam);
+		JoinEntity PRT4 = new JoinEntity(RequesterType.PLAYER,StatusType.RETURN,tomato,bteam);
+		
+		//Player, Confirmation(짝수)
+		JoinEntity PC1 = new JoinEntity(RequesterType.PLAYER,StatusType.CONFIRMATION,banana,pteam);
+		JoinEntity PC2 = new JoinEntity(RequesterType.PLAYER,StatusType.CONFIRMATION,kiwi,pteam);
+		JoinEntity PC3 = new JoinEntity(RequesterType.PLAYER,StatusType.CONFIRMATION,paprika,pteam);
+		
+		// Team, Proposal(홀수)
+		JoinEntity TP1 = new JoinEntity(RequesterType.TEAM,StatusType.PROPOSAL,apple,rteam);
+		JoinEntity TP2 = new JoinEntity(RequesterType.TEAM,StatusType.PROPOSAL,apple,yteam);
+		JoinEntity TP3 = new JoinEntity(RequesterType.TEAM,StatusType.PROPOSAL,apple,bteam);
+		JoinEntity TP4 = new JoinEntity(RequesterType.TEAM,StatusType.PROPOSAL,apple,pteam);
+		
+		// Team, Reject(짝수)
+		JoinEntity TRJ1 = new JoinEntity(RequesterType.TEAM,StatusType.REJECT,banana,oteam);
+		JoinEntity TRJ2 = new JoinEntity(RequesterType.TEAM,StatusType.REJECT,banana,gteam);
+		JoinEntity TRJ3 = new JoinEntity(RequesterType.TEAM,StatusType.REJECT,banana,iteam);
+		
+		// Team, Approval(홀수)
+		JoinEntity TA1 = new JoinEntity(RequesterType.PLAYER,StatusType.APPROVAL,graph,rteam);
+		JoinEntity TA2 = new JoinEntity(RequesterType.PLAYER,StatusType.APPROVAL,graph,yteam);
+		JoinEntity TA3 = new JoinEntity(RequesterType.PLAYER,StatusType.APPROVAL,graph,bteam);
+		JoinEntity TA4 = new JoinEntity(RequesterType.PLAYER,StatusType.APPROVAL,graph,pteam);
+
+		// Team, Withdraw(짝수)
+		JoinEntity TW1 = new JoinEntity(RequesterType.TEAM,StatusType.WITHDRAW,kiwi,oteam);
+		JoinEntity TW2 = new JoinEntity(RequesterType.TEAM,StatusType.WITHDRAW,kiwi,gteam);
+		JoinEntity TW3 = new JoinEntity(RequesterType.TEAM,StatusType.WITHDRAW,kiwi,iteam);
+
+		// Team, Return(홀수)
+		JoinEntity TRT1 = new JoinEntity(RequesterType.TEAM,StatusType.RETURN,paprika,rteam);
+		JoinEntity TRT2 = new JoinEntity(RequesterType.TEAM,StatusType.RETURN,paprika,yteam);
+		JoinEntity TRT3 = new JoinEntity(RequesterType.TEAM,StatusType.RETURN,paprika,bteam);
+		JoinEntity TRT4 = new JoinEntity(RequesterType.TEAM,StatusType.RETURN,paprika,pteam);
+		
+		// Team, Confirmation(짝수)
+		JoinEntity TC1 = new JoinEntity(RequesterType.TEAM,StatusType.CONFIRMATION,tomato,oteam);
+		JoinEntity TC2 = new JoinEntity(RequesterType.TEAM,StatusType.CONFIRMATION,tomato,gteam);
+		JoinEntity TC3 = new JoinEntity(RequesterType.TEAM,StatusType.CONFIRMATION,tomato,iteam);
+		
+		joinRepository.save(PP1);
+		joinRepository.save(PP2);
+		joinRepository.save(PP3);
+		joinRepository.save(PP4);
+		joinRepository.save(PRJ1);
+		joinRepository.save(PRJ2);
+		joinRepository.save(PRJ3);
+		joinRepository.save(PA1);
+		joinRepository.save(PA2);
+		joinRepository.save(PA3);
+		joinRepository.save(PA4);
+		joinRepository.save(PW1);
+		joinRepository.save(PW2);
+		joinRepository.save(PW3);
+		joinRepository.save(PRT1);
+		joinRepository.save(PRT2);
+		joinRepository.save(PRT3);
+		joinRepository.save(PRT4);
+		joinRepository.save(PC1);
+		joinRepository.save(PC2);
+		joinRepository.save(PC3);
+		
+		joinRepository.save(TP1);
+		joinRepository.save(TP2);
+		joinRepository.save(TP3);
+		joinRepository.save(TP4);
+		joinRepository.save(TRJ1);
+		joinRepository.save(TRJ2);
+		joinRepository.save(TRJ3);
+		joinRepository.save(TA1);
+		joinRepository.save(TA2);
+		joinRepository.save(TA3);
+		joinRepository.save(TA4);
+		joinRepository.save(TW1);
+		joinRepository.save(TW2);
+		joinRepository.save(TW3);
+		joinRepository.save(TRT1);
+		joinRepository.save(TRT2);
+		joinRepository.save(TRT3);
+		joinRepository.save(TRT4);
+		joinRepository.save(TC1);
+		joinRepository.save(TC2);
+		joinRepository.save(TC3);
+		
+		JoinSearchCondition  playerProposalCondition = new JoinSearchCondition();
+		playerProposalCondition.setRequesterType(RequesterType.PLAYER);
+		playerProposalCondition.setStatusType(StatusType.PROPOSAL);
+		playerProposalCondition.setActiveYN('Y');
+		JoinSearchCondition  playerRejectCondition = new JoinSearchCondition();
+		playerRejectCondition.setRequesterType(RequesterType.PLAYER);
+		playerRejectCondition.setStatusType(StatusType.REJECT);
+		playerRejectCondition.setActiveYN('Y');
+		JoinSearchCondition  playerApprovalCondition = new JoinSearchCondition();
+		playerApprovalCondition.setRequesterType(RequesterType.PLAYER);
+		playerApprovalCondition.setStatusType(StatusType.APPROVAL);
+		playerApprovalCondition.setActiveYN('Y');
+		JoinSearchCondition  playerWithdrawCondition = new JoinSearchCondition();
+		playerWithdrawCondition.setRequesterType(RequesterType.PLAYER);
+		playerWithdrawCondition.setStatusType(StatusType.WITHDRAW);
+		playerWithdrawCondition.setActiveYN('Y');
+		JoinSearchCondition  playerReturnCondition = new JoinSearchCondition();
+		playerReturnCondition.setRequesterType(RequesterType.PLAYER);
+		playerReturnCondition.setStatusType(StatusType.RETURN);
+		playerReturnCondition.setActiveYN('Y');
+		JoinSearchCondition  playerConfirmationCondition = new JoinSearchCondition();
+		playerConfirmationCondition.setRequesterType(RequesterType.PLAYER);
+		playerConfirmationCondition.setStatusType(StatusType.CONFIRMATION);
+		playerConfirmationCondition.setActiveYN('Y');
+
+		JoinSearchCondition  teamProposalCondition = new JoinSearchCondition();
+		teamProposalCondition.setRequesterType(RequesterType.TEAM);
+		teamProposalCondition.setStatusType(StatusType.PROPOSAL);
+		teamProposalCondition.setActiveYN('Y');
+		JoinSearchCondition  teamRejectCondition = new JoinSearchCondition();
+		teamRejectCondition.setRequesterType(RequesterType.TEAM);
+		teamRejectCondition.setStatusType(StatusType.REJECT);
+		teamRejectCondition.setActiveYN('Y');
+		JoinSearchCondition  teamApprovalCondition = new JoinSearchCondition();
+		teamApprovalCondition.setRequesterType(RequesterType.TEAM);
+		teamApprovalCondition.setStatusType(StatusType.APPROVAL);
+		teamApprovalCondition.setActiveYN('Y');
+		JoinSearchCondition  teamWithdrawCondition = new JoinSearchCondition();
+		teamWithdrawCondition.setRequesterType(RequesterType.TEAM);
+		teamWithdrawCondition.setStatusType(StatusType.WITHDRAW);
+		teamWithdrawCondition.setActiveYN('Y');
+		JoinSearchCondition  teamReturnCondition = new JoinSearchCondition();
+		teamReturnCondition.setRequesterType(RequesterType.TEAM);
+		teamReturnCondition.setStatusType(StatusType.RETURN);
+		teamReturnCondition.setActiveYN('Y');
+		JoinSearchCondition  teamConfirmationCondition = new JoinSearchCondition();
+		teamConfirmationCondition.setRequesterType(RequesterType.TEAM);
+		teamConfirmationCondition.setStatusType(StatusType.CONFIRMATION);
+		teamConfirmationCondition.setActiveYN('Y');
+		
+		PageRequest sortUpdate = PageRequest.of(0, 10, Sort.by("updatedDate").descending().and(Sort.by("id")));
+		PageRequest sortPlayer = PageRequest.of(0, 10, Sort.by("player.playerName").descending().and(Sort.by("id")));
+		PageRequest sortTeam = PageRequest.of(0, 10, Sort.by("team.teamName").descending().and(Sort.by("id")));
+		
+		// then
+		// 검색 parameter에 따라서 결과가 잘 나오는지
+		// RequesterType에 따라 결과가 잘 나오는지			// StatusType에 따라 결과가 잘 나오는지
+		Page<JoinDto> rResults = joinRepositoryCustom.findJoinOffer(playerProposalCondition, null, rteam.getId(), sortUpdate);
+		List<JoinDto> rList = rResults.getContent();
+		Page<JoinDto> iResults = joinRepositoryCustom.findJoinOffer(playerProposalCondition, null, iteam.getId(), sortUpdate);
+		List<JoinDto> iList = iResults.getContent();
+		Assertions.assertThat(rList.get(0).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(rList.get(0).getStatusType()).isEqualTo(StatusType.PROPOSAL);
+		Assertions.assertThat(rList.get(0).getPlayerName()).isEqualTo("apple");
+		Assertions.assertThat(rList.get(0).getTeamName()).isEqualTo("RedTeam");
+		Assertions.assertThat(rList.get(1).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(rList.get(1).getStatusType()).isEqualTo(StatusType.PROPOSAL);
+		Assertions.assertThat(rList.get(1).getPlayerName()).isEqualTo("graph");
+		Assertions.assertThat(rList.get(1).getTeamName()).isEqualTo("RedTeam");
+		Assertions.assertThat(rList.get(2).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(rList.get(2).getStatusType()).isEqualTo(StatusType.PROPOSAL);
+		Assertions.assertThat(rList.get(2).getPlayerName()).isEqualTo("mango");
+		Assertions.assertThat(rList.get(2).getTeamName()).isEqualTo("RedTeam");
+		Assertions.assertThat(rList.get(3).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(rList.get(3).getStatusType()).isEqualTo(StatusType.PROPOSAL);
+		Assertions.assertThat(rList.get(3).getPlayerName()).isEqualTo("tomato");
+		Assertions.assertThat(rList.get(3).getTeamName()).isEqualTo("RedTeam");
+		Assertions.assertThatThrownBy(() -> iList.get(0)).isInstanceOf(IndexOutOfBoundsException.class);
+		
+		Page<JoinDto> orResults = joinRepositoryCustom.findJoinOffer(playerRejectCondition, null, oteam.getId(), sortUpdate);
+		List<JoinDto> orList = orResults.getContent();
+		Page<JoinDto> irResults = joinRepositoryCustom.findJoinOffer(playerRejectCondition, null, iteam.getId(), sortUpdate);
+		List<JoinDto> irList = irResults.getContent();
+		Assertions.assertThat(orList.get(0).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(orList.get(0).getStatusType()).isEqualTo(StatusType.REJECT);
+		Assertions.assertThat(orList.get(0).getPlayerName()).isEqualTo("banana");
+		Assertions.assertThat(orList.get(0).getTeamName()).isEqualTo("OrangeTeam");
+		Assertions.assertThat(orList.get(1).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(orList.get(1).getStatusType()).isEqualTo(StatusType.REJECT);
+		Assertions.assertThat(orList.get(1).getPlayerName()).isEqualTo("kiwi");
+		Assertions.assertThat(orList.get(1).getTeamName()).isEqualTo("OrangeTeam");
+		Assertions.assertThat(orList.get(2).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(orList.get(2).getStatusType()).isEqualTo(StatusType.REJECT);
+		Assertions.assertThat(orList.get(2).getPlayerName()).isEqualTo("paprika");
+		Assertions.assertThat(orList.get(2).getTeamName()).isEqualTo("OrangeTeam");
+		Assertions.assertThatThrownBy(() -> irList.get(0)).isInstanceOf(IndexOutOfBoundsException.class);
+		
+		Page<JoinDto> yaResults = joinRepositoryCustom.findJoinOffer(playerApprovalCondition, null, yteam.getId(), sortUpdate);
+		List<JoinDto> yaList = yaResults.getContent();
+		Page<JoinDto> iaResults = joinRepositoryCustom.findJoinOffer(playerApprovalCondition, null, iteam.getId(), sortUpdate);
+		List<JoinDto> iaList = iaResults.getContent();
+		Assertions.assertThat(yaList.get(0).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(yaList.get(0).getStatusType()).isEqualTo(StatusType.APPROVAL);
+		Assertions.assertThat(yaList.get(0).getPlayerName()).isEqualTo("apple");
+		Assertions.assertThat(yaList.get(0).getTeamName()).isEqualTo("YellowTeam");
+		Assertions.assertThat(yaList.get(1).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(yaList.get(1).getStatusType()).isEqualTo(StatusType.APPROVAL);
+		Assertions.assertThat(yaList.get(1).getPlayerName()).isEqualTo("graph");
+		Assertions.assertThat(yaList.get(1).getTeamName()).isEqualTo("YellowTeam");
+		Assertions.assertThat(yaList.get(2).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(yaList.get(2).getStatusType()).isEqualTo(StatusType.APPROVAL);
+		Assertions.assertThat(yaList.get(2).getPlayerName()).isEqualTo("mango");
+		Assertions.assertThat(yaList.get(2).getTeamName()).isEqualTo("YellowTeam");
+		Assertions.assertThat(yaList.get(3).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(yaList.get(3).getStatusType()).isEqualTo(StatusType.APPROVAL);
+		Assertions.assertThat(yaList.get(3).getPlayerName()).isEqualTo("tomato");
+		Assertions.assertThat(yaList.get(3).getTeamName()).isEqualTo("YellowTeam");
+		Assertions.assertThatThrownBy(() -> iaList.get(0)).isInstanceOf(IndexOutOfBoundsException.class);
+		
+		Page<JoinDto> gwResults = joinRepositoryCustom.findJoinOffer(playerWithdrawCondition, null, gteam.getId(), sortUpdate);
+		List<JoinDto> gwList = gwResults.getContent();
+		Page<JoinDto> iwResults = joinRepositoryCustom.findJoinOffer(playerWithdrawCondition, null, iteam.getId(), sortUpdate);
+		List<JoinDto> iwList = iwResults.getContent();
+		Assertions.assertThat(gwList.get(0).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(gwList.get(0).getStatusType()).isEqualTo(StatusType.WITHDRAW);
+		Assertions.assertThat(gwList.get(0).getPlayerName()).isEqualTo("banana");
+		Assertions.assertThat(gwList.get(0).getTeamName()).isEqualTo("GreenTeam");
+		Assertions.assertThat(gwList.get(1).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(gwList.get(1).getStatusType()).isEqualTo(StatusType.WITHDRAW);
+		Assertions.assertThat(gwList.get(1).getPlayerName()).isEqualTo("kiwi");
+		Assertions.assertThat(gwList.get(1).getTeamName()).isEqualTo("GreenTeam");
+		Assertions.assertThat(gwList.get(2).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(gwList.get(2).getStatusType()).isEqualTo(StatusType.WITHDRAW);
+		Assertions.assertThat(gwList.get(2).getPlayerName()).isEqualTo("paprika");
+		Assertions.assertThat(gwList.get(2).getTeamName()).isEqualTo("GreenTeam");
+		Assertions.assertThatThrownBy(() -> iwList.get(0)).isInstanceOf(IndexOutOfBoundsException.class);
+		
+		Page<JoinDto> brResults = joinRepositoryCustom.findJoinOffer(playerReturnCondition, null, bteam.getId(), sortUpdate);
+		List<JoinDto> brList = brResults.getContent();
+		Page<JoinDto> iRResults = joinRepositoryCustom.findJoinOffer(playerReturnCondition, null, iteam.getId(), sortUpdate);
+		List<JoinDto> iRList = iRResults.getContent();
+		Assertions.assertThat(brList.get(0).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(brList.get(0).getStatusType()).isEqualTo(StatusType.RETURN);
+		Assertions.assertThat(brList.get(0).getPlayerName()).isEqualTo("apple");
+		Assertions.assertThat(brList.get(0).getTeamName()).isEqualTo("BlueTeam");
+		Assertions.assertThat(brList.get(1).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(brList.get(1).getStatusType()).isEqualTo(StatusType.RETURN);
+		Assertions.assertThat(brList.get(1).getPlayerName()).isEqualTo("graph");
+		Assertions.assertThat(brList.get(1).getTeamName()).isEqualTo("BlueTeam");
+		Assertions.assertThat(brList.get(2).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(brList.get(2).getStatusType()).isEqualTo(StatusType.RETURN);
+		Assertions.assertThat(brList.get(2).getPlayerName()).isEqualTo("mango");
+		Assertions.assertThat(brList.get(2).getTeamName()).isEqualTo("BlueTeam");
+		Assertions.assertThat(brList.get(3).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(brList.get(3).getStatusType()).isEqualTo(StatusType.RETURN);
+		Assertions.assertThat(brList.get(3).getPlayerName()).isEqualTo("tomato");
+		Assertions.assertThat(brList.get(3).getTeamName()).isEqualTo("BlueTeam");
+		Assertions.assertThatThrownBy(() -> iRList.get(0)).isInstanceOf(IndexOutOfBoundsException.class);
+		
+		Page<JoinDto> pcResults = joinRepositoryCustom.findJoinOffer(playerConfirmationCondition, null, pteam.getId(), sortUpdate);
+		List<JoinDto> pcList = pcResults.getContent();
+		Page<JoinDto> icResults = joinRepositoryCustom.findJoinOffer(playerConfirmationCondition, null, iteam.getId(), sortUpdate);
+		List<JoinDto> icList = icResults.getContent();
+		Assertions.assertThat(pcList.get(0).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(pcList.get(0).getStatusType()).isEqualTo(StatusType.CONFIRMATION);
+		Assertions.assertThat(pcList.get(0).getPlayerName()).isEqualTo("apple");
+		Assertions.assertThat(pcList.get(0).getTeamName()).isEqualTo("PurpleTeam");
+		Assertions.assertThat(pcList.get(1).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(pcList.get(1).getStatusType()).isEqualTo(StatusType.CONFIRMATION);
+		Assertions.assertThat(pcList.get(1).getPlayerName()).isEqualTo("graph");
+		Assertions.assertThat(pcList.get(1).getTeamName()).isEqualTo("PurpleTeam");
+		Assertions.assertThat(pcList.get(2).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(pcList.get(2).getStatusType()).isEqualTo(StatusType.CONFIRMATION);
+		Assertions.assertThat(pcList.get(2).getPlayerName()).isEqualTo("mango");
+		Assertions.assertThat(pcList.get(2).getTeamName()).isEqualTo("PurpleTeam");
+		Assertions.assertThat(pcList.get(3).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(pcList.get(3).getStatusType()).isEqualTo(StatusType.CONFIRMATION);
+		Assertions.assertThat(pcList.get(3).getPlayerName()).isEqualTo("tomato");
+		Assertions.assertThat(pcList.get(3).getTeamName()).isEqualTo("PurpleTeam");
+		Assertions.assertThatThrownBy(() -> icList.get(0)).isInstanceOf(IndexOutOfBoundsException.class);
+		
+		//
+		Page<JoinDto> APResults = joinRepositoryCustom.findJoinOffer(teamProposalCondition, apple.getId(), null, sortUpdate);
+		List<JoinDto> APList = APResults.getContent();
+		Page<JoinDto> MPResults = joinRepositoryCustom.findJoinOffer(teamProposalCondition, mango.getId(), null, sortUpdate);
+		List<JoinDto> MPList = MPResults.getContent();
+		Assertions.assertThat(APList.get(0).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(APList.get(0).getStatusType()).isEqualTo(StatusType.PROPOSAL);
+		Assertions.assertThat(APList.get(0).getPlayerName()).isEqualTo("apple");
+		Assertions.assertThat(APList.get(0).getTeamName()).isEqualTo("RedTeam");
+		Assertions.assertThat(APList.get(1).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(APList.get(1).getStatusType()).isEqualTo(StatusType.PROPOSAL);
+		Assertions.assertThat(APList.get(1).getPlayerName()).isEqualTo("apple");
+		Assertions.assertThat(APList.get(1).getTeamName()).isEqualTo("YellowTeam");
+		Assertions.assertThat(APList.get(2).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(APList.get(2).getStatusType()).isEqualTo(StatusType.PROPOSAL);
+		Assertions.assertThat(APList.get(2).getPlayerName()).isEqualTo("apple");
+		Assertions.assertThat(APList.get(2).getTeamName()).isEqualTo("BlueTeam");
+		Assertions.assertThat(APList.get(3).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(APList.get(3).getStatusType()).isEqualTo(StatusType.PROPOSAL);
+		Assertions.assertThat(APList.get(3).getPlayerName()).isEqualTo("apple");
+		Assertions.assertThat(APList.get(3).getTeamName()).isEqualTo("PurpleTeam");
+		Assertions.assertThatThrownBy(() -> MPList.get(0)).isInstanceOf(IndexOutOfBoundsException.class);
+		
+		Page<JoinDto> BRResults = joinRepositoryCustom.findJoinOffer(teamRejectCondition, banana.getId(), null, sortUpdate);
+		List<JoinDto> BRList = BRResults.getContent();
+		Page<JoinDto> MRResults = joinRepositoryCustom.findJoinOffer(teamRejectCondition, banana.getId(), null, sortUpdate);
+		List<JoinDto> MRList = MRResults.getContent();
+		Assertions.assertThat(BRList.get(0).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(BRList.get(0).getStatusType()).isEqualTo(StatusType.REJECT);
+		Assertions.assertThat(BRList.get(0).getPlayerName()).isEqualTo("banana");
+		Assertions.assertThat(BRList.get(0).getTeamName()).isEqualTo("OrangeTeam");
+		Assertions.assertThat(BRList.get(1).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(BRList.get(1).getStatusType()).isEqualTo(StatusType.REJECT);
+		Assertions.assertThat(BRList.get(1).getPlayerName()).isEqualTo("banana");
+		Assertions.assertThat(BRList.get(1).getTeamName()).isEqualTo("GreenTeam");
+		Assertions.assertThat(BRList.get(2).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(BRList.get(2).getStatusType()).isEqualTo(StatusType.REJECT);
+		Assertions.assertThat(BRList.get(2).getPlayerName()).isEqualTo("banana");
+		Assertions.assertThat(BRList.get(2).getTeamName()).isEqualTo("IdigoTeam");
+		Assertions.assertThatThrownBy(() -> MRList.get(0)).isInstanceOf(IndexOutOfBoundsException.class);
+		
+		Page<JoinDto> GAResults = joinRepositoryCustom.findJoinOffer(playerApprovalCondition, null, yteam.getId(), sortUpdate);
+		List<JoinDto> GAList = GAResults.getContent();
+		Page<JoinDto> MAResults = joinRepositoryCustom.findJoinOffer(playerApprovalCondition, null, iteam.getId(), sortUpdate);
+		List<JoinDto> MAList = MAResults.getContent();
+		Assertions.assertThat(GAList.get(0).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(GAList.get(0).getStatusType()).isEqualTo(StatusType.APPROVAL);
+		Assertions.assertThat(GAList.get(0).getPlayerName()).isEqualTo("graph");
+		Assertions.assertThat(GAList.get(0).getTeamName()).isEqualTo("RedTeam");
+		Assertions.assertThat(GAList.get(1).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(GAList.get(1).getStatusType()).isEqualTo(StatusType.APPROVAL);
+		Assertions.assertThat(GAList.get(1).getPlayerName()).isEqualTo("graph");
+		Assertions.assertThat(GAList.get(1).getTeamName()).isEqualTo("YellowTeam");
+		Assertions.assertThat(GAList.get(2).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(GAList.get(2).getStatusType()).isEqualTo(StatusType.APPROVAL);
+		Assertions.assertThat(GAList.get(2).getPlayerName()).isEqualTo("graph");
+		Assertions.assertThat(GAList.get(2).getTeamName()).isEqualTo("BlueTeam");
+		Assertions.assertThat(GAList.get(3).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(GAList.get(3).getStatusType()).isEqualTo(StatusType.APPROVAL);
+		Assertions.assertThat(GAList.get(3).getPlayerName()).isEqualTo("graph");
+		Assertions.assertThat(GAList.get(3).getTeamName()).isEqualTo("PurpleTeam");
+		Assertions.assertThatThrownBy(() -> MAList.get(0)).isInstanceOf(IndexOutOfBoundsException.class);
+		
+		Page<JoinDto> KWResults = joinRepositoryCustom.findJoinOffer(teamWithdrawCondition, null, gteam.getId(), sortUpdate);
+		List<JoinDto> KWList = KWResults.getContent();
+		Page<JoinDto> MWResults = joinRepositoryCustom.findJoinOffer(teamWithdrawCondition, null, iteam.getId(), sortUpdate);
+		List<JoinDto> MWList = MWResults.getContent();
+		Assertions.assertThat(KWList.get(0).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(KWList.get(0).getStatusType()).isEqualTo(StatusType.WITHDRAW);
+		Assertions.assertThat(KWList.get(0).getPlayerName()).isEqualTo("kiwi");
+		Assertions.assertThat(KWList.get(0).getTeamName()).isEqualTo("OrangeTeam");
+		Assertions.assertThat(KWList.get(1).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(KWList.get(1).getStatusType()).isEqualTo(StatusType.WITHDRAW);
+		Assertions.assertThat(KWList.get(1).getPlayerName()).isEqualTo("kiwi");
+		Assertions.assertThat(KWList.get(1).getTeamName()).isEqualTo("GreenTeam");
+		Assertions.assertThat(KWList.get(2).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(KWList.get(2).getStatusType()).isEqualTo(StatusType.WITHDRAW);
+		Assertions.assertThat(KWList.get(2).getPlayerName()).isEqualTo("kiwi");
+		Assertions.assertThat(KWList.get(2).getTeamName()).isEqualTo("IndigoTeam");
+		Assertions.assertThatThrownBy(() -> MWList.get(0)).isInstanceOf(IndexOutOfBoundsException.class);
+		
+		Page<JoinDto> PRResults = joinRepositoryCustom.findJoinOffer(teamReturnCondition, null, bteam.getId(), sortUpdate);
+		List<JoinDto> PRList = PRResults.getContent();
+		Page<JoinDto> MReResults = joinRepositoryCustom.findJoinOffer(teamReturnCondition, null, iteam.getId(), sortUpdate);
+		List<JoinDto> MReList = MReResults.getContent();
+		Assertions.assertThat(PRList.get(0).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(PRList.get(0).getStatusType()).isEqualTo(StatusType.RETURN);
+		Assertions.assertThat(PRList.get(0).getPlayerName()).isEqualTo("paprika");
+		Assertions.assertThat(PRList.get(0).getTeamName()).isEqualTo("RendTeam");
+		Assertions.assertThat(PRList.get(1).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(PRList.get(1).getStatusType()).isEqualTo(StatusType.RETURN);
+		Assertions.assertThat(PRList.get(1).getPlayerName()).isEqualTo("paprika");
+		Assertions.assertThat(PRList.get(1).getTeamName()).isEqualTo("YellowTeam");
+		Assertions.assertThat(PRList.get(2).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(PRList.get(2).getStatusType()).isEqualTo(StatusType.RETURN);
+		Assertions.assertThat(PRList.get(2).getPlayerName()).isEqualTo("paprika");
+		Assertions.assertThat(PRList.get(2).getTeamName()).isEqualTo("BlueTeam");
+		Assertions.assertThat(PRList.get(3).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(PRList.get(3).getStatusType()).isEqualTo(StatusType.RETURN);
+		Assertions.assertThat(PRList.get(3).getPlayerName()).isEqualTo("paprika");
+		Assertions.assertThat(PRList.get(3).getTeamName()).isEqualTo("PurpleTeam");
+		Assertions.assertThatThrownBy(() -> MReList.get(0)).isInstanceOf(IndexOutOfBoundsException.class);
+		
+		Page<JoinDto> TCResults = joinRepositoryCustom.findJoinOffer(playerConfirmationCondition, null, pteam.getId(), sortUpdate);
+		List<JoinDto> TCList = TCResults.getContent();
+		Page<JoinDto> MCResults = joinRepositoryCustom.findJoinOffer(playerConfirmationCondition, null, iteam.getId(), sortUpdate);
+		List<JoinDto> MCList = MCResults.getContent();
+		Assertions.assertThat(TCList.get(0).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(TCList.get(0).getStatusType()).isEqualTo(StatusType.CONFIRMATION);
+		Assertions.assertThat(TCList.get(0).getPlayerName()).isEqualTo("tomato");
+		Assertions.assertThat(TCList.get(0).getTeamName()).isEqualTo("OrangeTeam");
+		Assertions.assertThat(TCList.get(1).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(TCList.get(1).getStatusType()).isEqualTo(StatusType.CONFIRMATION);
+		Assertions.assertThat(TCList.get(1).getPlayerName()).isEqualTo("tomato");
+		Assertions.assertThat(TCList.get(1).getTeamName()).isEqualTo("GreenTeam");
+		Assertions.assertThat(TCList.get(2).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(TCList.get(2).getStatusType()).isEqualTo(StatusType.CONFIRMATION);
+		Assertions.assertThat(TCList.get(2).getPlayerName()).isEqualTo("tomato");
+		Assertions.assertThat(TCList.get(2).getTeamName()).isEqualTo("IndigoTeam");
+		Assertions.assertThatThrownBy(() -> MCList.get(0)).isInstanceOf(IndexOutOfBoundsException.class);
+		
+		// Sorting의 순서대로 잘 나오는지
+		
+				
 	}
 }
