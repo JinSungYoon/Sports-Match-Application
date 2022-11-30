@@ -133,11 +133,14 @@ public class JoinRepositoryUnitTest {
 		expectPlayer1List.add(new JoinDto(player4.toDto(),rTeam.toDto(),RequesterType.PLAYER,StatusType.PROPOSAL));
 		
 		JoinSearchCondition condition = new JoinSearchCondition();
+		condition.setRequesterType(RequesterType.PLAYER);
 		condition.setStatusType(StatusType.PROPOSAL);
 		
 		// when
-		Page<JoinDto> rtnList = joinRepositoryCustom.findPlayerJoinApplication(condition, 1L, pageRequest);
-
+		
+		Page<JoinDto> rtnResults = joinRepositoryCustom.findJoinApplication(condition, 1L,null, pageRequest);
+		List<JoinDto> rtnList = rtnResults.getContent();
+		
 		System.out.println("Result : "+rtnList);
 		
 		// then
@@ -147,11 +150,11 @@ public class JoinRepositoryUnitTest {
 			System.out.println("updateDate : "+dto.getUpdatedDate());
 		}
 		
-		Assertions.assertThat(rtnList.getContent().get(0).getTeamId()).isEqualTo(3L);
-		Assertions.assertThat(rtnList.getContent().get(1).getTeamId()).isEqualTo(4L);
-		Assertions.assertThat(rtnList.getContent().get(0).getRequesterType()).isEqualTo(RequesterType.PLAYER);
-		Assertions.assertThat(rtnList.getContent().get(0).getStatusType()).isEqualTo(StatusType.PROPOSAL);
-		Assertions.assertThat(rtnList.getContent().get(0).getActiveYN()).isEqualTo('Y');
+		Assertions.assertThat(rtnList.get(0).getTeamId()).isEqualTo(3L);
+		Assertions.assertThat(rtnList.get(1).getTeamId()).isEqualTo(4L);
+		Assertions.assertThat(rtnList.get(0).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(rtnList.get(0).getStatusType()).isEqualTo(StatusType.PROPOSAL);
+		Assertions.assertThat(rtnList.get(0).getActiveYN()).isEqualTo('Y');
 		
 	}
 	
@@ -204,9 +207,10 @@ public class JoinRepositoryUnitTest {
 		PageRequest pageRequest = PageRequest.of(0, 2);
 		
 		JoinSearchCondition condition = new JoinSearchCondition();
+		condition.setRequesterType(RequesterType.TEAM);
 		condition.setStatusType(StatusType.PROPOSAL);
 		
-		Page<JoinDto> rtnList = joinRepositoryCustom.findTeamJoinApplication(condition, 2L, pageRequest);
+		Page<JoinDto> rtnList = joinRepositoryCustom.findJoinApplication(condition, null, 2L, pageRequest);
 		
 		for(JoinDto dto : rtnList) {
 			System.out.println("dto = "+dto);
@@ -332,7 +336,8 @@ public class JoinRepositoryUnitTest {
 		condition.setStatusType(StatusType.PROPOSAL);
 		condition.setActiveYN('Y');
 		
-		PageRequest page = PageRequest.of(0, 10, Sort.by("updatedDate").descending().and(Sort.by("joinId")));
+		//PageRequest page = PageRequest.of(0, 10, Sort.by("updatedDate").descending().and(Sort.by("joinId")));
+		PageRequest page = PageRequest.of(0, 10, Sort.by("id"));
 		
 		Page<JoinDto> aResults = joinRepositoryCustom.findJoinApplication(condition, apple.getId(), null, page);
 		List<JoinDto> list = aResults.getContent();
@@ -722,10 +727,10 @@ public class JoinRepositoryUnitTest {
 		JoinEntity TRJ3 = new JoinEntity(RequesterType.TEAM,StatusType.REJECT,banana,iteam);
 		
 		// Team, Approval(홀수)
-		JoinEntity TA1 = new JoinEntity(RequesterType.PLAYER,StatusType.APPROVAL,graph,rteam);
-		JoinEntity TA2 = new JoinEntity(RequesterType.PLAYER,StatusType.APPROVAL,graph,yteam);
-		JoinEntity TA3 = new JoinEntity(RequesterType.PLAYER,StatusType.APPROVAL,graph,bteam);
-		JoinEntity TA4 = new JoinEntity(RequesterType.PLAYER,StatusType.APPROVAL,graph,pteam);
+		JoinEntity TA1 = new JoinEntity(RequesterType.TEAM,StatusType.APPROVAL,graph,rteam);
+		JoinEntity TA2 = new JoinEntity(RequesterType.TEAM,StatusType.APPROVAL,graph,yteam);
+		JoinEntity TA3 = new JoinEntity(RequesterType.TEAM,StatusType.APPROVAL,graph,bteam);
+		JoinEntity TA4 = new JoinEntity(RequesterType.TEAM,StatusType.APPROVAL,graph,pteam);
 
 		// Team, Withdraw(짝수)
 		JoinEntity TW1 = new JoinEntity(RequesterType.TEAM,StatusType.WITHDRAW,kiwi,oteam);
@@ -837,7 +842,8 @@ public class JoinRepositoryUnitTest {
 		teamConfirmationCondition.setStatusType(StatusType.CONFIRMATION);
 		teamConfirmationCondition.setActiveYN('Y');
 		
-		PageRequest sortUpdate = PageRequest.of(0, 10, Sort.by("updatedDate").descending().and(Sort.by("id")));
+		//PageRequest sortUpdate = PageRequest.of(0, 10, Sort.by("updatedDate").descending().and(Sort.by("id")));
+		PageRequest sortUpdate = PageRequest.of(0, 10, Sort.by("id"));
 		PageRequest sortPlayer = PageRequest.of(0, 10, Sort.by("player.playerName").descending().and(Sort.by("id")));
 		PageRequest sortTeam = PageRequest.of(0, 10, Sort.by("team.teamName").descending().and(Sort.by("id")));
 		
@@ -890,7 +896,7 @@ public class JoinRepositoryUnitTest {
 		List<JoinDto> iaList = iaResults.getContent();
 		Assertions.assertThat(yaList.get(0).getRequesterType()).isEqualTo(RequesterType.PLAYER);
 		Assertions.assertThat(yaList.get(0).getStatusType()).isEqualTo(StatusType.APPROVAL);
-		Assertions.assertThat(yaList.get(0).getPlayerName()).isEqualTo("apple");
+		Assertions.assertThat(yaList.get(0).getPlayerName()).isEqualTo("apple"); //
 		Assertions.assertThat(yaList.get(0).getTeamName()).isEqualTo("YellowTeam");
 		Assertions.assertThat(yaList.get(1).getRequesterType()).isEqualTo(RequesterType.PLAYER);
 		Assertions.assertThat(yaList.get(1).getStatusType()).isEqualTo(StatusType.APPROVAL);
@@ -952,20 +958,16 @@ public class JoinRepositoryUnitTest {
 		List<JoinDto> icList = icResults.getContent();
 		Assertions.assertThat(pcList.get(0).getRequesterType()).isEqualTo(RequesterType.PLAYER);
 		Assertions.assertThat(pcList.get(0).getStatusType()).isEqualTo(StatusType.CONFIRMATION);
-		Assertions.assertThat(pcList.get(0).getPlayerName()).isEqualTo("apple");
+		Assertions.assertThat(pcList.get(0).getPlayerName()).isEqualTo("banana");
 		Assertions.assertThat(pcList.get(0).getTeamName()).isEqualTo("PurpleTeam");
 		Assertions.assertThat(pcList.get(1).getRequesterType()).isEqualTo(RequesterType.PLAYER);
 		Assertions.assertThat(pcList.get(1).getStatusType()).isEqualTo(StatusType.CONFIRMATION);
-		Assertions.assertThat(pcList.get(1).getPlayerName()).isEqualTo("graph");
+		Assertions.assertThat(pcList.get(1).getPlayerName()).isEqualTo("kiwi");
 		Assertions.assertThat(pcList.get(1).getTeamName()).isEqualTo("PurpleTeam");
 		Assertions.assertThat(pcList.get(2).getRequesterType()).isEqualTo(RequesterType.PLAYER);
 		Assertions.assertThat(pcList.get(2).getStatusType()).isEqualTo(StatusType.CONFIRMATION);
-		Assertions.assertThat(pcList.get(2).getPlayerName()).isEqualTo("mango");
+		Assertions.assertThat(pcList.get(2).getPlayerName()).isEqualTo("paprika");
 		Assertions.assertThat(pcList.get(2).getTeamName()).isEqualTo("PurpleTeam");
-		Assertions.assertThat(pcList.get(3).getRequesterType()).isEqualTo(RequesterType.PLAYER);
-		Assertions.assertThat(pcList.get(3).getStatusType()).isEqualTo(StatusType.CONFIRMATION);
-		Assertions.assertThat(pcList.get(3).getPlayerName()).isEqualTo("tomato");
-		Assertions.assertThat(pcList.get(3).getTeamName()).isEqualTo("PurpleTeam");
 		Assertions.assertThatThrownBy(() -> icList.get(0)).isInstanceOf(IndexOutOfBoundsException.class);
 		
 		//
@@ -973,19 +975,19 @@ public class JoinRepositoryUnitTest {
 		List<JoinDto> APList = APResults.getContent();
 		Page<JoinDto> MPResults = joinRepositoryCustom.findJoinOffer(teamProposalCondition, mango.getId(), null, sortUpdate);
 		List<JoinDto> MPList = MPResults.getContent();
-		Assertions.assertThat(APList.get(0).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(APList.get(0).getRequesterType()).isEqualTo(RequesterType.TEAM);
 		Assertions.assertThat(APList.get(0).getStatusType()).isEqualTo(StatusType.PROPOSAL);
 		Assertions.assertThat(APList.get(0).getPlayerName()).isEqualTo("apple");
 		Assertions.assertThat(APList.get(0).getTeamName()).isEqualTo("RedTeam");
-		Assertions.assertThat(APList.get(1).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(APList.get(1).getRequesterType()).isEqualTo(RequesterType.TEAM);
 		Assertions.assertThat(APList.get(1).getStatusType()).isEqualTo(StatusType.PROPOSAL);
 		Assertions.assertThat(APList.get(1).getPlayerName()).isEqualTo("apple");
 		Assertions.assertThat(APList.get(1).getTeamName()).isEqualTo("YellowTeam");
-		Assertions.assertThat(APList.get(2).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(APList.get(2).getRequesterType()).isEqualTo(RequesterType.TEAM);
 		Assertions.assertThat(APList.get(2).getStatusType()).isEqualTo(StatusType.PROPOSAL);
 		Assertions.assertThat(APList.get(2).getPlayerName()).isEqualTo("apple");
 		Assertions.assertThat(APList.get(2).getTeamName()).isEqualTo("BlueTeam");
-		Assertions.assertThat(APList.get(3).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(APList.get(3).getRequesterType()).isEqualTo(RequesterType.TEAM);
 		Assertions.assertThat(APList.get(3).getStatusType()).isEqualTo(StatusType.PROPOSAL);
 		Assertions.assertThat(APList.get(3).getPlayerName()).isEqualTo("apple");
 		Assertions.assertThat(APList.get(3).getTeamName()).isEqualTo("PurpleTeam");
@@ -993,20 +995,20 @@ public class JoinRepositoryUnitTest {
 		
 		Page<JoinDto> BRResults = joinRepositoryCustom.findJoinOffer(teamRejectCondition, banana.getId(), null, sortUpdate);
 		List<JoinDto> BRList = BRResults.getContent();
-		Page<JoinDto> MRResults = joinRepositoryCustom.findJoinOffer(teamRejectCondition, banana.getId(), null, sortUpdate);
+		Page<JoinDto> MRResults = joinRepositoryCustom.findJoinOffer(teamRejectCondition, mango.getId(), null, sortUpdate);
 		List<JoinDto> MRList = MRResults.getContent();
-		Assertions.assertThat(BRList.get(0).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(BRList.get(0).getRequesterType()).isEqualTo(RequesterType.TEAM);
 		Assertions.assertThat(BRList.get(0).getStatusType()).isEqualTo(StatusType.REJECT);
 		Assertions.assertThat(BRList.get(0).getPlayerName()).isEqualTo("banana");
 		Assertions.assertThat(BRList.get(0).getTeamName()).isEqualTo("OrangeTeam");
-		Assertions.assertThat(BRList.get(1).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(BRList.get(1).getRequesterType()).isEqualTo(RequesterType.TEAM);
 		Assertions.assertThat(BRList.get(1).getStatusType()).isEqualTo(StatusType.REJECT);
 		Assertions.assertThat(BRList.get(1).getPlayerName()).isEqualTo("banana");
 		Assertions.assertThat(BRList.get(1).getTeamName()).isEqualTo("GreenTeam");
-		Assertions.assertThat(BRList.get(2).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(BRList.get(2).getRequesterType()).isEqualTo(RequesterType.TEAM);
 		Assertions.assertThat(BRList.get(2).getStatusType()).isEqualTo(StatusType.REJECT);
 		Assertions.assertThat(BRList.get(2).getPlayerName()).isEqualTo("banana");
-		Assertions.assertThat(BRList.get(2).getTeamName()).isEqualTo("IdigoTeam");
+		Assertions.assertThat(BRList.get(2).getTeamName()).isEqualTo("IndigoTeam");
 		Assertions.assertThatThrownBy(() -> MRList.get(0)).isInstanceOf(IndexOutOfBoundsException.class);
 		
 		Page<JoinDto> GAResults = joinRepositoryCustom.findJoinOffer(playerApprovalCondition, null, yteam.getId(), sortUpdate);
@@ -1015,82 +1017,158 @@ public class JoinRepositoryUnitTest {
 		List<JoinDto> MAList = MAResults.getContent();
 		Assertions.assertThat(GAList.get(0).getRequesterType()).isEqualTo(RequesterType.PLAYER);
 		Assertions.assertThat(GAList.get(0).getStatusType()).isEqualTo(StatusType.APPROVAL);
-		Assertions.assertThat(GAList.get(0).getPlayerName()).isEqualTo("graph");
-		Assertions.assertThat(GAList.get(0).getTeamName()).isEqualTo("RedTeam");
+		Assertions.assertThat(GAList.get(0).getPlayerName()).isEqualTo("apple");
+		Assertions.assertThat(GAList.get(0).getTeamName()).isEqualTo("YellowTeam");
 		Assertions.assertThat(GAList.get(1).getRequesterType()).isEqualTo(RequesterType.PLAYER);
 		Assertions.assertThat(GAList.get(1).getStatusType()).isEqualTo(StatusType.APPROVAL);
 		Assertions.assertThat(GAList.get(1).getPlayerName()).isEqualTo("graph");
 		Assertions.assertThat(GAList.get(1).getTeamName()).isEqualTo("YellowTeam");
 		Assertions.assertThat(GAList.get(2).getRequesterType()).isEqualTo(RequesterType.PLAYER);
 		Assertions.assertThat(GAList.get(2).getStatusType()).isEqualTo(StatusType.APPROVAL);
-		Assertions.assertThat(GAList.get(2).getPlayerName()).isEqualTo("graph");
-		Assertions.assertThat(GAList.get(2).getTeamName()).isEqualTo("BlueTeam");
+		Assertions.assertThat(GAList.get(2).getPlayerName()).isEqualTo("mango");
+		Assertions.assertThat(GAList.get(2).getTeamName()).isEqualTo("YellowTeam");
 		Assertions.assertThat(GAList.get(3).getRequesterType()).isEqualTo(RequesterType.PLAYER);
 		Assertions.assertThat(GAList.get(3).getStatusType()).isEqualTo(StatusType.APPROVAL);
-		Assertions.assertThat(GAList.get(3).getPlayerName()).isEqualTo("graph");
-		Assertions.assertThat(GAList.get(3).getTeamName()).isEqualTo("PurpleTeam");
+		Assertions.assertThat(GAList.get(3).getPlayerName()).isEqualTo("tomato");
+		Assertions.assertThat(GAList.get(3).getTeamName()).isEqualTo("YellowTeam");
 		Assertions.assertThatThrownBy(() -> MAList.get(0)).isInstanceOf(IndexOutOfBoundsException.class);
 		
-		Page<JoinDto> KWResults = joinRepositoryCustom.findJoinOffer(teamWithdrawCondition, null, gteam.getId(), sortUpdate);
+		Page<JoinDto> KWResults = joinRepositoryCustom.findJoinOffer(teamWithdrawCondition, kiwi.getId(), null, sortUpdate);
 		List<JoinDto> KWList = KWResults.getContent();
-		Page<JoinDto> MWResults = joinRepositoryCustom.findJoinOffer(teamWithdrawCondition, null, iteam.getId(), sortUpdate);
+		Page<JoinDto> MWResults = joinRepositoryCustom.findJoinOffer(teamWithdrawCondition, mango.getId(), null, sortUpdate);
 		List<JoinDto> MWList = MWResults.getContent();
-		Assertions.assertThat(KWList.get(0).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(KWList.get(0).getRequesterType()).isEqualTo(RequesterType.TEAM);
 		Assertions.assertThat(KWList.get(0).getStatusType()).isEqualTo(StatusType.WITHDRAW);
 		Assertions.assertThat(KWList.get(0).getPlayerName()).isEqualTo("kiwi");
 		Assertions.assertThat(KWList.get(0).getTeamName()).isEqualTo("OrangeTeam");
-		Assertions.assertThat(KWList.get(1).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(KWList.get(1).getRequesterType()).isEqualTo(RequesterType.TEAM);
 		Assertions.assertThat(KWList.get(1).getStatusType()).isEqualTo(StatusType.WITHDRAW);
 		Assertions.assertThat(KWList.get(1).getPlayerName()).isEqualTo("kiwi");
 		Assertions.assertThat(KWList.get(1).getTeamName()).isEqualTo("GreenTeam");
-		Assertions.assertThat(KWList.get(2).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(KWList.get(2).getRequesterType()).isEqualTo(RequesterType.TEAM);
 		Assertions.assertThat(KWList.get(2).getStatusType()).isEqualTo(StatusType.WITHDRAW);
 		Assertions.assertThat(KWList.get(2).getPlayerName()).isEqualTo("kiwi");
 		Assertions.assertThat(KWList.get(2).getTeamName()).isEqualTo("IndigoTeam");
 		Assertions.assertThatThrownBy(() -> MWList.get(0)).isInstanceOf(IndexOutOfBoundsException.class);
 		
-		Page<JoinDto> PRResults = joinRepositoryCustom.findJoinOffer(teamReturnCondition, null, bteam.getId(), sortUpdate);
+		Page<JoinDto> PRResults = joinRepositoryCustom.findJoinOffer(teamReturnCondition, paprika.getId(), null, sortUpdate);
 		List<JoinDto> PRList = PRResults.getContent();
-		Page<JoinDto> MReResults = joinRepositoryCustom.findJoinOffer(teamReturnCondition, null, iteam.getId(), sortUpdate);
+		Page<JoinDto> MReResults = joinRepositoryCustom.findJoinOffer(teamReturnCondition, mango.getId(), null, sortUpdate);
 		List<JoinDto> MReList = MReResults.getContent();
-		Assertions.assertThat(PRList.get(0).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(PRList.get(0).getRequesterType()).isEqualTo(RequesterType.TEAM);
 		Assertions.assertThat(PRList.get(0).getStatusType()).isEqualTo(StatusType.RETURN);
 		Assertions.assertThat(PRList.get(0).getPlayerName()).isEqualTo("paprika");
-		Assertions.assertThat(PRList.get(0).getTeamName()).isEqualTo("RendTeam");
-		Assertions.assertThat(PRList.get(1).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(PRList.get(0).getTeamName()).isEqualTo("RedTeam");
+		Assertions.assertThat(PRList.get(1).getRequesterType()).isEqualTo(RequesterType.TEAM);
 		Assertions.assertThat(PRList.get(1).getStatusType()).isEqualTo(StatusType.RETURN);
 		Assertions.assertThat(PRList.get(1).getPlayerName()).isEqualTo("paprika");
 		Assertions.assertThat(PRList.get(1).getTeamName()).isEqualTo("YellowTeam");
-		Assertions.assertThat(PRList.get(2).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(PRList.get(2).getRequesterType()).isEqualTo(RequesterType.TEAM);
 		Assertions.assertThat(PRList.get(2).getStatusType()).isEqualTo(StatusType.RETURN);
 		Assertions.assertThat(PRList.get(2).getPlayerName()).isEqualTo("paprika");
 		Assertions.assertThat(PRList.get(2).getTeamName()).isEqualTo("BlueTeam");
-		Assertions.assertThat(PRList.get(3).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(PRList.get(3).getRequesterType()).isEqualTo(RequesterType.TEAM);
 		Assertions.assertThat(PRList.get(3).getStatusType()).isEqualTo(StatusType.RETURN);
 		Assertions.assertThat(PRList.get(3).getPlayerName()).isEqualTo("paprika");
 		Assertions.assertThat(PRList.get(3).getTeamName()).isEqualTo("PurpleTeam");
 		Assertions.assertThatThrownBy(() -> MReList.get(0)).isInstanceOf(IndexOutOfBoundsException.class);
 		
-		Page<JoinDto> TCResults = joinRepositoryCustom.findJoinOffer(playerConfirmationCondition, null, pteam.getId(), sortUpdate);
+		Page<JoinDto> TCResults = joinRepositoryCustom.findJoinOffer(teamConfirmationCondition , tomato.getId(), null, sortUpdate);
 		List<JoinDto> TCList = TCResults.getContent();
-		Page<JoinDto> MCResults = joinRepositoryCustom.findJoinOffer(playerConfirmationCondition, null, iteam.getId(), sortUpdate);
+		Page<JoinDto> MCResults = joinRepositoryCustom.findJoinOffer(teamConfirmationCondition , mango.getId(), null, sortUpdate);
 		List<JoinDto> MCList = MCResults.getContent();
-		Assertions.assertThat(TCList.get(0).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(TCList.get(0).getRequesterType()).isEqualTo(RequesterType.TEAM);
 		Assertions.assertThat(TCList.get(0).getStatusType()).isEqualTo(StatusType.CONFIRMATION);
 		Assertions.assertThat(TCList.get(0).getPlayerName()).isEqualTo("tomato");
 		Assertions.assertThat(TCList.get(0).getTeamName()).isEqualTo("OrangeTeam");
-		Assertions.assertThat(TCList.get(1).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(TCList.get(1).getRequesterType()).isEqualTo(RequesterType.TEAM);
 		Assertions.assertThat(TCList.get(1).getStatusType()).isEqualTo(StatusType.CONFIRMATION);
 		Assertions.assertThat(TCList.get(1).getPlayerName()).isEqualTo("tomato");
 		Assertions.assertThat(TCList.get(1).getTeamName()).isEqualTo("GreenTeam");
-		Assertions.assertThat(TCList.get(2).getRequesterType()).isEqualTo(RequesterType.PLAYER);
+		Assertions.assertThat(TCList.get(2).getRequesterType()).isEqualTo(RequesterType.TEAM);
 		Assertions.assertThat(TCList.get(2).getStatusType()).isEqualTo(StatusType.CONFIRMATION);
 		Assertions.assertThat(TCList.get(2).getPlayerName()).isEqualTo("tomato");
 		Assertions.assertThat(TCList.get(2).getTeamName()).isEqualTo("IndigoTeam");
 		Assertions.assertThatThrownBy(() -> MCList.get(0)).isInstanceOf(IndexOutOfBoundsException.class);
 		
 		// Sorting의 순서대로 잘 나오는지
-		
+		Page<JoinDto> ppspResults = joinRepositoryCustom.findJoinOffer(playerProposalCondition , null, rteam.getId(), sortPlayer);
+		List<JoinDto> ppspList = ppspResults.getContent();
+		Assertions.assertThat(ppspList.get(0).getPlayerName()).isEqualTo("tomato");
+		Assertions.assertThat(ppspList.get(1).getPlayerName()).isEqualTo("mango");
+		Assertions.assertThat(ppspList.get(2).getPlayerName()).isEqualTo("graph");
+		Assertions.assertThat(ppspList.get(3).getPlayerName()).isEqualTo("apple");
 				
+		Page<JoinDto> prjspResults = joinRepositoryCustom.findJoinOffer(playerRejectCondition , null, oteam.getId(), sortPlayer);
+		List<JoinDto> prjspList = prjspResults.getContent();
+		Assertions.assertThat(prjspList.get(0).getPlayerName()).isEqualTo("paprika");
+		Assertions.assertThat(prjspList.get(1).getPlayerName()).isEqualTo("kiwi");
+		Assertions.assertThat(prjspList.get(2).getPlayerName()).isEqualTo("banana");
+		
+		Page<JoinDto> paspResults = joinRepositoryCustom.findJoinOffer(playerApprovalCondition , null, yteam.getId(), sortPlayer);
+		List<JoinDto> paspList = paspResults.getContent();
+		Assertions.assertThat(paspList.get(0).getPlayerName()).isEqualTo("tomato");
+		Assertions.assertThat(paspList.get(1).getPlayerName()).isEqualTo("mango");
+		Assertions.assertThat(ppspList.get(2).getPlayerName()).isEqualTo("graph");
+		Assertions.assertThat(ppspList.get(3).getPlayerName()).isEqualTo("apple");
+		
+		Page<JoinDto> pwspResults = joinRepositoryCustom.findJoinOffer(playerWithdrawCondition , null, gteam.getId(), sortPlayer);
+		List<JoinDto> pwspList = pwspResults.getContent();
+		Assertions.assertThat(pwspList.get(0).getPlayerName()).isEqualTo("paprika");
+		Assertions.assertThat(pwspList.get(1).getPlayerName()).isEqualTo("kiwi");
+		Assertions.assertThat(pwspList.get(2).getPlayerName()).isEqualTo("banana");
+		
+		Page<JoinDto> prtspResults = joinRepositoryCustom.findJoinOffer(playerReturnCondition , null, bteam.getId(), sortPlayer);
+		List<JoinDto> prtspList = prtspResults.getContent();
+		Assertions.assertThat(prtspList.get(0).getPlayerName()).isEqualTo("tomato");
+		Assertions.assertThat(prtspList.get(1).getPlayerName()).isEqualTo("mango");
+		Assertions.assertThat(prtspList.get(2).getPlayerName()).isEqualTo("graph");
+		Assertions.assertThat(prtspList.get(3).getPlayerName()).isEqualTo("apple");
+		
+		Page<JoinDto> pcspResults = joinRepositoryCustom.findJoinOffer(playerConfirmationCondition , null, pteam.getId(), sortPlayer);
+		List<JoinDto> pcspList = pcspResults.getContent();
+		Assertions.assertThat(pcspList.get(0).getPlayerName()).isEqualTo("paprika");
+		Assertions.assertThat(pcspList.get(1).getPlayerName()).isEqualTo("kiwi");
+		Assertions.assertThat(pcspList.get(2).getPlayerName()).isEqualTo("banana");
+		
+		Page<JoinDto> TPSTResults = joinRepositoryCustom.findJoinOffer(teamProposalCondition , apple.getId(), null, sortTeam);
+		List<JoinDto> TPSTList = TPSTResults.getContent();
+		Assertions.assertThat(TPSTList.get(0).getTeamName()).isEqualTo("YellowTeam");
+		Assertions.assertThat(TPSTList.get(1).getTeamName()).isEqualTo("RedTeam");
+		Assertions.assertThat(TPSTList.get(2).getTeamName()).isEqualTo("PurpleTeam");
+		Assertions.assertThat(TPSTList.get(3).getTeamName()).isEqualTo("BlueTeam");
+		
+		Page<JoinDto> TRJSTResults = joinRepositoryCustom.findJoinOffer(teamRejectCondition , banana.getId(), null, sortTeam);
+		List<JoinDto> TRJSTList = TRJSTResults.getContent();
+		Assertions.assertThat(TRJSTList.get(0).getTeamName()).isEqualTo("OrangeTeam");
+		Assertions.assertThat(TRJSTList.get(1).getTeamName()).isEqualTo("IndigoTeam");
+		Assertions.assertThat(TRJSTList.get(2).getTeamName()).isEqualTo("GreenTeam");
+		
+		Page<JoinDto> TASTResults = joinRepositoryCustom.findJoinOffer(teamApprovalCondition , graph.getId(), null, sortTeam);
+		List<JoinDto> TASTList = TASTResults.getContent();
+		Assertions.assertThat(TASTList.get(0).getTeamName()).isEqualTo("YellowTeam");
+		Assertions.assertThat(TASTList.get(1).getTeamName()).isEqualTo("RedTeam");
+		Assertions.assertThat(TASTList.get(2).getTeamName()).isEqualTo("PurpleTeam");
+		Assertions.assertThat(TASTList.get(3).getTeamName()).isEqualTo("BlueTeam");
+		
+		Page<JoinDto> TWSTResults = joinRepositoryCustom.findJoinOffer(teamWithdrawCondition , kiwi.getId(), null, sortTeam);
+		List<JoinDto> TWSTList = TWSTResults.getContent();
+		Assertions.assertThat(TWSTList.get(0).getTeamName()).isEqualTo("OrangeTeam");
+		Assertions.assertThat(TWSTList.get(1).getTeamName()).isEqualTo("IndigoTeam");
+		Assertions.assertThat(TWSTList.get(2).getTeamName()).isEqualTo("GreenTeam");
+		
+		Page<JoinDto> TRSTResults = joinRepositoryCustom.findJoinOffer(teamReturnCondition , paprika.getId(), null, sortTeam);
+		List<JoinDto> TRSTList = TRSTResults.getContent();
+		Assertions.assertThat(TRSTList.get(0).getTeamName()).isEqualTo("YellowTeam");
+		Assertions.assertThat(TRSTList.get(1).getTeamName()).isEqualTo("RedTeam");
+		Assertions.assertThat(TRSTList.get(2).getTeamName()).isEqualTo("PurpleTeam");
+		Assertions.assertThat(TRSTList.get(3).getTeamName()).isEqualTo("BlueTeam");
+		
+		Page<JoinDto> TCSTResults = joinRepositoryCustom.findJoinOffer(teamConfirmationCondition , tomato.getId(), null, sortTeam);
+		List<JoinDto> TCSTList = TCSTResults.getContent();
+		Assertions.assertThat(TCSTList.get(0).getTeamName()).isEqualTo("OrangeTeam");
+		Assertions.assertThat(TCSTList.get(1).getTeamName()).isEqualTo("IndigoTeam");
+		Assertions.assertThat(TCSTList.get(2).getTeamName()).isEqualTo("GreenTeam");
+		
 	}
 }
