@@ -86,8 +86,8 @@ public class JoinServiceUnitTest {
 		// mocking
 		when(teamRepository.findById(1L)).thenReturn(Optional.of(rTeam));
 		when(playerRepository.findById(1L)).thenReturn(Optional.of(player));
-		when(joinRepositoryCustom.findPlayerJoinApplication(condition, 1L, PageRequest.of(0, 1))).thenReturn(searchPage);
-		when(joinRepository.save(any())).thenReturn(new JoinEntity(StatusType.PROPOSAL,RequesterType.PLAYER,player,rTeam));
+		when(joinRepositoryCustom.findJoinApplication(condition, proposal.getPlayerId(), proposal.getTeamId(), PageRequest.of(0, 1))).thenReturn(searchPage);
+		when(joinRepository.save(any())).thenReturn(new JoinEntity(RequesterType.PLAYER,StatusType.PROPOSAL,player,rTeam));
 		
 		// when
 		JoinDto rtnJoin = joinService.requestPlayerJoin(1L,proposal);
@@ -124,8 +124,8 @@ public class JoinServiceUnitTest {
 		// mocking
 		when(teamRepository.findById(2L)).thenReturn(Optional.of(rTeam));
 		when(playerRepository.findById(1L)).thenReturn(Optional.of(player));
-		when(joinRepositoryCustom.findTeamJoinApplication(condition, 2L, PageRequest.of(0, 1))).thenReturn(searchPage);
-		when(joinRepository.save(any())).thenReturn(new JoinEntity(StatusType.PROPOSAL,RequesterType.TEAM,player,gTeam));
+		when(joinRepositoryCustom.findJoinApplication(condition, proposal.getPlayerId(), proposal.getTeamId(), PageRequest.of(0, 1))).thenReturn(searchPage);
+		when(joinRepository.save(any())).thenReturn(new JoinEntity(RequesterType.TEAM,StatusType.PROPOSAL,player,gTeam));
 		
 		// when
 		JoinDto rtnJoin = joinService.requestTeamJoin(2L,proposal);
@@ -151,7 +151,7 @@ public class JoinServiceUnitTest {
 		
 		JoinDto proposal1 = new JoinDto(player.toDto(),rTeam.toDto(),RequesterType.PLAYER,StatusType.PROPOSAL);
 		JoinDto proposal2 = new JoinDto(player.toDto(),rTeam.toDto(),RequesterType.PLAYER,StatusType.PROPOSAL);
-		JoinEntity expectJoin1 = new JoinEntity(StatusType.PROPOSAL,RequesterType.PLAYER,player,rTeam);
+		JoinEntity expectJoin1 = new JoinEntity(RequesterType.PLAYER,StatusType.PROPOSAL,player,rTeam);
 		
 		
 		expectJoin1.initId(1L);
@@ -167,7 +167,7 @@ public class JoinServiceUnitTest {
 		// mocking
 		when(teamRepository.findById(1L)).thenReturn(Optional.of(rTeam));
 		when(playerRepository.findById(1L)).thenReturn(Optional.of(player));
-		when(joinRepositoryCustom.findPlayerJoinApplication(condition, 1L, PageRequest.of(0, 1))).thenReturn(searchPage);
+		when(joinRepositoryCustom.findJoinApplication(condition, 1L, null, PageRequest.of(0, 1))).thenReturn(searchPage);
 		when(joinRepository.save(any())).thenReturn(expectJoin1);
 		JoinDto rtnJoin1 = joinService.requestPlayerJoin(1L,proposal1);
 		
@@ -175,7 +175,7 @@ public class JoinServiceUnitTest {
 		searchPage = new PageImpl<>(searchList,pageRequest,searchList.size());
 		when(teamRepository.findById(1L)).thenReturn(Optional.of(rTeam));
 		when(playerRepository.findById(1L)).thenReturn(Optional.of(player));
-		when(joinRepositoryCustom.findPlayerJoinApplication(condition, 1L, pageRequest)).thenReturn(searchPage);
+		when(joinRepositoryCustom.findJoinApplication(condition, 1L, null, pageRequest)).thenReturn(searchPage);
 		
 		// when
 		Exception existProposal = assertThrows(Exception.class,()->joinService.requestPlayerJoin(1L,proposal2));
@@ -210,7 +210,7 @@ public class JoinServiceUnitTest {
 		// when
 		when(teamRepository.findById(2L)).thenReturn(Optional.of(team2));
 		when(playerRepository.findById(1L)).thenReturn(Optional.of(player));
-		when(joinRepositoryCustom.findPlayerJoinOffer(condition,1L,pageRequest)).thenReturn(expectPage);
+		when(joinRepositoryCustom.findJoinOffer(condition,joinDto.getPlayerId(),joinDto.getTeamId(),pageRequest)).thenReturn(expectPage);
 		joinEntity.updateStatus(StatusType.REJECT);
 		when(joinRepository.save(any())).thenReturn(joinEntity);
 		
@@ -247,7 +247,7 @@ public class JoinServiceUnitTest {
 		// when
 		when(teamRepository.findById(any())).thenReturn(Optional.of(team2));
 		when(playerRepository.findById(any())).thenReturn(Optional.of(player));
-		when(joinRepositoryCustom.findTeamJoinOffer(condition,2L,pageRequest)).thenReturn(expectPage);
+		when(joinRepositoryCustom.findJoinOffer(condition,joinDto.getPlayerId(),joinDto.getTeamId(),pageRequest)).thenReturn(expectPage);
 		joinEntity.updateStatus(StatusType.REJECT);
 		when(joinRepository.save(any())).thenReturn(joinEntity);
 		
@@ -284,7 +284,7 @@ public class JoinServiceUnitTest {
 		// when
 		when(teamRepository.findById(2L)).thenReturn(Optional.of(team2));
 		when(playerRepository.findById(1L)).thenReturn(Optional.of(player));
-		when(joinRepositoryCustom.findPlayerJoinOffer(condition,1L,pageRequest)).thenReturn(expectPage);
+		when(joinRepositoryCustom.findJoinOffer(condition,joinDto.getPlayerId(),joinDto.getTeamId(),pageRequest)).thenReturn(expectPage);
 		entity.updateStatus(StatusType.APPROVAL);
 		when(joinRepository.save(any())).thenReturn(entity);
 		
@@ -322,7 +322,7 @@ public class JoinServiceUnitTest {
 		// when
 		when(teamRepository.findById(any())).thenReturn(Optional.of(team2));
 		when(playerRepository.findById(any())).thenReturn(Optional.of(player));
-		when(joinRepositoryCustom.findTeamJoinOffer(condition,2L,pageRequest)).thenReturn(expectPage);
+		when(joinRepositoryCustom.findJoinOffer(condition,joinDto.getPlayerId(),joinDto.getTeamId(),pageRequest)).thenReturn(expectPage);
 		entity.updateStatus(StatusType.APPROVAL);
 		when(joinRepository.save(any())).thenReturn(entity);
 		
@@ -356,11 +356,11 @@ public class JoinServiceUnitTest {
 		graph.initId(2L);
 		banana.initId(3L);
 		
-		JoinEntity join1 = new JoinEntity(StatusType.PROPOSAL,RequesterType.PLAYER,apple,rTeam);
+		JoinEntity join1 = new JoinEntity(RequesterType.PLAYER,StatusType.PROPOSAL,apple,rTeam);
 		join1.initId(1L);
-		JoinEntity join2 = new JoinEntity(StatusType.PROPOSAL,RequesterType.PLAYER,graph,pTeam);
+		JoinEntity join2 = new JoinEntity(RequesterType.PLAYER,StatusType.PROPOSAL,graph,pTeam);
 		join2.initId(2L);
-		JoinEntity join3 = new JoinEntity(StatusType.PROPOSAL,RequesterType.PLAYER,graph,yTeam);
+		JoinEntity join3 = new JoinEntity(RequesterType.PLAYER,StatusType.PROPOSAL,graph,yTeam);
 		join2.initId(3L);
 		
 		PageRequest page = PageRequest.of(0,10);
@@ -372,7 +372,7 @@ public class JoinServiceUnitTest {
 		
 		JoinSearchCondition condition = new JoinSearchCondition(StatusType.PROPOSAL,RequesterType.PLAYER,' ',null,null);
 		
-		when(joinRepositoryCustom.findPlayerJoinApplication(condition, null, page)).thenReturn(expectPage);
+		when(joinRepositoryCustom.findJoinApplication(condition, null ,null, page)).thenReturn(expectPage);
 		
 		Page<JoinDto> rtnList = joinService.searchPlayerJoinApplication(null,condition, page);
 		
@@ -401,15 +401,14 @@ public class JoinServiceUnitTest {
 		graph.initId(2L);
 		banana.initId(3L);
 		
-		JoinEntity join1 = new JoinEntity(StatusType.PROPOSAL,RequesterType.TEAM,graph,rTeam);
+		JoinEntity join1 = new JoinEntity(RequesterType.TEAM,StatusType.PROPOSAL,graph,rTeam);
 		join1.initId(1L);
-		JoinEntity join2 = new JoinEntity(StatusType.PROPOSAL,RequesterType.TEAM,graph,pTeam);
+		JoinEntity join2 = new JoinEntity(RequesterType.TEAM,StatusType.PROPOSAL,graph,pTeam);
 		join2.initId(2L);
-		JoinEntity join3 = new JoinEntity(StatusType.PROPOSAL,RequesterType.TEAM,graph,yTeam);
+		JoinEntity join3 = new JoinEntity(RequesterType.TEAM,StatusType.PROPOSAL,graph,yTeam);
 		join2.initId(3L);
-		JoinEntity join4 = new JoinEntity(StatusType.PROPOSAL,RequesterType.TEAM,banana,yTeam);
+		JoinEntity join4 = new JoinEntity(RequesterType.TEAM,StatusType.PROPOSAL,banana,yTeam);
 		join2.initId(4L);
-		
 		
 		PageRequest page = PageRequest.of(0,10);
 		List<JoinDto> expectList = new ArrayList<>();
@@ -420,7 +419,7 @@ public class JoinServiceUnitTest {
 		
 		JoinSearchCondition condition = new JoinSearchCondition(StatusType.PROPOSAL,RequesterType.TEAM,' ',null,null);
 		
-		when(joinRepositoryCustom.findPlayerJoinOffer(condition, 2L, page)).thenReturn(expectPage);
+		when(joinRepositoryCustom.findJoinOffer(condition, 2L, null, page)).thenReturn(expectPage);
 		
 		Page<JoinDto> rtnList = joinService.searchPlayerJoinOffer(2L,condition, page);
 		
@@ -461,7 +460,7 @@ public class JoinServiceUnitTest {
 		// when
 		when(teamRepository.findById(any())).thenReturn(Optional.of(steam));
 		when(playerRepository.findById(any())).thenReturn(Optional.of(player1));
-		when(joinRepositoryCustom.findPlayerJoinApplication(condition, player1.getId(), pageRequest)).thenReturn(expectPage);
+		when(joinRepositoryCustom.findJoinApplication(condition, player1.getId(),steam.getId(), pageRequest)).thenReturn(expectPage);
 		joinEntity.updateStatus(StatusType.WITHDRAW);
 		when(joinRepository.save(any())).thenReturn(joinEntity);
 		
@@ -506,7 +505,7 @@ public class JoinServiceUnitTest {
 		// when
 		when(teamRepository.findById(any())).thenReturn(Optional.of(steam));
 		when(playerRepository.findById(any())).thenReturn(Optional.of(player1));
-		when(joinRepositoryCustom.findTeamJoinApplication(condition, steam.getId(), pageRequest)).thenReturn(expectPage);
+		when(joinRepositoryCustom.findJoinApplication(condition, player1.getId() ,steam.getId(), pageRequest)).thenReturn(expectPage);
 		joinEntity.updateStatus(StatusType.WITHDRAW);
 		when(joinRepository.save(any())).thenReturn(joinEntity);
 		
@@ -558,7 +557,7 @@ public class JoinServiceUnitTest {
 		// when
 		when(teamRepository.findById(any())).thenReturn(Optional.of(steam));
 		when(playerRepository.findById(any())).thenReturn(Optional.of(player1));
-		when(joinRepositoryCustom.findPlayerJoinApplication(condition,player1.getId(),page)).thenReturn(expectPage);
+		when(joinRepositoryCustom.findJoinApplication(condition,player1.getId(),steam.getId(),page)).thenReturn(expectPage);
 		approvalEntity.updateStatus(StatusType.RETURN);
 		when(joinRepository.save(any())).thenReturn(approvalEntity);
 		
@@ -612,7 +611,7 @@ public class JoinServiceUnitTest {
 		// when
 		when(teamRepository.findById(any())).thenReturn(Optional.of(rteam));
 		when(playerRepository.findById(any())).thenReturn(Optional.of(player2));
-		when(joinRepositoryCustom.findTeamJoinApplication(condition,rteam.getId(),page)).thenReturn(expectPage);
+		when(joinRepositoryCustom.findJoinApplication(condition,player2.getId(),rteam.getId(),page)).thenReturn(expectPage);
 		approvalEntity.updateStatus(StatusType.RETURN);
 		when(joinRepository.save(any())).thenReturn(approvalEntity);
 		
@@ -679,8 +678,8 @@ public class JoinServiceUnitTest {
 		// then
 		when(teamRepository.findById(any())).thenReturn(Optional.of(gteam));
 		when(playerRepository.findById(any())).thenReturn(Optional.of(player1));
-		when(joinRepositoryCustom.findTeamJoinApplication(confirmCondition, requestJoinDto.getTeamId(), page)).thenReturn(expectConfirmPage);
-		when(joinRepositoryCustom.findTeamJoinApplication(approveCondition, gteam.getId(), page)).thenReturn(expectApprovePage);
+		when(joinRepositoryCustom.findJoinApplication(confirmCondition, requestJoinDto.getPlayerId() ,requestJoinDto.getTeamId(), page)).thenReturn(expectConfirmPage);
+		when(joinRepositoryCustom.findJoinApplication(approveCondition, approveJoinDto.getPlayerId(), approveJoinDto.getTeamId(), page)).thenReturn(expectApprovePage);
 		when(playerRepositoryCustom.findPlayer(null,null,"griffindor",page)).thenReturn(playerList);
 		approveJoinEntity.updateStatus(StatusType.CONFIRMATION);
 		lenient().doReturn(approveJoinEntity).when(joinRepository).save(any());
@@ -748,8 +747,8 @@ public class JoinServiceUnitTest {
 		// when
 		when(teamRepository.findById(any())).thenReturn(Optional.of(steam));
 		when(playerRepository.findById(any())).thenReturn(Optional.of(player1));
-		when(joinRepositoryCustom.findPlayerJoinApplication(confirmCondition, requestJoinDto.getPlayerId(), page)).thenReturn(expectConfirmPage);
-		when(joinRepositoryCustom.findPlayerJoinApplication(approveCondition, requestJoinDto.getPlayerId(), page)).thenReturn(expectApprovePage);
+		when(joinRepositoryCustom.findJoinApplication(confirmCondition, requestJoinDto.getPlayerId(), requestJoinDto.getTeamId(), page)).thenReturn(expectConfirmPage);
+		when(joinRepositoryCustom.findJoinApplication(approveCondition, approveJoinDto.getPlayerId(), approveJoinDto.getTeamId(), page)).thenReturn(expectApprovePage);
 		when(playerRepositoryCustom.findPlayer(null, null, steam.getTeamName(), page)).thenReturn(emptyPlayer);
 		approveJoinEntity.updateStatus(StatusType.CONFIRMATION);
 		lenient().doReturn(approveJoinEntity).when(joinRepository).save(any());

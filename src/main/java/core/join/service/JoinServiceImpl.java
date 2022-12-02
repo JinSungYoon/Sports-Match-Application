@@ -68,7 +68,7 @@ public class JoinServiceImpl implements JoinService {
 		condition.setStatusType(StatusType.PROPOSAL);
 		
 		// 기존에 요청한 제안 중 동일한 대상에게 제안한 활성화된 요청이 있는지 확인한다.
-		inquiryList = joinRepositoryCustom.findPlayerJoinApplication(condition, joinDto.getPlayerId(), page);
+		inquiryList = joinRepositoryCustom.findJoinApplication(condition, joinDto.getPlayerId(), joinDto.getTeamId(), page);
 		
 		if(inquiryList.getTotalElements()>0) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"이미 요청한 제안입니다.",new Exception());
@@ -105,7 +105,7 @@ public class JoinServiceImpl implements JoinService {
 		condition.setStatusType(StatusType.PROPOSAL);
 		
 		// 기존에 요청한 제안 중 동일한 대상에게 제안한 활성화된 요청이 있는지 확인한다.
-		inquiryList = joinRepositoryCustom.findTeamJoinApplication(condition, joinDto.getTeamId(), page);
+		inquiryList = joinRepositoryCustom.findJoinApplication(condition, joinDto.getPlayerId() ,joinDto.getTeamId(), page);
 		
 		if(inquiryList.getTotalElements()>0) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"이미 요청한 제안입니다.",new Exception());
@@ -137,7 +137,7 @@ public class JoinServiceImpl implements JoinService {
 		condition.setStatusType(StatusType.PROPOSAL);
 		
 		// 거절할 제안이 있는지 확인.
-		inquiryList = joinRepositoryCustom.findPlayerJoinOffer(condition, joinDto.getPlayerId(), page);
+		inquiryList = joinRepositoryCustom.findJoinOffer(condition, joinDto.getPlayerId(), joinDto.getTeamId(), page);
 		
 		JoinEntity proposal = inquiryList.getContent().stream()
 				.filter(d->d.getTeamId()==joinDto.getTeamId())
@@ -167,7 +167,7 @@ public class JoinServiceImpl implements JoinService {
 		condition.setStatusType(StatusType.PROPOSAL);
 		
 		// 거절할 제안이 있는지 확인.
-		inquiryList = joinRepositoryCustom.findTeamJoinOffer(condition, joinDto.getTeamId(), page);
+		inquiryList = joinRepositoryCustom.findJoinOffer(condition, joinDto.getPlayerId(), joinDto.getTeamId(), page);
 		
 		JoinEntity proposal = inquiryList.getContent().stream()
 				.filter(d->d.getPlayerId()==joinDto.getPlayerId())
@@ -196,7 +196,7 @@ public class JoinServiceImpl implements JoinService {
 		condition.setStatusType(StatusType.PROPOSAL);
 		
 		// Player에게 제안한 요청이 있는지 확인.
-		inquiryList = joinRepositoryCustom.findPlayerJoinOffer(condition, joinDto.getPlayerId(), page);
+		inquiryList = joinRepositoryCustom.findJoinOffer(condition, joinDto.getPlayerId(), joinDto.getTeamId(), page);
 		
 		JoinEntity proposal = inquiryList.getContent().stream()
 				.filter(d->d.getPlayerId()==joinDto.getPlayerId())
@@ -225,7 +225,7 @@ public class JoinServiceImpl implements JoinService {
 		condition.setStatusType(StatusType.PROPOSAL);
 		
 		// Team에게 제안한 요청이 있는지 확인.
-		inquiryList = joinRepositoryCustom.findTeamJoinOffer(condition, joinDto.getTeamId(), page);
+		inquiryList = joinRepositoryCustom.findJoinOffer(condition, joinDto.getPlayerId(), joinDto.getTeamId(), page);
 		
 		JoinEntity proposal = inquiryList.getContent().stream()
 				.filter(d->d.getPlayerId()==joinDto.getPlayerId())
@@ -254,7 +254,7 @@ public class JoinServiceImpl implements JoinService {
 		condition.setStatusType(StatusType.APPROVAL);
 		
 		// Player가 승인한 요청이 있는지 확인.
-		inquiryList = joinRepositoryCustom.findPlayerJoinApplication(condition, joinDto.getPlayerId(), page);
+		inquiryList = joinRepositoryCustom.findJoinApplication(condition, joinDto.getPlayerId(), joinDto.getTeamId(), page);
 		
 		JoinEntity approval = inquiryList.getContent().stream()
 													.filter(d->d.getTeamId()==joinDto.getTeamId())
@@ -283,7 +283,7 @@ public class JoinServiceImpl implements JoinService {
 		condition.setRequesterType(RequesterType.TEAM);
 		condition.setStatusType(StatusType.APPROVAL);
 		
-		inquiryList = joinRepositoryCustom.findTeamJoinApplication(condition, joinDto.getTeamId(), page);
+		inquiryList = joinRepositoryCustom.findJoinApplication(condition, joinDto.getPlayerId(), joinDto.getTeamId(), page);
 		
 		JoinEntity approval = inquiryList.getContent().stream()
 													.filter(d->d.getPlayerId()==joinDto.getPlayerId())
@@ -315,7 +315,7 @@ public class JoinServiceImpl implements JoinService {
 		condition.setFromToDate(LocalDateTime.now(clock), before, diffDays);
 		
 		// 신청(Player) -> 승인(Team) -> 반려(Player)
-		inquiryList = joinRepositoryCustom.findPlayerJoinApplication(condition, player.getId(), page);
+		inquiryList = joinRepositoryCustom.findJoinApplication(condition, joinDto.getPlayerId(), joinDto.getTeamId(), page);
 
 		JoinEntity approval = inquiryList.getContent().stream()
 														.filter(d->d.getTeamId() == joinDto.getTeamId())
@@ -345,7 +345,7 @@ public class JoinServiceImpl implements JoinService {
 		condition.setFromToDate(LocalDateTime.now(clock), before, diffDays);
 		
 		// 신청(Team) -> 승인(Player) -> 반려(Team)
-		inquiryList = joinRepositoryCustom.findTeamJoinApplication(condition, team.getId(), page);
+		inquiryList = joinRepositoryCustom.findJoinApplication(condition, joinDto.getPlayerId(), joinDto.getTeamId(), page);
 
 		JoinEntity approval = inquiryList.getContent().stream()
 														.filter(d->d.getPlayerId() == joinDto.getPlayerId())
@@ -374,7 +374,7 @@ public class JoinServiceImpl implements JoinService {
 		approvalCondition.setRequesterType(RequesterType.TEAM);
 		approvalCondition.setStatusType(StatusType.CONFIRMATION);
 		
-		inquiryList = joinRepositoryCustom.findTeamJoinApplication(approvalCondition, joinDto.getTeamId(), page);
+		inquiryList = joinRepositoryCustom.findJoinApplication(approvalCondition, joinDto.getPlayerId(), joinDto.getTeamId(), page);
 		
 		// 만일 기존에 확정한 요청이 있다면 확정 요청은 철회한다.
 		if(inquiryList.getTotalElements()>0) {
@@ -395,7 +395,7 @@ public class JoinServiceImpl implements JoinService {
 		clock = Clock.systemDefaultZone();
 		confirmCondition.setFromToDate(LocalDateTime.now(clock), before, diffDays);
 		
-		inquiryList = joinRepositoryCustom.findTeamJoinApplication(confirmCondition, joinDto.getTeamId(), page);
+		inquiryList = joinRepositoryCustom.findJoinApplication(confirmCondition, joinDto.getPlayerId(), joinDto.getTeamId(), page);
 		JoinEntity approval = inquiryList.stream()
 											.filter(d->d.getPlayerId() == joinDto.getPlayerId())
 											.map(d->d.toEntity(d,player,team))
@@ -443,7 +443,7 @@ public class JoinServiceImpl implements JoinService {
 		approvalCondition.setRequesterType(RequesterType.PLAYER);
 		approvalCondition.setStatusType(StatusType.CONFIRMATION);
 		
-		inquiryList = joinRepositoryCustom.findPlayerJoinApplication(approvalCondition, joinDto.getPlayerId(), page);
+		inquiryList = joinRepositoryCustom.findJoinApplication(approvalCondition, joinDto.getPlayerId(), joinDto.getTeamId(), page);
 		
 		// 만일 기존에 확정한 요청이 있다면 확정 요청은 철회한다.
 		if(inquiryList.getTotalElements()>0) {
@@ -464,7 +464,7 @@ public class JoinServiceImpl implements JoinService {
 		clock = Clock.systemDefaultZone();
 		confirmCondition.setFromToDate(LocalDateTime.now(clock), before, diffDays);
 		
-		inquiryList = joinRepositoryCustom.findPlayerJoinApplication(confirmCondition, joinDto.getPlayerId(), page);
+		inquiryList = joinRepositoryCustom.findJoinApplication(confirmCondition, joinDto.getPlayerId(), joinDto.getTeamId(), page);
 		JoinEntity approval = inquiryList.stream()
 											.filter(d->d.getTeamId() == joinDto.getTeamId())
 											.map(d->d.toEntity(d,player,team))
