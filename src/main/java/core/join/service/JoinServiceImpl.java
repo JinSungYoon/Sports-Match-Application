@@ -46,8 +46,7 @@ public class JoinServiceImpl implements JoinService {
 	
 	@Autowired
 	private Clock clock;
-			
-	
+		
 	@Override
 	public JoinDto requestPlayerJoin(Long id, JoinDto joinDto) {
 
@@ -83,7 +82,7 @@ public class JoinServiceImpl implements JoinService {
 		
 		return join.toDto();
 	}
-
+	
 	@Override
 	public JoinDto requestTeamJoin(Long id, JoinDto joinDto) {
 		
@@ -506,21 +505,21 @@ public class JoinServiceImpl implements JoinService {
 	@Override
 	public Page<JoinDto> searchPlayerJoinOffer(Long playerId,JoinSearchCondition condition, Pageable pageable) {
 		Page<JoinDto> rtnList = new PageImpl<>(new ArrayList<>(),pageable,0);
-		rtnList = joinRepositoryCustom.findPlayerJoinOffer(condition, playerId, pageable);
+		rtnList = joinRepositoryCustom.findJoinOffer(condition, playerId, null, pageable);
 		return rtnList;
 	}
 
 	@Override
 	public Page<JoinDto> searchTeamJoinApplication(Long teamId,JoinSearchCondition condition, Pageable pageable) {
 		Page<JoinDto> rtnList = new PageImpl<>(new ArrayList<>(),pageable,0);
-		rtnList = joinRepositoryCustom.findTeamJoinApplication(condition, teamId, pageable);
+		rtnList = joinRepositoryCustom.findJoinApplication(condition, null, teamId, pageable);
 		return rtnList;
 	}
 
 	@Override
 	public Page<JoinDto> searchTeamJoinOffer(Long teamId,JoinSearchCondition condition, Pageable pageable) {
 		Page<JoinDto> rtnList = new PageImpl<>(new ArrayList<>(),pageable,0);
-		rtnList = joinRepositoryCustom.findTeamJoinOffer(condition, teamId, pageable);
+		rtnList = joinRepositoryCustom.findJoinOffer(condition, null, teamId, pageable);
 		return rtnList;
 	}
 		

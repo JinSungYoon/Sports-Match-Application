@@ -167,7 +167,7 @@ public class JoinServiceUnitTest {
 		// mocking
 		when(teamRepository.findById(1L)).thenReturn(Optional.of(rTeam));
 		when(playerRepository.findById(1L)).thenReturn(Optional.of(player));
-		when(joinRepositoryCustom.findJoinApplication(condition, 1L, null, PageRequest.of(0, 1))).thenReturn(searchPage);
+		when(joinRepositoryCustom.findJoinApplication(condition, proposal1.getPlayerId(), proposal1.getTeamId(), PageRequest.of(0, 1))).thenReturn(searchPage);
 		when(joinRepository.save(any())).thenReturn(expectJoin1);
 		JoinDto rtnJoin1 = joinService.requestPlayerJoin(1L,proposal1);
 		
@@ -175,7 +175,7 @@ public class JoinServiceUnitTest {
 		searchPage = new PageImpl<>(searchList,pageRequest,searchList.size());
 		when(teamRepository.findById(1L)).thenReturn(Optional.of(rTeam));
 		when(playerRepository.findById(1L)).thenReturn(Optional.of(player));
-		when(joinRepositoryCustom.findJoinApplication(condition, 1L, null, pageRequest)).thenReturn(searchPage);
+		when(joinRepositoryCustom.findJoinApplication(condition, proposal2.getPlayerId(), proposal2.getTeamId(), pageRequest)).thenReturn(searchPage);
 		
 		// when
 		Exception existProposal = assertThrows(Exception.class,()->joinService.requestPlayerJoin(1L,proposal2));
@@ -370,7 +370,7 @@ public class JoinServiceUnitTest {
 		expectList.add(join3.toDto());
 		Page<JoinDto> expectPage = new PageImpl<>(expectList,page,expectList.size());
 		
-		JoinSearchCondition condition = new JoinSearchCondition(StatusType.PROPOSAL,RequesterType.PLAYER,' ',null,null);
+		JoinSearchCondition condition = new JoinSearchCondition(StatusType.PROPOSAL,RequesterType.PLAYER,'Y',null,null);
 		
 		when(joinRepositoryCustom.findJoinApplication(condition, null ,null, page)).thenReturn(expectPage);
 		
@@ -661,7 +661,6 @@ public class JoinServiceUnitTest {
 		Page<JoinDto> expectConfirmPage = new PageImpl<>(emptyList,page,emptyList.size());
 		
 		JoinSearchCondition approveCondition = new JoinSearchCondition();
-		//Clock clock = Clock.fixed(Instant.parse("2022-11-08T06:08:00.00Z"), ZoneOffset.UTC);
 		Clock clock = Clock.systemDefaultZone();
 		approveCondition.setRequesterType(RequesterType.TEAM);
 		approveCondition.setStatusType(StatusType.APPROVAL);
