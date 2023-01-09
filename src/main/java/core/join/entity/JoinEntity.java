@@ -72,6 +72,7 @@ public class JoinEntity extends BaseEntity {
 		this.requesterType = requesterType;
 		this.team = team;
 		this.player = player;
+		this.activeYN = 'Y' ;
 	}
 	
 	public void updateStatus(StatusType status) {

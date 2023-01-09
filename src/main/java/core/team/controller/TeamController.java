@@ -66,7 +66,7 @@ public class TeamController {
 	
 	// team 가입 제안
 	@PostMapping("/team/{id}/request-join")
-	public ResponseEntity<?> requestJoin(@PathVariable Long id,@RequestBody JoinDto dto){
+	public ResponseEntity<?> requestJoin(@PathVariable Long id,@RequestBody JoinDto dto) throws Exception{
 		return new ResponseEntity<>(joinService.requestTeamJoin(id, dto),HttpStatus.CREATED);
 	}
 	
@@ -76,7 +76,7 @@ public class TeamController {
 		JoinDto joinDto = new JoinDto();
 		joinDto.setTeamId(id);
 		joinDto.setPlayerId(playerId);
-		return new ResponseEntity<>(joinService.rejectTeamJoin(joinDto),HttpStatus.OK);
+		return new ResponseEntity<>(joinService.rejectPlayerJoin(joinDto),HttpStatus.OK);
 	}
 	
 	// team 가입 제안 승인
@@ -85,7 +85,7 @@ public class TeamController {
 		JoinDto joinDto = new JoinDto();
 		joinDto.setTeamId(id);
 		joinDto.setPlayerId(playerId);
-		return new ResponseEntity<>(joinService.approveTeamJoin(joinDto),HttpStatus.OK);
+		return new ResponseEntity<>(joinService.approvePlayerJoin(joinDto),HttpStatus.OK);
 	}
 	
 	// team 가입 제안 철회
@@ -95,6 +95,24 @@ public class TeamController {
 		joinDto.setTeamId(id);
 		joinDto.setPlayerId(playerId);
 		return new ResponseEntity<>(joinService.withdrawTeamApprove(joinDto),HttpStatus.OK);
+	}
+	
+	// team 가입 제안 반려
+	@PatchMapping("/team/{id}/return-join/{playerId}")
+	public ResponseEntity<?> returnJoin(@PathVariable Long id,@PathVariable Long playerId)throws Exception{
+		JoinDto joinDto = new JoinDto();
+		joinDto.setTeamId(id);
+		joinDto.setPlayerId(playerId);
+		return new ResponseEntity<>(joinService.returnTeamApprove(joinDto),HttpStatus.OK);
+	}
+	
+	// team 가입 제안 확정
+	@PatchMapping("/team/{id}/confirm-join/{playerId}")
+	public ResponseEntity<?> confirmJoin(@PathVariable Long id,@PathVariable Long playerId)throws Exception{
+		JoinDto joinDto = new JoinDto();
+		joinDto.setTeamId(id);
+		joinDto.setPlayerId(playerId);
+		return new ResponseEntity<>(joinService.confirmPlayerApprove(joinDto),HttpStatus.OK);
 	}
 	
 	@GetMapping("/team/{id}/search-join-application")

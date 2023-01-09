@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -44,11 +45,10 @@ public class JoinServiceImpl implements JoinService {
 	public final Integer backAndForth = 0;
 	public final Integer diffDays   = 7;
 	
-	@Autowired
 	private Clock clock;
 		
 	@Override
-	public JoinDto requestPlayerJoin(Long id, JoinDto joinDto) {
+	public JoinDto requestPlayerJoin(Long id, JoinDto joinDto) throws Exception {
 
 		if(id != joinDto.getPlayerId()) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"타인의 가입 요청은 할 수 없습니다.",new Exception());
@@ -69,7 +69,12 @@ public class JoinServiceImpl implements JoinService {
 		// 기존에 요청한 제안 중 동일한 대상에게 제안한 활성화된 요청이 있는지 확인한다.
 		inquiryList = joinRepositoryCustom.findJoinApplication(condition, joinDto.getPlayerId(), joinDto.getTeamId(), page);
 		
-		if(inquiryList.getTotalElements()>0) {
+		boolean existJoin = inquiryList.getContent().stream()
+										.filter(d->d.getTeamId() == joinDto.getTeamId())
+										.map(d->d.toEntity(joinDto,player,team))
+										.findFirst().isPresent();
+		
+		if(existJoin) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"이미 요청한 제안입니다.",new Exception());
 		}
 		
@@ -106,7 +111,12 @@ public class JoinServiceImpl implements JoinService {
 		// 기존에 요청한 제안 중 동일한 대상에게 제안한 활성화된 요청이 있는지 확인한다.
 		inquiryList = joinRepositoryCustom.findJoinApplication(condition, joinDto.getPlayerId() ,joinDto.getTeamId(), page);
 		
-		if(inquiryList.getTotalElements()>0) {
+		boolean existJoin = inquiryList.getContent().stream()
+				.filter(d->d.getPlayerId() == joinDto.getPlayerId())
+				.map(d->d.toEntity(joinDto,player,team))
+				.findFirst().isPresent();
+
+		if(existJoin) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"이미 요청한 제안입니다.",new Exception());
 		}
 		

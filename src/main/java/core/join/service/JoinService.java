@@ -11,9 +11,9 @@ import core.join.dto.JoinSearchCondition;
 public interface JoinService {
 
 	// Player 가입 신청
-	JoinDto requestPlayerJoin(Long id,JoinDto joinDto);
+	JoinDto requestPlayerJoin(Long id,JoinDto joinDto) throws Exception;
 	// Team 가입 신청
-	JoinDto requestTeamJoin(Long id,JoinDto joinDto);
+	JoinDto requestTeamJoin(Long id,JoinDto joinDto) throws Exception;
 	// 가입 신청 거절
 	JoinDto rejectPlayerJoin(JoinDto joinDto) throws Exception;
 	// 가입 신청 거절

@@ -76,7 +76,7 @@ public class PlayerController {
 	
 	// player 가입 신청
 	@PostMapping("/player/{id}/request-join")
-	public ResponseEntity<?> requestJoin(@PathVariable Long id,@RequestBody JoinDto dto){
+	public ResponseEntity<?> requestJoin(@PathVariable Long id,@RequestBody JoinDto dto) throws Exception{
 		return new ResponseEntity<>(joinService.requestPlayerJoin(id, dto),HttpStatus.CREATED);
 	}
 	
@@ -86,7 +86,7 @@ public class PlayerController {
 		JoinDto joinDto = new JoinDto();
 		joinDto.setPlayerId(id);
 		joinDto.setTeamId(teamId);
-		return new ResponseEntity<>(joinService.rejectPlayerJoin(joinDto),HttpStatus.OK);
+		return new ResponseEntity<>(joinService.rejectTeamJoin(joinDto),HttpStatus.OK);
 	}
 	
 	// player 가입 제안 승인
@@ -95,16 +95,35 @@ public class PlayerController {
 		JoinDto joinDto = new JoinDto();
 		joinDto.setPlayerId(id);
 		joinDto.setTeamId(teamId);
-		return new ResponseEntity<>(joinService.approvePlayerJoin(joinDto),HttpStatus.OK);
+		return new ResponseEntity<>(joinService.approveTeamJoin(joinDto),HttpStatus.OK);
 	}
 	
-	// player 가입 제안 승인
+	// player 가입 제안 철회
 	@PatchMapping("/player/{id}/withdraw-approve/{teamId}")
 	public ResponseEntity<?> withdrawJoin(@PathVariable Long id,@PathVariable Long teamId) throws Exception{
 		JoinDto joinDto = new JoinDto();
 		joinDto.setPlayerId(id);
 		joinDto.setTeamId(teamId);
 		return new ResponseEntity<>(joinService.withdrawPlayerApprove(joinDto),HttpStatus.OK);
+	}
+	
+	
+	// player 가입 제안 반려
+	@PatchMapping("/player/{id}/return-join/{teamId}")
+	public ResponseEntity<?> returnJoin(@PathVariable Long id,@PathVariable Long teamId) throws Exception{
+		JoinDto joinDto = new JoinDto();
+		joinDto.setPlayerId(id);
+		joinDto.setTeamId(teamId);
+		return new ResponseEntity<>(joinService.returnPlayerApprove(joinDto),HttpStatus.OK);
+	}
+	
+	// player 가입 제안 확정 
+	@PatchMapping("/player/{id}/confirm-join/{teamId}")
+	public ResponseEntity<?> confirmJoin(@PathVariable Long id, @PathVariable Long teamId)throws Exception{
+		JoinDto joinDto = new JoinDto();
+		joinDto.setPlayerId(id);
+		joinDto.setTeamId(teamId);
+		return new ResponseEntity<>(joinService.confirmTeamApprove(joinDto),HttpStatus.OK);
 	}
 	
 	@GetMapping("/player/{id}/search-join-application")
