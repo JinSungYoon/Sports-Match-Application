@@ -40,21 +40,21 @@ import org.springframework.util.MultiValueMap;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
-import core.join.dto.JoinDto;
-import core.join.entity.RequesterType;
-import core.join.entity.StatusType;
-import core.join.repository.JoinRepository;
-import core.join.service.JoinService;
-import core.player.dto.PlayerDto;
-import core.player.dto.PlayerListDto;
-import core.player.entity.BelongType;
-import core.player.entity.PlayerEntity;
-import core.player.repository.PlayerRepository;
-import core.player.service.PlayerService;
-import core.team.dto.TeamDto;
-import core.team.entity.TeamEntity;
-import core.team.repository.TeamRepository;
-import core.team.service.TeamService;
+import core.api.join.dto.JoinDto;
+import core.api.join.entity.RequesterType;
+import core.api.join.entity.StatusType;
+import core.api.join.repository.JoinRepository;
+import core.api.join.service.JoinService;
+import core.api.player.dto.PlayerDto;
+import core.api.player.dto.PlayerListDto;
+import core.api.player.entity.BelongType;
+import core.api.player.entity.PlayerEntity;
+import core.api.player.repository.PlayerRepository;
+import core.api.player.service.PlayerService;
+import core.api.team.dto.TeamDto;
+import core.api.team.entity.TeamEntity;
+import core.api.team.repository.TeamRepository;
+import core.api.team.service.TeamService;
 import lombok.extern.slf4j.Slf4j;
 /**
  * 통합 테스트(모든 Bean들을 똑같이 IoC에 올리고 테스트)

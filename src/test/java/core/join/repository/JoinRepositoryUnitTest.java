@@ -28,16 +28,18 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
-import core.join.dto.JoinDto;
-import core.join.dto.JoinSearchCondition;
-import core.join.entity.JoinEntity;
-import core.join.entity.RequesterType;
-import core.join.entity.StatusType;
-import core.player.entity.BelongType;
-import core.player.entity.PlayerEntity;
-import core.player.repository.PlayerRepository;
-import core.team.entity.TeamEntity;
-import core.team.repository.TeamRepository;
+import core.api.join.dto.JoinDto;
+import core.api.join.dto.JoinSearchCondition;
+import core.api.join.entity.JoinEntity;
+import core.api.join.entity.RequesterType;
+import core.api.join.entity.StatusType;
+import core.api.join.repository.JoinRepository;
+import core.api.join.repository.JoinRepositoryCustom;
+import core.api.player.entity.BelongType;
+import core.api.player.entity.PlayerEntity;
+import core.api.player.repository.PlayerRepository;
+import core.api.team.entity.TeamEntity;
+import core.api.team.repository.TeamRepository;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

@@ -4,6 +4,8 @@ import static com.querydsl.core.types.PathMetadataFactory.*;
 
 import com.querydsl.core.types.dsl.*;
 
+import core.api.team.entity.TeamEntity;
+
 import com.querydsl.core.types.PathMetadata;
 import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
@@ -21,7 +23,7 @@ public class QTeamEntity extends EntityPathBase<TeamEntity> {
 
     public final core.common.entity.QBaseEntity _super = new core.common.entity.QBaseEntity(this);
 
-    public final EnumPath<core.player.entity.BelongType> belongType = createEnum("belongType", core.player.entity.BelongType.class);
+    public final EnumPath<core.api.player.entity.BelongType> belongType = createEnum("belongType", core.api.player.entity.BelongType.class);
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdDate = _super.createdDate;

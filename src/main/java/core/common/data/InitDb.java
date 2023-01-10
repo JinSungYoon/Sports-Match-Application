@@ -7,12 +7,12 @@ import javax.transaction.Transactional;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
-import core.join.entity.JoinEntity;
-import core.join.entity.RequesterType;
-import core.join.entity.StatusType;
-import core.player.entity.BelongType;
-import core.player.entity.PlayerEntity;
-import core.team.entity.TeamEntity;
+import core.api.join.entity.JoinEntity;
+import core.api.join.entity.RequesterType;
+import core.api.join.entity.StatusType;
+import core.api.player.entity.BelongType;
+import core.api.player.entity.PlayerEntity;
+import core.api.team.entity.TeamEntity;
 import lombok.RequiredArgsConstructor;
 
 @Profile("local")

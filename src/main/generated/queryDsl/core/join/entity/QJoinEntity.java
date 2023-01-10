@@ -9,6 +9,10 @@ import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.dsl.PathInits;
 
+import core.api.join.entity.JoinEntity;
+import core.api.join.entity.RequesterType;
+import core.api.join.entity.StatusType;
+
 
 /**
  * QJoinEntity is a Querydsl query type for JoinEntity

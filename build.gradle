@@ -53,6 +53,9 @@ dependencies {
 	// hasSize
 	testImplementation group: 'org.hamcrest', name: 'hamcrest', version: '2.1'
 	
+	// swagger
+	implementation 'io.springfox:springfox-boot-starter:3.0.0'
+	
 	
 	runtimeOnly 'mysql:mysql-connector-java'
 	annotationProcessor 'org.projectlombok:lombok'

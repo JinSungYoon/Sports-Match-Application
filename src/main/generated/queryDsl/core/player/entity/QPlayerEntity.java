@@ -9,6 +9,8 @@ import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.dsl.PathInits;
 
+import core.api.player.entity.PlayerEntity;
+
 
 /**
  * QPlayerEntity is a Querydsl query type for PlayerEntity

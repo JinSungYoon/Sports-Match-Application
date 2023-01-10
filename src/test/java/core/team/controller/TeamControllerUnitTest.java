@@ -32,14 +32,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
-import core.join.dto.JoinDto;
-import core.join.entity.RequesterType;
-import core.join.entity.StatusType;
-import core.join.service.JoinService;
-import core.player.dto.PlayerDto;
-import core.player.entity.BelongType;
-import core.team.dto.TeamDto;
-import core.team.service.TeamService;
+import core.api.join.dto.JoinDto;
+import core.api.join.entity.RequesterType;
+import core.api.join.entity.StatusType;
+import core.api.join.service.JoinService;
+import core.api.player.dto.PlayerDto;
+import core.api.player.entity.BelongType;
+import core.api.team.controller.TeamController;
+import core.api.team.dto.TeamDto;
+import core.api.team.service.TeamService;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

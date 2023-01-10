@@ -19,10 +19,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
-import core.player.entity.BelongType;
-import core.team.dto.TeamDto;
-import core.team.repository.TeamRepository;
-import core.team.repository.TeamRepositoryImpl;
+import core.api.player.entity.BelongType;
+import core.api.team.dto.TeamDto;
+import core.api.team.repository.TeamRepository;
+import core.api.team.repository.TeamRepositoryImpl;
+import core.api.team.service.TeamServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 
 /*

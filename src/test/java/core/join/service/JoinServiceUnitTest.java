@@ -24,19 +24,20 @@ import java.util.Optional;
 import org.assertj.core.api.Assertions;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import core.join.dto.JoinDto;
-import core.join.dto.JoinSearchCondition;
-import core.join.entity.JoinEntity;
-import core.join.entity.RequesterType;
-import core.join.entity.StatusType;
-import core.join.repository.JoinRepository;
-import core.join.repository.JoinRepositoryCustom;
-import core.player.entity.BelongType;
-import core.player.entity.PlayerEntity;
-import core.player.repository.PlayerRepository;
-import core.player.repository.PlayerRepositoryCustom;
-import core.team.entity.TeamEntity;
-import core.team.repository.TeamRepository;
+import core.api.join.dto.JoinDto;
+import core.api.join.dto.JoinSearchCondition;
+import core.api.join.entity.JoinEntity;
+import core.api.join.entity.RequesterType;
+import core.api.join.entity.StatusType;
+import core.api.join.repository.JoinRepository;
+import core.api.join.repository.JoinRepositoryCustom;
+import core.api.join.service.JoinServiceImpl;
+import core.api.player.entity.BelongType;
+import core.api.player.entity.PlayerEntity;
+import core.api.player.repository.PlayerRepository;
+import core.api.player.repository.PlayerRepositoryCustom;
+import core.api.team.entity.TeamEntity;
+import core.api.team.repository.TeamRepository;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -63,7 +64,7 @@ public class JoinServiceUnitTest {
 	
 	@Test
 	@DisplayName("Player 가입 신청 테스트")
-	void requestPlayerJoin() {
+	void requestPlayerJoin() throws Exception {
 		// given
 		TeamEntity rTeam = new TeamEntity("redTeam","Busan",BelongType.CLUB,"We are Red team");
 		TeamEntity gTeam = new TeamEntity("greenTeam","Wonju",BelongType.CLUB,"We are Green team");

@@ -26,8 +26,10 @@ import org.springframework.test.context.ActiveProfiles;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
-import core.player.entity.BelongType;
-import core.team.entity.TeamEntity;
+import core.api.player.entity.BelongType;
+import core.api.team.entity.TeamEntity;
+import core.api.team.repository.TeamRepository;
+import core.api.team.repository.TeamRepositoryCustom;
 
 @DataJpaTest
 @ActiveProfiles("test")

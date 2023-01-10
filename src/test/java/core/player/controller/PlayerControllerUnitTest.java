@@ -33,15 +33,16 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
-import core.join.dto.JoinDto;
-import core.join.entity.RequesterType;
-import core.join.entity.StatusType;
-import core.join.service.JoinService;
-import core.player.dto.PlayerDto;
-import core.player.dto.PlayerListDto;
-import core.player.entity.BelongType;
-import core.player.service.PlayerService;
-import core.team.dto.TeamDto;
+import core.api.join.dto.JoinDto;
+import core.api.join.entity.RequesterType;
+import core.api.join.entity.StatusType;
+import core.api.join.service.JoinService;
+import core.api.player.controller.PlayerController;
+import core.api.player.dto.PlayerDto;
+import core.api.player.dto.PlayerListDto;
+import core.api.player.entity.BelongType;
+import core.api.player.service.PlayerService;
+import core.api.team.dto.TeamDto;
 import lombok.extern.slf4j.Slf4j;
 
 // 단위 테스트(Controller,Filter,ControllerAdvice 관련 로직만 테스트)

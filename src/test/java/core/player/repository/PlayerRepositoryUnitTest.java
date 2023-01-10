@@ -24,11 +24,13 @@ import org.springframework.data.domain.PageRequest;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
-import core.player.entity.BelongType;
-import core.player.entity.PlayerEntity;
-import core.team.entity.TeamEntity;
-import core.team.repository.TeamRepository;
-import core.team.repository.TeamRepositoryCustom;
+import core.api.player.entity.BelongType;
+import core.api.player.entity.PlayerEntity;
+import core.api.player.repository.PlayerRepository;
+import core.api.player.repository.PlayerRepositoryCustom;
+import core.api.team.entity.TeamEntity;
+import core.api.team.repository.TeamRepository;
+import core.api.team.repository.TeamRepositoryCustom;
 import lombok.extern.slf4j.Slf4j;
 
 /* 단위 테스트(DB 관련된 Bean이 IoC에 등록)
