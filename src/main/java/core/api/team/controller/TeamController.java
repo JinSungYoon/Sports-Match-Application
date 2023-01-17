@@ -1,5 +1,7 @@
 package core.api.team.controller;
 
+import java.util.List;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -21,6 +23,9 @@ import core.api.player.entity.BelongType;
 import core.api.team.dto.TeamDto;
 import core.api.team.service.TeamService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
@@ -43,9 +48,12 @@ public class TeamController {
 	
 	// team을 id로 검색
 	@Tag(name ="TEAM API")
-	@Operation(summary = "Search one team",description = "조건에 맞는 한명의 Team을 찾는 API입니다.")
+	@Operation(summary = "Search one team",description = "조건에 맞는 한명의 Team을 찾는 API입니다.",
+				responses = {
+						@ApiResponse(responseCode = "200",description="팀 정보 조회",content = @Content(schema = @Schema(implementation = TeamDto.class)))
+				})
 	@GetMapping("/team/{id}")
-	public ResponseEntity<?> searchOneTeams(@PathVariable Long id){
+	public ResponseEntity<TeamDto> searchOneTeams(@PathVariable Long id){ 
 		return new ResponseEntity<>(teamService.searchTeamById(id),HttpStatus.OK);
 	}
 	
@@ -53,7 +61,7 @@ public class TeamController {
 	@Tag(name ="TEAM API")
 	@Operation(summary = "Search all Team",description = "모든 팀을 찾는 API입니다.")
 	@GetMapping("/teams/all")
-	public ResponseEntity<?> searchAllTeams(@PageableDefault(page = 0, size = 10) Pageable pageable){
+	public ResponseEntity<List<TeamDto>> searchAllTeams(@PageableDefault(page = 0, size = 10) Pageable pageable){
 		return new ResponseEntity<>(teamService.searchAllTeams(pageable),HttpStatus.OK);
 	}
 	
@@ -61,7 +69,7 @@ public class TeamController {
 	@Tag(name ="TEAM API")
 	@Operation(summary = "Search multi-teams",description="조건에 해당하는 다수의 팀을 찾는 API입니다.")
 	@GetMapping("/teams")
-	public ResponseEntity<?> searchTeams(@RequestParam(value="teamName",required=false) String teamName,@RequestParam(value="location",required=false) String location,@RequestParam(value="belongType",required=false) BelongType belongType,@RequestParam(value="introduction",required=false) String introduction,@PageableDefault(page=0,size=10)Pageable pageable){
+	public ResponseEntity<List<TeamDto>> searchTeams(@RequestParam(value="teamName",required=false) String teamName,@RequestParam(value="location",required=false) String location,@RequestParam(value="belongType",required=false) BelongType belongType,@RequestParam(value="introduction",required=false) String introduction,@PageableDefault(page=0,size=10)Pageable pageable){
 		return new ResponseEntity<>(teamService.searchTeams(teamName, location, belongType, introduction,pageable),HttpStatus.OK);
 	}
 	
@@ -69,7 +77,7 @@ public class TeamController {
 	@Tag(name ="TEAM API")
 	@Operation(summary = "Update team information",description="Team의 정보를 업데이트하는 API입니다.")
 	@PatchMapping("/team/{id}")
-	public ResponseEntity<?> updateTeam(@PathVariable Long id,@RequestBody TeamDto dto){
+	public ResponseEntity<TeamDto> updateTeam(@PathVariable Long id,@RequestBody TeamDto dto){
 		return new ResponseEntity<>(teamService.updateTeam(id, dto),HttpStatus.OK);
 	}
 	
@@ -77,7 +85,7 @@ public class TeamController {
 	@Tag(name ="TEAM API")
 	@Operation(summary = "Delete team information",description="Team 정보를 삭제하는 API입니다.")
 	@DeleteMapping("/team/{id}")
-	public ResponseEntity<?> deleteTeam(@PathVariable Long id){
+	public ResponseEntity<Long> deleteTeam(@PathVariable Long id){
 		return new ResponseEntity<>(teamService.deleteTeam(id),HttpStatus.OK);
 	}
 	
@@ -85,7 +93,7 @@ public class TeamController {
 	@Tag(name ="TEAM API")
 	@Operation(summary = "Request join",description="Team이 다른 Player를 가입 제안하는 API입니다.")
 	@PostMapping("/team/{id}/request-join")
-	public ResponseEntity<?> requestJoin(@PathVariable Long id,@RequestBody JoinDto dto) throws Exception{
+	public ResponseEntity<JoinDto> requestJoin(@PathVariable Long id,@RequestBody JoinDto dto) throws Exception{
 		return new ResponseEntity<>(joinService.requestTeamJoin(id, dto),HttpStatus.CREATED);
 	}
 	
@@ -93,7 +101,7 @@ public class TeamController {
 	@Tag(name ="TEAM API")
 	@Operation(summary = "Reject join",description = "Team에게 제안 온 가입제안을 거절하는 API입니다.")
 	@PatchMapping("/team/{id}/reject-join/{playerId}")
-	public ResponseEntity<?> rejectJoin(@PathVariable Long id,@PathVariable Long playerId) throws Exception{
+	public ResponseEntity<JoinDto> rejectJoin(@PathVariable Long id,@PathVariable Long playerId) throws Exception{
 		JoinDto joinDto = new JoinDto();
 		joinDto.setTeamId(id);
 		joinDto.setPlayerId(playerId);
@@ -104,7 +112,7 @@ public class TeamController {
 	@Tag(name ="TEAM API")
 	@Operation(summary = "Approve join",description = "제안 온 가입제안을 승인하는 API입니다.")
 	@PatchMapping("/team/{id}/approve-join/{playerId}")
-	public ResponseEntity<?> approveJoin(@PathVariable Long id,@PathVariable Long playerId) throws Exception{
+	public ResponseEntity<JoinDto> approveJoin(@PathVariable Long id,@PathVariable Long playerId) throws Exception{
 		JoinDto joinDto = new JoinDto();
 		joinDto.setTeamId(id);
 		joinDto.setPlayerId(playerId);
@@ -115,7 +123,7 @@ public class TeamController {
 	@Tag(name ="TEAM API")
 	@Operation(summary = "Withdraw join",description="제안 한 가입제안을 철회하는 API입니다.")
 	@PatchMapping("/team/{id}/withdraw-approve/{playerId}")
-	public ResponseEntity<?> withdrawJoin(@PathVariable Long id,@PathVariable Long playerId) throws Exception{
+	public ResponseEntity<JoinDto> withdrawJoin(@PathVariable Long id,@PathVariable Long playerId) throws Exception{
 		JoinDto joinDto = new JoinDto();
 		joinDto.setTeamId(id);
 		joinDto.setPlayerId(playerId);
@@ -126,7 +134,7 @@ public class TeamController {
 	@Tag(name ="TEAM API")
 	@Operation(summary = "Return join",description ="승인 된 가입제안을 반려하는 API입니다.")
 	@PatchMapping("/team/{id}/return-join/{playerId}")
-	public ResponseEntity<?> returnJoin(@PathVariable Long id,@PathVariable Long playerId)throws Exception{
+	public ResponseEntity<JoinDto> returnJoin(@PathVariable Long id,@PathVariable Long playerId)throws Exception{
 		JoinDto joinDto = new JoinDto();
 		joinDto.setTeamId(id);
 		joinDto.setPlayerId(playerId);
@@ -137,7 +145,7 @@ public class TeamController {
 	@Tag(name ="TEAM API")
 	@Operation(summary = "Confirm join",description = "승인 된 가입제안을 확정하는 API입니다.")
 	@PatchMapping("/team/{id}/confirm-join/{playerId}")
-	public ResponseEntity<?> confirmJoin(@PathVariable Long id,@PathVariable Long playerId)throws Exception{
+	public ResponseEntity<JoinDto> confirmJoin(@PathVariable Long id,@PathVariable Long playerId)throws Exception{
 		JoinDto joinDto = new JoinDto();
 		joinDto.setTeamId(id);
 		joinDto.setPlayerId(playerId);
